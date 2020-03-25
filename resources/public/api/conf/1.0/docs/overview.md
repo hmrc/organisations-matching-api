@@ -1,0 +1,2 @@
+### What is this API for?
+This API is for the Home Office to verify a company's eligibility to sponsor an employee for a working visa. This API returns the records that HMRC holds for the company and allows them to assess the records against their criteria.

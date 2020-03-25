@@ -1,0 +1,39 @@
+#%RAML 1.0
+---
+
+title: Organisations Matching
+version: 1.0
+protocols: [ HTTPS ]
+baseUri: https://api.service.hmrc.gov.uk/
+
+documentation:
+ - title: Overview
+   content: !include docs/overview.md
+ - title: Versioning
+   content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/versioning.md
+ - title: Errors
+   content: !include https://developer.service.hmrc.gov.uk/api-documentation/assets/common/docs/errors.md
+
+mediaType: [ application/json, application/hal+json ]
+
+uses:
+  sec: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/securitySchemes.raml
+  headers: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/headers.raml
+  annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
+  types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
+
+/organisations:
+  /matching:
+    post:
+      displayName: Submit an Organisation Matching Request
+      description: This endpoint takes a JSON body that contains an Organisation's CRN and Postcode in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
+      is: [headers.acceptHeader, headers.contentHeader]
+      securedBy: [sec.x-application]
+      body:
+        application/json:
+          type: !include schemas/organisation-matching-request.json
+          example: !include examples/organisation-matching-request-example.json
+      responses:
+        200:
+        400:
+        404:
