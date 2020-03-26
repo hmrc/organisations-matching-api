@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "description": "Partnership's UTR and known facts",
+  "required": [
+    "utr",
+    "name",
+    "address",
+    "postcode"
+  ],
+  "properties": {
+    "utr": {
+      "type": "string",
+      "description": "Partnership's UTR",
+      "pattern": "^[0-9]{10}$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Partnership name"
+    },
+    "address": {
+      "type": "object",
+      "description": "Partnership address",
+      "required": [
+        "addressLine1"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "addressLine3": {
+          "type": "string"
+        },
+        "addressLine4": {
+          "type": "string"
+        }
+      }
+    },
+    "postcode": {
+      "type": "string",
+      "description": "Partnership's postcode"
+    }
+  }
+}

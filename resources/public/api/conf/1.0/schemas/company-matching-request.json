@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "description": "Company's CRN and known facts",
+  "required": [
+    "crn",
+    "name",
+    "address",
+    "postcode"
+  ],
+  "properties": {
+    "crn": {
+      "type": "string",
+      "description": "Company Registration Number",
+      "pattern": "^([A-Za-z0-9]{0,2})?([0-9]{1,6})$"
+    },
+    "name": {
+      "type": "string",
+      "description": "Company name"
+    },
+    "address": {
+      "type": "object",
+      "description": "Company address",
+      "required": [
+        "addressLine1"
+      ],
+      "properties": {
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "addressLine3": {
+          "type": "string"
+        },
+        "addressLine4": {
+          "type": "string"
+        }
+      }
+    },
+    "postcode": {
+      "type": "string",
+      "description": "Company's postcode"
+    }
+  }
+}

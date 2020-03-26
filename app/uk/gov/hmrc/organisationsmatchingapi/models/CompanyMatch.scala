@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.models
 
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.UUID.randomUUID
+
 import play.api.libs.json.Json
 
-case class OrganisationMatchingRequest(crn: String, postcode: String)
+case class CompanyMatch(crn: String, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
 
-object OrganisationMatchingRequest {
-  implicit val formats = Json.format[OrganisationMatchingRequest]
+object CompanyMatch {
+  implicit val formats = Json.format[CompanyMatch]
 }

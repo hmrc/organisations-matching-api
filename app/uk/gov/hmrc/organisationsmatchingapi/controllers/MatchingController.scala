@@ -21,7 +21,7 @@ import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.actions.{PrivilegedAuthAction, ValidatedAction, VersionTransformer}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.models.OrganisationMatchingRequest
+import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatchingRequest, PartnershipMatchingRequest}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -33,14 +33,26 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    validatedAction: ValidatedAction,
                                    versionTransformer: VersionTransformer) extends BaseApiController(cc) with ErrorHandling {
 
-  val organisationMatchingRequestSchema = loadVersionedSchemas("organisation-matching-request.json")
+  val companyMatchingRequestSchema = loadVersionedSchemas("company-matching-request.json")
+  val partnershipMatchingRequestSchema = loadVersionedSchemas("partnership-matching-request.json")
 
-  def matchOrganisation = privilegedAuthAction
+  def matchCompany = privilegedAuthAction
     .andThen(validatedAction)
     .andThen(versionTransformer).async(parse.json) { implicit request =>
     handleErrors {
-      withVersionedJsonBody[OrganisationMatchingRequest](organisationMatchingRequestSchema) {
-        orgMatchRequest =>
+      withVersionedJsonBody[CompanyMatchingRequest](companyMatchingRequestSchema) {
+        matchRequest =>
+          Future successful Ok
+      }
+    }
+  }
+
+  def matchPartnership = privilegedAuthAction
+    .andThen(validatedAction)
+    .andThen(versionTransformer).async(parse.json) { implicit request =>
+    handleErrors {
+      withVersionedJsonBody[PartnershipMatchingRequest](partnershipMatchingRequestSchema) {
+        matchRequest =>
           Future successful Ok
       }
     }

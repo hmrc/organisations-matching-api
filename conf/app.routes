@@ -1,3 +1,4 @@
 # microservice specific routes
 
-POST        /             uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisation
+POST        /company            uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCompany
+POST        /partnership        uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchPartnership

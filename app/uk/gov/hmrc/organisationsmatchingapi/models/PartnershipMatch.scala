@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.models
 
+import java.time.LocalDateTime
 import java.util.UUID
+import java.util.UUID.randomUUID
 
-import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json}
+import play.api.libs.json.Json
 
-object JsonFormatters {
+case class PartnershipMatch(crn: String, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
 
-  implicit val uuidJsonFormat = new Format[UUID] {
-    override def writes(uuid: UUID) = JsString(uuid.toString)
-
-    override def reads(json: JsValue) =
-      JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
-  }
-
+object PartnershipMatch {
+  implicit val formats = Json.format[PartnershipMatch]
 }
+
+

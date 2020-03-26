@@ -14,19 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.services
 
-import java.util.UUID
-
-import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json}
-
-object JsonFormatters {
-
-  implicit val uuidJsonFormat = new Format[UUID] {
-    override def writes(uuid: UUID) = JsString(uuid.toString)
-
-    override def reads(json: JsValue) =
-      JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
-  }
+class MatchingService {
 
 }
