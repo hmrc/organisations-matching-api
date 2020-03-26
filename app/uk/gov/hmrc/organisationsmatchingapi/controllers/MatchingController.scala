@@ -19,25 +19,29 @@ package uk.gov.hmrc.organisationsmatchingapi.controllers
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.actions.{ValidatedAction, VersionTransformer}
-import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, OrganisationMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.actions.{PrivilegedAuthAction, ValidatedAction, VersionTransformer}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
+import uk.gov.hmrc.organisationsmatchingapi.models.OrganisationMatchingRequest
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class MatchingController @Inject()(val authConnector: AuthConnector, cc: ControllerComponents, validatedAction: ValidatedAction, versionTransformer: VersionTransformer) extends BaseApiController(cc) {
+class MatchingController @Inject()(val authConnector: AuthConnector,
+                                   cc: ControllerComponents,
+                                   privilegedAuthAction: PrivilegedAuthAction,
+                                   validatedAction: ValidatedAction,
+                                   versionTransformer: VersionTransformer) extends BaseApiController(cc) with ErrorHandling {
 
   val organisationMatchingRequestSchema = loadVersionedSchemas("organisation-matching-request.json")
 
-  def matchOrganisation = Action.async(parse.json) { implicit request =>
-    withPrivilegedAuth {
-      validatedAction.andThen(versionTransformer).async(parse.json) { implicit request =>
-        handleErrors {
-          withVersionedJsonBody[OrganisationMatchingRequest](organisationMatchingRequestSchema) {
-            orgMatchRequest =>
-              Future successful Ok()
-          }
-        }
+  def matchOrganisation = privilegedAuthAction
+    .andThen(validatedAction)
+    .andThen(versionTransformer).async(parse.json) { implicit request =>
+    handleErrors {
+      withVersionedJsonBody[OrganisationMatchingRequest](organisationMatchingRequestSchema) {
+        orgMatchRequest =>
+          Future successful Ok
       }
     }
   }
