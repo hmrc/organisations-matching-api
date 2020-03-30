@@ -1,0 +1,12 @@
+{
+  "_links": {
+    "company": {
+      "href": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "type": "GET"
+    },
+    "self": {
+      "href": "/organisations/matching/partnership/",
+      "type": "POST"
+    }
+  }
+}

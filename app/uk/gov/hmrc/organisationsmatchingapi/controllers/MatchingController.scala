@@ -16,12 +16,15 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
+import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.actions.{PrivilegedAuthAction, ValidatedAction, VersionTransformer}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatchingRequest, PartnershipMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -31,14 +34,17 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
                                    privilegedAuthAction: PrivilegedAuthAction,
                                    validatedAction: ValidatedAction,
-                                   versionTransformer: VersionTransformer) extends BaseApiController(cc) with ErrorHandling {
+                                   versionTransformer: VersionTransformer,
+                                   matchingService: MatchingService) extends BaseApiController(cc) with ErrorHandling {
 
   val companyMatchingRequestSchema = loadVersionedSchemas("company-matching-request.json")
   val partnershipMatchingRequestSchema = loadVersionedSchemas("partnership-matching-request.json")
 
-  def matchCompany = privilegedAuthAction
+  private def commonAction = privilegedAuthAction
     .andThen(validatedAction)
-    .andThen(versionTransformer).async(parse.json) { implicit request =>
+    .andThen(versionTransformer)
+
+  def matchCompany = commonAction.async(parse.json) { implicit request =>
     handleErrors {
       withVersionedJsonBody[CompanyMatchingRequest](companyMatchingRequestSchema) {
         matchRequest =>
@@ -47,14 +53,24 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def matchPartnership = privilegedAuthAction
-    .andThen(validatedAction)
-    .andThen(versionTransformer).async(parse.json) { implicit request =>
+  def matchedCompany(matchId: UUID) = commonAction.async { implicit request =>
+    handleErrors {
+      Future successful Ok
+    }
+  }
+
+  def matchPartnership = commonAction.async(parse.json) { implicit request =>
     handleErrors {
       withVersionedJsonBody[PartnershipMatchingRequest](partnershipMatchingRequestSchema) {
         matchRequest =>
           Future successful Ok
       }
+    }
+  }
+
+  def matchedPartnership(matchId: UUID) = commonAction.async { implicit request =>
+    handleErrors {
+      Future successful Ok
     }
   }
 

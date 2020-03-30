@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "details": {
+      "href": "/organisations/details/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "type": "GET"
+    },
+    "self": {
+      "href": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "type": "GET"
+    }
+  },
+  "details": {
+    "utr": "1234567890",
+    "name": "Example Partnership",
+    "address": {
+      "addressLine1": "123 Long Road",
+      "addressLine2": "Some City",
+      "addressLine3": "Some County",
+      "addressLine4": ""
+    },
+    "postcode": "AB12 3CD"
+  }
+}

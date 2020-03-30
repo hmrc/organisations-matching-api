@@ -32,6 +32,10 @@ object ErrorResponse {
 
   case object BadRequest
     extends ErrorResponse(400, "BAD_REQUEST", "Bad request")
+  case object Unauthorized
+    extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
+  case object MatchingFailed
+    extends ErrorResponse(403, "MATCHING_FAILED", "There is no match for the information provided")
   case object NotFound
     extends ErrorResponse(404, "NOT_FOUND", "Resource was not found")
   case object InvalidAcceptHeader

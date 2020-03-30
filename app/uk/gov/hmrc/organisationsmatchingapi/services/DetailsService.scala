@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.services
 
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.UUID.randomUUID
+class DetailsService {
 
-import play.api.libs.json.Json
-
-case class CompanyMatch(request: CompanyMatchingRequest, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
-
-object CompanyMatch {
-  implicit val formats = Json.format[CompanyMatch]
 }

@@ -22,7 +22,7 @@ import java.util.UUID.randomUUID
 
 import play.api.libs.json.Json
 
-case class PartnershipMatch(crn: String, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
+case class PartnershipMatch(request: PartnershipMatchingRequest, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
 
 object PartnershipMatch {
   implicit val formats = Json.format[PartnershipMatch]

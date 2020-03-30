@@ -16,6 +16,30 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
-class MatchingService {
+import java.util.UUID
+
+import javax.inject.Inject
+import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatch, CompanyMatchingRequest, PartnershipMatch, PartnershipMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.repository.{CompanyMatchRepository, PartnershipMatchRepository}
+
+class MatchingService @Inject()(companyMatchRepository: CompanyMatchRepository, partnershipMatchRepository: PartnershipMatchRepository) {
+
+  def matchCompany(request: CompanyMatchingRequest) = {
+    //TODO Call DES API 1164
+    CompanyMatch(request)
+  }
+
+  def getCompanyMatch(matchId: UUID) = {
+    companyMatchRepository.read(matchId)
+  }
+
+  def matchPartnership(request: PartnershipMatchingRequest) = {
+    //TODO call DES API 1164
+    PartnershipMatch(request)
+  }
+
+  def getPartnershipMatch(matchId: UUID) = {
+    partnershipMatchRepository.read(matchId)
+  }
 
 }

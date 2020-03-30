@@ -1,4 +1,7 @@
-# microservice specific routes
+POST        /matching/company                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCompany
+GET         /matching/company/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedCompany(matchId: java.util.UUID)
+GET         /details/company/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.companyDetails(matchId: java.util.UUID)
 
-POST        /company            uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCompany
-POST        /partnership        uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchPartnership
+POST        /matching/partnership            uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchPartnership
+GET         /matching/partnership/:matchId   uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedPartnership(matchId: java.util.UUID)
+GET         /details/company/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.partnershipDetails(matchId: java.util.UUID)

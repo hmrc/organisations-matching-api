@@ -12,7 +12,7 @@
   "api":{
     "name":"Organisations Matching",
     "description":"Match an organisation against HMRC's records",
-    "context":"organisations/matching",
+    "context":"organisations/",
     "versions":[
       {
         "version":"1.0",

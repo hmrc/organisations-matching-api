@@ -41,21 +41,6 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
     HeaderCarrierConverter.fromHeadersAndSessionAndRequest(rh.headers,
       request = Some(rh))
 
-  def withPrivilegedAuth(body: => Future[Result])(implicit hc: HeaderCarrier): Future[Result] =
-    authorised(AuthProviders(PrivilegedApplication) and Enrolment("read:organisations-matching")) {
-      body
-    }.recover {
-      case _: NoActiveSession =>
-        logger.warn(s"user not logged in")
-        Unauthorized
-      case _: InsufficientEnrolments =>
-        logger.warn(s"stride user doesn't have permission to terminate an agent")
-        Forbidden
-      case _: UnsupportedAuthProvider =>
-        logger.warn(s"user logged in with unsupported auth provider")
-        Forbidden
-    }
-
   def withValidJson[T](f: T => Future[Result])(implicit ec: ExecutionContext,
                                                hc: HeaderCarrier,
                                                request: Request[JsValue],
