@@ -1,6 +1,6 @@
 {
   "_links": {
-    "company": {
+    "partnership": {
       "href": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "type": "GET"
     },

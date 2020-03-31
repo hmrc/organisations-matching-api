@@ -5,7 +5,7 @@
     "_links": {
       "type": "object",
       "properties": {
-        "company": {
+        "partnership": {
           "type": "object",
           "description": "URI to get company links",
           "properties": {

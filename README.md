@@ -1,7 +1,7 @@
 
 # organisations-matching-api
 
-This is a placeholder README.md for a new repository
+API Documentation can be viewed [here](docs/organisations-matching.md)
 
 ### License
 
