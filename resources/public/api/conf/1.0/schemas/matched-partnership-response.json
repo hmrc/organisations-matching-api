@@ -1,0 +1,75 @@
+{
+  "type": "object",
+  "description": "Matched Partnership Details and links to other resources",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "properties": {
+        "details": {
+          "type": "object",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/organisations/details/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            },
+            "type": {
+              "type": "string",
+              "example": "GET"
+            }
+          }
+        },
+        "self": {
+          "type": "object",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            },
+            "type": {
+              "type": "string",
+              "example": "GET"
+            }
+          }
+        }
+      }
+    },
+    "details": {
+      "type": "object",
+      "properties": {
+        "utr": {
+          "type": "string",
+          "example": "1234567890"
+        },
+        "name": {
+          "type": "string",
+          "example": "Example Partnership"
+        },
+        "address": {
+          "type": "object",
+          "properties": {
+            "addressLine1": {
+              "type": "string",
+              "example": "123 Long Road"
+            },
+            "addressLine2": {
+              "type": "string",
+              "example": "Some City"
+            },
+            "addressLine3": {
+              "type": "string",
+              "example": "Some County"
+            },
+            "addressLine4": {
+              "type": "string",
+              "example": ""
+            }
+          }
+        },
+        "postcode": {
+          "type": "string",
+          "example": "AB12 3CD"
+        }
+      }
+    }
+  }
+}

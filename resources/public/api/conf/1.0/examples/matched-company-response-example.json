@@ -1,0 +1,23 @@
+{
+  "_links": {
+    "details": {
+      "href": "/organisations/details/company/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "type": "GET"
+    },
+    "self": {
+      "href": "/organisations/matching/company/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "type": "GET"
+    }
+  },
+  "details": {
+    "crn": "AA123456",
+    "name": "Example Company Ltd",
+    "address": {
+      "addressLine1": "123 Long Road",
+      "addressLine2": "Some City",
+      "addressLine3": "Some County",
+      "addressLine4": ""
+    },
+    "postcode": "AB12 3CD"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "type": "object",
+  "description": "Partnership Matching Response",
+  "properties": {
+    "_links": {
+      "type": "object",
+      "properties": {
+        "partnership": {
+          "type": "object",
+          "description": "URI to get company links",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            },
+            "type": {
+              "type": "string",
+              "example": "GET"
+            }
+          }
+        },
+        "self": {
+          "type": "object",
+          "description": "URI to this resource",
+          "properties": {
+            "href": {
+              "type": "string",
+              "example": "/organisations/matching/partnership/"
+            },
+            "type": {
+              "type": "string",
+              "example": "POST"
+            }
+          }
+        }
+      }
+    }
+  }
+}

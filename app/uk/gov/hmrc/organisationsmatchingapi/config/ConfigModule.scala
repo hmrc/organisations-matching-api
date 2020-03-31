@@ -16,15 +16,16 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.config
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import com.google.inject.AbstractModule
+import play.api.{Configuration, Environment}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
+import uk.gov.hmrc.play.bootstrap.http.{DefaultHttpClient, HttpClient}
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+class ConfigModule(environment: Environment, configuration: Configuration) extends AbstractModule {
+  override def configure(): Unit = {
+    bind(classOf[HttpClient]).to(classOf[DefaultHttpClient])
+    bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
-
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
+  }
 }

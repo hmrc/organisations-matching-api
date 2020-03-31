@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.config
+package uk.gov.hmrc.organisationsmatchingapi.models
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.UUID.randomUUID
 
-@Singleton
-class AppConfig @Inject()(config: Configuration, servicesConfig: ServicesConfig) {
+import play.api.libs.json.Json
 
-  val authBaseUrl: String = servicesConfig.baseUrl("auth")
+case class PartnershipMatch(request: PartnershipMatchingRequest, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
 
-  val auditingEnabled: Boolean = config.get[Boolean]("auditing.enabled")
-  val graphiteHost: String     = config.get[String]("microservice.metrics.graphite.host")
+object PartnershipMatch {
+  implicit val formats = Json.format[PartnershipMatch]
 }
+
+

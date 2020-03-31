@@ -1,0 +1,28 @@
+@import play.api.libs.json.Json
+@(whitelistedApplicationIds: Seq[String])
+
+{
+  "scopes":[
+    {
+      "key":"read:organisations-matching-api",
+      "name":"Match an organisation using their details",
+      "description":"Organisations Matching API"
+    }
+  ],
+  "api":{
+    "name":"Organisations Matching",
+    "description":"Match an organisation against HMRC's records",
+    "context":"organisations/",
+    "versions":[
+      {
+        "version":"1.0",
+        "status":"STABLE",
+        "endpointsEnabled": true,
+        "access": {
+          "type": "PRIVATE",
+          "whitelistedApplicationIds": @Json.toJson(whitelistedApplicationIds)
+        }
+      }
+    ]
+  }
+}
