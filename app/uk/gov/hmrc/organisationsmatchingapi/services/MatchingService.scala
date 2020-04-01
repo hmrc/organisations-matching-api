@@ -19,27 +19,27 @@ package uk.gov.hmrc.organisationsmatchingapi.services
 import java.util.UUID
 
 import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatch, CompanyMatchingRequest, PartnershipMatch, PartnershipMatchingRequest}
-import uk.gov.hmrc.organisationsmatchingapi.repository.{CompanyMatchRepository, PartnershipMatchRepository}
+import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, CrnMatchingRequest, SaUtrMatch, SaUtrMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.repository.{CrnMatchRepository, SaUtrMatchRepository}
 
-class MatchingService @Inject()(companyMatchRepository: CompanyMatchRepository, partnershipMatchRepository: PartnershipMatchRepository) {
+class MatchingService @Inject()(crnMatchRepository: CrnMatchRepository, saUtrMatchRepository: SaUtrMatchRepository) {
 
-  def matchCompany(request: CompanyMatchingRequest) = {
+  def matchCrn(request: CrnMatchingRequest) = {
     //TODO Call DES API 1164
-    CompanyMatch(request)
+    CrnMatch(request)
   }
 
-  def getCompanyMatch(matchId: UUID) = {
-    companyMatchRepository.read(matchId)
+  def getCrnMatch(matchId: UUID) = {
+    crnMatchRepository.read(matchId)
   }
 
-  def matchPartnership(request: PartnershipMatchingRequest) = {
+  def matchSaUtr(request: SaUtrMatchingRequest) = {
     //TODO call DES API 1164
-    PartnershipMatch(request)
+    SaUtrMatch(request)
   }
 
-  def getPartnershipMatch(matchId: UUID) = {
-    partnershipMatchRepository.read(matchId)
+  def getSaUtrMatch(matchId: UUID) = {
+    saUtrMatchRepository.read(matchId)
   }
 
 }

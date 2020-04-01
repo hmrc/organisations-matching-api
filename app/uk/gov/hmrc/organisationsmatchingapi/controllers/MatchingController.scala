@@ -23,7 +23,7 @@ import play.api.mvc.ControllerComponents
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.actions.{PrivilegedAuthAction, ValidatedAction, VersionTransformer}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatchingRequest, PartnershipMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatchingRequest, SaUtrMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -37,40 +37,28 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    versionTransformer: VersionTransformer,
                                    matchingService: MatchingService) extends BaseApiController(cc) with ErrorHandling {
 
-  val companyMatchingRequestSchema = loadVersionedSchemas("company-matching-request.json")
-  val partnershipMatchingRequestSchema = loadVersionedSchemas("partnership-matching-request.json")
+  val crnMatchingRequestSchema = loadVersionedSchemas("crn-matching-request.json")
+  val saUtrMatchingRequestSchema = loadVersionedSchemas("sautr-matching-request.json")
 
   private def commonAction = privilegedAuthAction
     .andThen(validatedAction)
     .andThen(versionTransformer)
 
-  def matchCompany = commonAction.async(parse.json) { implicit request =>
+  def matchCrn = commonAction.async(parse.json) { implicit request =>
     handleErrors {
-      withVersionedJsonBody[CompanyMatchingRequest](companyMatchingRequestSchema) {
+      withVersionedJsonBody[CrnMatchingRequest](crnMatchingRequestSchema) {
         matchRequest =>
           Future successful Ok
       }
     }
   }
 
-  def matchedCompany(matchId: UUID) = commonAction.async { implicit request =>
+  def matchSaUtr = commonAction.async(parse.json) { implicit request =>
     handleErrors {
-      Future successful Ok
-    }
-  }
-
-  def matchPartnership = commonAction.async(parse.json) { implicit request =>
-    handleErrors {
-      withVersionedJsonBody[PartnershipMatchingRequest](partnershipMatchingRequestSchema) {
+      withVersionedJsonBody[SaUtrMatchingRequest](saUtrMatchingRequestSchema) {
         matchRequest =>
           Future successful Ok
       }
-    }
-  }
-
-  def matchedPartnership(matchId: UUID) = commonAction.async { implicit request =>
-    handleErrors {
-      Future successful Ok
     }
   }
 

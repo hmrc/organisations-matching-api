@@ -40,13 +40,13 @@ class DetailsController @Inject()(val authConnector: AuthConnector,
     .andThen(validatedAction)
     .andThen(versionTransformer)
 
-  def companyDetails(matchId: UUID) = commonAction.async { implicit request =>
+  def crnDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]) = commonAction.async { implicit request =>
     handleErrors {
       Future successful Ok
     }
   }
 
-  def partnershipDetails(matchId: UUID) = commonAction.async { implicit request =>
+  def saUtrDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]) = commonAction.async { implicit request =>
     handleErrors {
       Future successful Ok
     }

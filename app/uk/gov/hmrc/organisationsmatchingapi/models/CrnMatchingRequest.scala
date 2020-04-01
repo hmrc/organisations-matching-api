@@ -18,8 +18,8 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-case class CompanyMatchingRequest(crn: String, name: String, address: Address, postcode: String)
+case class CrnMatchingRequest(crn: String, name: String, address: Address, postcode: String)
 
-object CompanyMatchingRequest {
-  implicit val formats = Json.format[CompanyMatchingRequest]
+object CrnMatchingRequest {
+  implicit val formats = Json.format[CrnMatchingRequest]
 }

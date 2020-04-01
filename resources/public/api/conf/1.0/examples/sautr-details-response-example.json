@@ -1,0 +1,22 @@
+{
+  "details": [
+    {
+      "year": 2017,
+      "turnover": 1000000.00,
+      "registrationDate": "2001-01-01",
+      "taxSolvencyStatus": "S"
+    },
+    {
+      "year": 2018,
+      "turnover": 1500000.00,
+      "registrationDate": "2001-01-01",
+      "taxSolvencyStatus": "S"
+    },
+    {
+      "year": 2019,
+      "turnover": 2000000.00,
+      "registrationDate": "2001-01-01",
+      "taxSolvencyStatus": "S"
+    }
+  ]
+}

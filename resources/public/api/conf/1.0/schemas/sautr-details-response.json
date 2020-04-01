@@ -1,0 +1,35 @@
+{
+  "tyoe": "object",
+  "properties": {
+    "details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "year": {
+            "type": "number",
+            "example": 2019
+          },
+          "turnover": {
+            "type": "number",
+            "example": 1000000.00
+          },
+          "registrationDate": {
+            "type": "string",
+            "example": "2001-01-01"
+          },
+          "taxSolvencyStatus": {
+            "type": "string",
+            "description": "S = Solvent, I = Insolvent, A = Administration Order, V = Voluntary Arrangement",
+            "enum": [
+              "S",
+              "I",
+              "A",
+              "V"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

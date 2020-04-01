@@ -23,10 +23,10 @@ uses:
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
 /organisations:
-  /matching/company:
+  /matching/crn:
     /:
       post:
-        displayName: Submit an Organisation Matching Request For a Company
+        displayName: CRN Matching Request
         description: This endpoint takes a JSON body that contains a Company's CRN and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
@@ -44,15 +44,15 @@ uses:
             example: application/json
         body:
           application/json:
-            type: !include schemas/company-matching-request.json
-            example: !include examples/company-matching-request-example.json
+            type: !include schemas/crn-matching-request.json
+            example: !include examples/crn-matching-request-example.json
         responses:
           200:
-            description: The available resources to retrieve the matched organisation's details
+            description: Returns a matchId which can be used to make calls to details endpoints
             body:
               application/json:
-                type: !include schemas/company-matching-response.json
-                example: !include examples/company-matching-response-example.json
+                type: !include schemas/crn-matching-response.json
+                example: !include examples/crn-matching-response-example.json
           400:
             body:
               application/json:
@@ -71,45 +71,11 @@ uses:
                     description: The organisation's details provided did not match with HMRC's records
                     value:
                       code: MATCHING_FAILED
-    /{matchId}:
-      uriParameters:
-        matchId:
-          description: A short-lived UUID, typically valid for several hours
-          type: string
-          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
-      get:
-        displayName: Retrieve matched Company's details and links to other resources
-        description: This endpoint takes a matchId and returns the details held against the match, as well as links to other resources
-        is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
-        headers:
-          Authorization:
-            description: OAuth 2.0 Bearer Token with the read:individuals-matching scope.
-            type: string
-            required: true
-            example: Bearer <BEARER_TOKEN>
-        responses:
-          200:
-            description: The organisation's details for a given matchId
-            body:
-              application/json:
-                type: !include schemas/matched-company-response.json
-                example: !include examples/matched-company-response-example.json
-          404:
-            body:
-              application/json:
-                type: types.errorResponse
-                examples:
-                  NotFound:
-                    description: Not Found
-                    value:
-                      code: NOT_FOUND
-  /matching/partnership:
+  /matching/sautr:
     /:
       post:
-        displayName: Submit an Organisation Matching Request For a Partnership
-        description: This endpoint takes a JSON body that contains a Partnership's UTR and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
+        displayName: SAUTR Matching Request
+        description: This endpoint takes a JSON body that contains a UTR, Organisation Type and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
@@ -126,15 +92,15 @@ uses:
             example: application/json
         body:
           application/json:
-            type: !include schemas/partnership-matching-request.json
-            example: !include examples/partnership-matching-request-example.json
+            type: !include schemas/sautr-matching-request.json
+            example: !include examples/sautr-matching-request-example.json
         responses:
           200:
-            description: The available resources to retrieve the matched organisation's details
+            description: Returns a matchId which can be used to make calls to details endpoints
             body:
               application/json:
-                type: !include schemas/partnership-matching-response.json
-                example: !include examples/partnership-matching-response-example.json
+                type: !include schemas/sautr-matching-response.json
+                example: !include examples/sautr-matching-response-example.json
           400:
             body:
               application/json:
@@ -153,49 +119,15 @@ uses:
                     description: The organisation's details provided did not match with HMRC's records
                     value:
                       code: MATCHING_FAILED
+  /details/crn:
     /{matchId}:
       uriParameters:
         matchId:
-          description: A short-lived UUID, typically valid for several hours
+          description: A short-lived UUID, typically valid for 5 hours
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: Retrieve matched Partnership's details and links to other resources
-        description: This endpoint takes a matchId and returns the details held against the match, as well as links to other resources
-        is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
-        headers:
-          Authorization:
-            description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
-            type: string
-            required: true
-            example: Bearer <BEARER_TOKEN>
-        responses:
-          200:
-            description: The organisation's details for a given matchId
-            body:
-              application/json:
-                type: !include schemas/matched-partnership-response.json
-                example: !include examples/matched-partnership-response-example.json
-          404:
-            body:
-              application/json:
-                type: types.errorResponse
-                examples:
-                  NotFound:
-                    description: Not Found
-                    value:
-                      code: NOT_FOUND
-  /details/company:
-    /{matchId}:
-      uriParameters:
-        matchId:
-          description: A short-lived UUID, typically valid for several hours
-          type: string
-          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
-      get:
-        displayName: Retrieve matched Company's details
+        displayName: CRN Details
         description: This endpoint takes a matchId and returns corporation tax information for the company
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
@@ -206,13 +138,26 @@ uses:
             type: string
             required: true
             example: Bearer <BEARER_TOKEN>
+        queryParameters:
+          fromYear:
+            displayName: From Year
+            type: number
+            description: The earliest Tax Year from which you would like details
+            example: 2017
+            required: true
+          toYear:
+            displayName: To Year
+            type: number
+            description: The latest Tax Year from which you would like details, if not provided then current year will be used
+            example: 2019
+            required: false
         responses:
           200:
             description: The company's Corporation Tax details
             body:
               application/json:
-                type: !include schemas/company-details-response.json
-                example: !include examples/company-details-response-example.json
+                type: !include schemas/crn-details-response.json
+                example: !include examples/crn-details-response-example.json
           404:
             body:
               application/json:
@@ -222,7 +167,7 @@ uses:
                     description: Not Found
                     value:
                       code: NOT_FOUND
-  /details/partnership:
+  /details/sautr:
     /{matchId}:
       uriParameters:
         matchId:
@@ -230,8 +175,8 @@ uses:
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: Retrieve matched Partnership's details
-        description: This endpoint takes a matchId and returns self assessment information for the partnership
+        displayName: SAUTR Details
+        description: This endpoint takes a matchId and returns self assessment information for the organisation
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
@@ -241,13 +186,26 @@ uses:
             type: string
             required: true
             example: Bearer <BEARER_TOKEN>
+        queryParameters:
+          fromYear:
+            displayName: From Year
+            type: number
+            description: The earliest Tax Year from which you would like details
+            example: 2017
+            required: true
+          toYear:
+            displayName: To Year
+            type: number
+            description: The latest Tax Year from which you would like details, if not provided then current year will be used
+            example: 2019
+            required: false
         responses:
           200:
-            description: The Partnership's Self Assessment details
+            description: The Organisation's Self Assessment details
             body:
               application/json:
-                type: !include schemas/partnership-details-response.json
-                example: !include examples/partnership-details-response-example.json
+                type: !include schemas/sautr-details-response.json
+                example: !include examples/sautr-details-response-example.json
           404:
             body:
               application/json:
