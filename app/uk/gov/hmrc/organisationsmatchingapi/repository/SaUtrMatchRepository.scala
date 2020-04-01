@@ -29,18 +29,18 @@ import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
 import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatch, JsonFormatters, PartnershipMatch}
+import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, JsonFormatters, SaUtrMatch}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class PartnershipMatchRepository @Inject()(mongo: ReactiveMongoComponent,
-                                           config: Configuration)
-  extends ReactiveRepository[PartnershipMatch, UUID] (
-    "partnership-match",
+class SaUtrMatchRepository @Inject()(mongo: ReactiveMongoComponent,
+                                     config: Configuration)
+  extends ReactiveRepository[SaUtrMatch, UUID] (
+    "sautr-match",
     mongo.mongoConnector.db,
-    PartnershipMatch.formats,
+    SaUtrMatch.formats,
     JsonFormatters.uuidJsonFormat) {
 
   private lazy val matchTtl: Int = config.get[Int]("mongodb.matchTtlInSeconds")
@@ -54,19 +54,19 @@ class PartnershipMatchRepository @Inject()(mongo: ReactiveMongoComponent,
       background = true)
   )
 
-  def create(record: PartnershipMatch): Future[PartnershipMatch] = {
+  def create(record: SaUtrMatch): Future[SaUtrMatch] = {
     insert(record) map { writeResult =>
       if (writeResult.n == 1) record
-      else throw new RuntimeException(s"failed to persist company match $record")
+      else throw new RuntimeException(s"failed to persist sautr match $record")
     }
   }
 
-  def read(uuid: UUID): Future[Option[PartnershipMatch]] = findById(uuid)
+  def read(uuid: UUID): Future[Option[SaUtrMatch]] = findById(uuid)
 
   override def findById(id: UUID, readPreference: ReadPreference)(
-    implicit ec: ExecutionContext): Future[Option[PartnershipMatch]] =
-    collection.find(Json.obj("id" -> id.toString), Some(Json.obj())).one[PartnershipMatch]
+    implicit ec: ExecutionContext): Future[Option[SaUtrMatch]] =
+    collection.find(Json.obj("id" -> id.toString), Some(Json.obj())).one[SaUtrMatch]
 
-  override def bulkInsert(entities: Seq[PartnershipMatch])(implicit ec: ExecutionContext): Future[MultiBulkWriteResult] =
+  override def bulkInsert(entities: Seq[SaUtrMatch])(implicit ec: ExecutionContext): Future[MultiBulkWriteResult] =
     throw new UnsupportedOperationException
 }

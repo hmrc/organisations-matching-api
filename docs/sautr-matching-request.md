@@ -1,19 +1,20 @@
-# Submit an Organisation Matching Request For a Company #
+# SAUTR Matching Request #
 
-This endpoint takes a JSON body that contains a Company's CRN and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
+This endpoint takes a JSON body that contains a UTR, Organisation Type and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
 
 ## Request ##
 
 #### Endpoint ####
 
-> POST /organisations/matching/company/
+> POST /organisations/matching/sautr/
 
 **JSON Body Example**
 
 ~~~~~~~~~~
 {
-  "crn": "AA123456",
-  "name": "Example Company Ltd",
+  "organisationType": "P",
+  "utr": "1234567890",
+  "name": "Example Partnership",
   "address": {
     "addressLine1": "123 Long Road",
     "addressLine2": "Some City",
@@ -29,26 +30,31 @@ This endpoint takes a JSON body that contains a Company's CRN and Known Facts in
 ~~~~~~~~~~
 {
   "type": "object",
-  "description": "Company's CRN and known facts",
   "required": [
-    "crn",
+    "organisationType",
+    "utr",
     "name",
     "address",
     "postcode"
   ],
   "properties": {
-    "crn": {
+    "organisationType": {
       "type": "string",
-      "description": "Company Registration Number",
-      "pattern": "^([A-Za-z0-9]{0,2})?([0-9]{1,6})$"
+      "description": "S = Sole Trader, P = Partnership",
+      "enum": [
+        "S",
+        "P"
+      ]
+    },
+    "utr": {
+      "type": "string",
+      "pattern": "^[0-9]{10}$"
     },
     "name": {
       "type": "string",
-      "description": "Company name"
     },
     "address": {
       "type": "object",
-      "description": "Company address",
       "required": [
         "addressLine1"
       ],
@@ -69,7 +75,6 @@ This endpoint takes a JSON body that contains a Company's CRN and Known Facts in
     },
     "postcode": {
       "type": "string",
-      "description": "Company's postcode"
     }
   }
 }
@@ -83,16 +88,7 @@ This endpoint takes a JSON body that contains a Company's CRN and Known Facts in
 
 ~~~~~~~~~~
 {
-  "_links": {
-    "company": {
-      "href": "/organisations/matching/company/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "type": "GET"
-    },
-    "self": {
-      "href": "/organisations/matching/company/",
-      "type": "POST"
-    }
-  }
+  "matchId": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
 }
 ~~~~~~~~~~
 
@@ -103,38 +99,9 @@ This endpoint takes a JSON body that contains a Company's CRN and Known Facts in
   "type": "object",
   "description": "Company Matching Response",
   "properties": {
-    "_links": {
-      "type": "object",
-      "properties": {
-        "company": {
-          "type": "object",
-          "description": "URI to get company links",
-          "properties": {
-            "href": {
-              "type": "string",
-              "example": "/organisations/matching/company/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-            },
-            "type": {
-              "type": "string",
-              "example": "GET"
-            }
-          }
-        },
-        "self": {
-          "type": "object",
-          "description": "URI to this resource",
-          "properties": {
-            "href": {
-              "type": "string",
-              "example": "/organisations/matching/company/"
-            },
-            "type": {
-              "type": "string",
-              "example": "POST"
-            }
-          }
-        }
-      }
+    "matchId": {
+      "type": "string",
+      "example": "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
     }
   }
 }

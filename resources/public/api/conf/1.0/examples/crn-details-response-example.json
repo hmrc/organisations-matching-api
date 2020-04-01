@@ -1,0 +1,25 @@
+{
+  "details": [
+    {
+      "year": 2017,
+      "employees": 100,
+      "turnover": 1000000.00,
+      "registrationDate": "2001-01-01",
+      "taxSolvencyStatus": "S"
+    },
+    {
+      "year": 2018,
+      "employees": 150,
+      "turnover": 1500000.00,
+      "registrationDate": "2001-01-01",
+      "taxSolvencyStatus": "S"
+    },
+    {
+      "year": 2019,
+      "employees": 200,
+      "turnover": 2000000.00,
+      "registrationDate": "2001-01-01",
+      "taxSolvencyStatus": "S"
+    }
+  ]
+}

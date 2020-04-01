@@ -1,25 +1,30 @@
 {
   "type": "object",
-  "description": "Partnership's UTR and known facts",
   "required": [
+    "organisationType",
     "utr",
     "name",
     "address",
     "postcode"
   ],
   "properties": {
+    "organisationType": {
+      "type": "string",
+      "description": "S = Sole Trader, P = Partnership",
+      "enum": [
+        "S",
+        "P"
+      ]
+    },
     "utr": {
       "type": "string",
-      "description": "Partnership's UTR",
       "pattern": "^[0-9]{10}$"
     },
     "name": {
       "type": "string",
-      "description": "Partnership name"
     },
     "address": {
       "type": "object",
-      "description": "Partnership address",
       "required": [
         "addressLine1"
       ],
@@ -40,7 +45,6 @@
     },
     "postcode": {
       "type": "string",
-      "description": "Partnership's postcode"
     }
   }
 }

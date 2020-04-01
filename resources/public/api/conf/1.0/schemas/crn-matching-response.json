@@ -1,0 +1,10 @@
+{
+  "type": "object",
+  "description": "Company Matching Response",
+  "properties": {
+    "matchId": {
+      "type": "string",
+      "example": "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+    }
+  }
+}

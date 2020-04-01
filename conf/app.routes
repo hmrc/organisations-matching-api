@@ -1,7 +1,5 @@
-POST        /matching/company                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCompany
-GET         /matching/company/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedCompany(matchId: java.util.UUID)
-GET         /details/company/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.companyDetails(matchId: java.util.UUID)
+POST        /matching/crn                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCrn
+GET         /details/crn/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.crnDetails(matchId: java.util.UUID, fromYear: Int, toYear: Option[Int])
 
-POST        /matching/partnership            uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchPartnership
-GET         /matching/partnership/:matchId   uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedPartnership(matchId: java.util.UUID)
-GET         /details/company/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.partnershipDetails(matchId: java.util.UUID)
+POST        /matching/sautr              uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchSaUtr
+GET         /details/sautr/:matchId      uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.saUtrDetails(matchId: java.util.UUID, fromYear: Int, toYear: Option[Int])

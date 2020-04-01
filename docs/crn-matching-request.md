@@ -1,19 +1,19 @@
-# Submit an Organisation Matching Request For a Partnership #
+# CRN Matching Request #
 
-This endpoint takes a JSON body that contains a Partnership's UTR and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
+This endpoint takes a JSON body that contains a Company's CRN and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
 
 ## Request ##
 
 #### Endpoint ####
 
-> POST /organisations/matching/partnership/
+> POST /organisations/matching/crn/
 
 **JSON Body Example**
 
 ~~~~~~~~~~
 {
-  "utr": "1234567890",
-  "name": "Example Partnership",
+  "crn": "AA123456",
+  "name": "Example Company Ltd",
   "address": {
     "addressLine1": "123 Long Road",
     "addressLine2": "Some City",
@@ -29,26 +29,26 @@ This endpoint takes a JSON body that contains a Partnership's UTR and Known Fact
 ~~~~~~~~~~
 {
   "type": "object",
-  "description": "Partnership's UTR and known facts",
+  "description": "Company's CRN and known facts",
   "required": [
-    "utr",
+    "crn",
     "name",
     "address",
     "postcode"
   ],
   "properties": {
-    "utr": {
+    "crn": {
       "type": "string",
-      "description": "Partnership's UTR",
-      "pattern": "^[0-9]{10}$"
+      "description": "Company Registration Number",
+      "pattern": "^([A-Za-z0-9]{0,2})?([0-9]{1,6})$"
     },
     "name": {
       "type": "string",
-      "description": "Partnership name"
+      "description": "Company name"
     },
     "address": {
       "type": "object",
-      "description": "Partnership address",
+      "description": "Company address",
       "required": [
         "addressLine1"
       ],
@@ -69,7 +69,7 @@ This endpoint takes a JSON body that contains a Partnership's UTR and Known Fact
     },
     "postcode": {
       "type": "string",
-      "description": "Partnership's postcode"
+      "description": "Company's postcode"
     }
   }
 }
@@ -83,16 +83,7 @@ This endpoint takes a JSON body that contains a Partnership's UTR and Known Fact
 
 ~~~~~~~~~~
 {
-  "_links": {
-    "partnership": {
-      "href": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "type": "GET"
-    },
-    "self": {
-      "href": "/organisations/matching/partnership/",
-      "type": "POST"
-    }
-  }
+  "matchId": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
 }
 ~~~~~~~~~~
 
@@ -101,40 +92,11 @@ This endpoint takes a JSON body that contains a Partnership's UTR and Known Fact
 ~~~~~~~~~~
 {
   "type": "object",
-  "description": "Partnership Matching Response",
+  "description": "Company Matching Response",
   "properties": {
-    "_links": {
-      "type": "object",
-      "properties": {
-        "partnership": {
-          "type": "object",
-          "description": "URI to get company links",
-          "properties": {
-            "href": {
-              "type": "string",
-              "example": "/organisations/matching/partnership/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-            },
-            "type": {
-              "type": "string",
-              "example": "GET"
-            }
-          }
-        },
-        "self": {
-          "type": "object",
-          "description": "URI to this resource",
-          "properties": {
-            "href": {
-              "type": "string",
-              "example": "/organisations/matching/partnership/"
-            },
-            "type": {
-              "type": "string",
-              "example": "POST"
-            }
-          }
-        }
-      }
+    "matchId": {
+      "type": "string",
+      "example": "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
     }
   }
 }

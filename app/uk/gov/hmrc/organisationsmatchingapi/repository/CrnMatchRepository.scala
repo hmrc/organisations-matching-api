@@ -29,18 +29,18 @@ import reactivemongo.api.indexes.IndexType.Ascending
 import reactivemongo.bson.BSONDocument
 import reactivemongo.play.json._
 import uk.gov.hmrc.mongo.ReactiveRepository
-import uk.gov.hmrc.organisationsmatchingapi.models.{CompanyMatch, JsonFormatters}
+import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, JsonFormatters}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class CompanyMatchRepository @Inject()(mongo: ReactiveMongoComponent,
-                                       config: Configuration)
-  extends ReactiveRepository[CompanyMatch, UUID] (
-    "company-match",
+class CrnMatchRepository @Inject()(mongo: ReactiveMongoComponent,
+                                   config: Configuration)
+  extends ReactiveRepository[CrnMatch, UUID] (
+    "crn-match",
     mongo.mongoConnector.db,
-    CompanyMatch.formats,
+    CrnMatch.formats,
     JsonFormatters.uuidJsonFormat) {
 
   private lazy val matchTtl: Int = config.get[Int]("mongodb.matchTtlInSeconds")
@@ -54,19 +54,19 @@ class CompanyMatchRepository @Inject()(mongo: ReactiveMongoComponent,
       background = true)
   )
 
-  def create(record: CompanyMatch): Future[CompanyMatch] = {
+  def create(record: CrnMatch): Future[CrnMatch] = {
     insert(record) map { writeResult =>
       if (writeResult.n == 1) record
-      else throw new RuntimeException(s"failed to persist company match $record")
+      else throw new RuntimeException(s"failed to persist crn match $record")
     }
   }
 
-  def read(uuid: UUID): Future[Option[CompanyMatch]] = findById(uuid)
+  def read(uuid: UUID): Future[Option[CrnMatch]] = findById(uuid)
 
   override def findById(id: UUID, readPreference: ReadPreference)(
-    implicit ec: ExecutionContext): Future[Option[CompanyMatch]] =
-    collection.find(Json.obj("id" -> id.toString), Some(Json.obj())).one[CompanyMatch]
+    implicit ec: ExecutionContext): Future[Option[CrnMatch]] =
+    collection.find(Json.obj("id" -> id.toString), Some(Json.obj())).one[CrnMatch]
 
-  override def bulkInsert(entities: Seq[CompanyMatch])(implicit ec: ExecutionContext): Future[MultiBulkWriteResult] =
+  override def bulkInsert(entities: Seq[CrnMatch])(implicit ec: ExecutionContext): Future[MultiBulkWriteResult] =
     throw new UnsupportedOperationException
 }
