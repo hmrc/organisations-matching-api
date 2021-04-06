@@ -13,8 +13,7 @@ object AppDependencies {
     hmrc                  %% "simple-reactivemongo"       % "7.23.0-play-26",
     hmrc                  %% "bootstrap-play-26"          % "1.3.0",
     hmrc                  %% "play-hmrc-api"              % "3.9.0-play-26",
-    "com.eclipsesource"   %% "play-json-schema-validator" % "0.9.4",
-    "org.typelevel"       %% "cats-core"                  % "2.0.0"
+    "org.typelevel"       %% "cats-core"                  % "2.5.0"
   )
 
   trait TestDependencies {
