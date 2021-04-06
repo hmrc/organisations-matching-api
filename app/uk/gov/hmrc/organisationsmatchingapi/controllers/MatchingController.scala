@@ -16,50 +16,25 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.actions.{PrivilegedAuthAction, ValidatedAction, VersionTransformer}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatchingRequest, SaUtrMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
-                                   privilegedAuthAction: PrivilegedAuthAction,
-                                   validatedAction: ValidatedAction,
-                                   versionTransformer: VersionTransformer,
                                    matchingService: MatchingService) extends BaseApiController(cc) with ErrorHandling {
 
-  val crnMatchingRequestSchema = loadVersionedSchemas("crn-matching-request.json")
-  val saUtrMatchingRequestSchema = loadVersionedSchemas("sautr-matching-request.json")
-
-  private def commonAction = privilegedAuthAction
-    .andThen(validatedAction)
-    .andThen(versionTransformer)
-
-  def matchCrn = commonAction.async(parse.json) { implicit request =>
-    handleErrors {
-      withVersionedJsonBody[CrnMatchingRequest](crnMatchingRequestSchema) {
-        matchRequest =>
-          Future successful Ok
-      }
+  def matchCrn() : Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok("IMPLEMENT ME!"))
     }
-  }
 
-  def matchSaUtr = commonAction.async(parse.json) { implicit request =>
-    handleErrors {
-      withVersionedJsonBody[SaUtrMatchingRequest](saUtrMatchingRequestSchema) {
-        matchRequest =>
-          Future successful Ok
-      }
-    }
+  def matchSaUtr() : Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok("IMPLEMENT ME!"))
   }
 
 }

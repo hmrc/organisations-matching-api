@@ -16,57 +16,35 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.repository
 
-import java.util.UUID
+import com.mongodb.client.model.IndexModel
+import jdk.jshell.spi.ExecutionControl.NotImplementedException
+import org.mongodb.scala.model.IndexModel
 
+import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.libs.json.Json
-import play.modules.reactivemongo.ReactiveMongoComponent
-import reactivemongo.api.ReadPreference
-import reactivemongo.api.commands.MultiBulkWriteResult
-import reactivemongo.api.indexes.Index
-import reactivemongo.api.indexes.IndexType.Ascending
-import reactivemongo.bson.BSONDocument
-import reactivemongo.play.json._
-import uk.gov.hmrc.mongo.ReactiveRepository
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, JsonFormatters, SaUtrMatch}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SaUtrMatchRepository @Inject()(mongo: ReactiveMongoComponent,
-                                     config: Configuration)
-  extends ReactiveRepository[SaUtrMatch, UUID] (
-    "sautr-match",
-    mongo.mongoConnector.db,
-    SaUtrMatch.formats,
-    JsonFormatters.uuidJsonFormat) {
+class SaUtrMatchRepository @Inject()(mongo: MongoComponent, config: Configuration) (implicit ec:ExecutionContext)
+  extends PlayMongoRepository[SaUtrMatch] (
+    collectionName = "sautr-match",
+    mongoComponent =  mongo,
+    domainFormat = SaUtrMatch.formats,
+    indexes = Seq.empty ) {
 
   private lazy val matchTtl: Int = config.get[Int]("mongodb.matchTtlInSeconds")
 
-  override lazy val indexes = Seq(
-    Index(Seq(("id", Ascending)), Some("idIndex"), background = true, unique = true),
-    Index(
-      Seq(("createdAt", Ascending)),
-      Some("createdAtIndex"),
-      options = BSONDocument("expireAfterSeconds" -> matchTtl),
-      background = true)
-  )
-
   def create(record: SaUtrMatch): Future[SaUtrMatch] = {
-    insert(record) map { writeResult =>
-      if (writeResult.n == 1) record
-      else throw new RuntimeException(s"failed to persist sautr match $record")
-    }
+   throw new NotImplementedException("Im not implemented")
   }
 
   def read(uuid: UUID): Future[Option[SaUtrMatch]] = findById(uuid)
 
-  override def findById(id: UUID, readPreference: ReadPreference)(
-    implicit ec: ExecutionContext): Future[Option[SaUtrMatch]] =
-    collection.find(Json.obj("id" -> id.toString), Some(Json.obj())).one[SaUtrMatch]
-
-  override def bulkInsert(entities: Seq[SaUtrMatch])(implicit ec: ExecutionContext): Future[MultiBulkWriteResult] =
-    throw new UnsupportedOperationException
+  def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[SaUtrMatch]] = Future.successful(None)
 }
