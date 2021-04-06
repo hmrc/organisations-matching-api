@@ -16,17 +16,13 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.repository
 
-import com.mongodb.client.model.IndexModel
-import jdk.jshell.spi.ExecutionControl.NotImplementedException
-import org.mongodb.scala.model.IndexModel
-
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.api.libs.json.Json
+import uk.gov.hmrc.http.NotImplementedException
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, JsonFormatters, SaUtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.models.SaUtrMatch
 
 import scala.concurrent.{ExecutionContext, Future}
 

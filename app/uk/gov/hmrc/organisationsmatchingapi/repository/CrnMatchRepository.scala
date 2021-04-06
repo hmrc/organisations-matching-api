@@ -16,11 +16,10 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.repository
 
-import jdk.jshell.spi.ExecutionControl.NotImplementedException
-
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+import uk.gov.hmrc.http.NotImplementedException
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatch
