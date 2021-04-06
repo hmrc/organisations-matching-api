@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import com.eclipsesource.schema.SchemaType
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OFormat, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
@@ -24,7 +23,6 @@ import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.organisationsmatchingapi.actions.VersionedRequest
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
 import uk.gov.hmrc.organisationsmatchingapi.schema.{ApiVersion, SchemaValidation, Version_1_0}
-import cats.syntax.show._
 import uk.gov.hmrc.auth.core.AuthProvider.PrivilegedApplication
 import uk.gov.hmrc.auth.core.{AuthProviders, AuthorisedFunctions, Enrolment, InsufficientEnrolments, NoActiveSession, UnsupportedAuthProvider}
 import uk.gov.hmrc.play.HeaderCarrierConverter
