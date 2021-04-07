@@ -16,14 +16,40 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
+import java.util.UUID
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.{Configuration, Environment}
+import play.api.http.Status
+import play.api.test.Helpers._
+import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
+import org.scalatestplus.mockito.MockitoSugar
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
 
-class DetailsControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite {
+class DetailsControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar {
+
+  private val fakeRequest = FakeRequest("GET", "/")
+
+  private val env           = Environment.simple()
+  private val configuration = Configuration.load(env)
+
+  private val mockAuthConnector = mock[AuthConnector]
+  private val mockDetailsService = mock[DetailsService]
+
+  private val serviceConfig = new ServicesConfig(configuration)
+  private val appConfig     = new AppConfig(configuration, serviceConfig)
+
+  private val controller = new DetailsController(mockAuthConnector, Helpers.stubControllerComponents(), mockDetailsService)
+
+
   "GET /" should {
     "return 200" in {
-      0 shouldBe 0
+      val result = controller.crnDetails(UUID.randomUUID(), 0, None)(fakeRequest)
+      status(result) shouldBe Status.OK
     }
   }
 }

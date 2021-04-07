@@ -22,7 +22,6 @@ import play.api.Configuration
 import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.organisationsmatchingapi.platform.views.txt
-
 import scala.concurrent.Future
 
 @Singleton

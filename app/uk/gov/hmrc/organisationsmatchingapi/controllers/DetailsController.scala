@@ -29,7 +29,7 @@ import scala.concurrent.Future
 @Singleton
 class DetailsController @Inject()(val authConnector: AuthConnector,
                                   cc: ControllerComponents,
-                                  detailsService: DetailsService) extends BackendController(cc) with ErrorHandling {
+                                  detailsService: DetailsService) extends BaseApiController(cc) with ErrorHandling {
 
   def crnDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]): Action[AnyContent] =
     Action.async { implicit request =>

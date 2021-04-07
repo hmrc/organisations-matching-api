@@ -21,7 +21,7 @@ object AppDependencies {
     "org.scalatest"           %% "scalatest"                % "3.2.5"               % scope,
     "com.typesafe.play"       %% "play-test"                % PlayVersion.current   % scope,
     "com.vladsch.flexmark"    %  "flexmark-all"             % "0.36.8"              % scope,
-    "org.scalatestplus.play"  %% "scalatestplus-play"       % "5.1.0"               % scope,
+    "org.scalatestplus.play"  %% "scalatestplus-play"       % "4.0.3"               % scope,
     "org.pegdown"             %  "pegdown"                  % "1.6.0"               % scope,
     "com.github.tomakehurst"  %  "wiremock-jre8"            % "2.27.0"              % scope,
     "org.mockito"             %  "mockito-core"             % "3.8.0"               % scope
