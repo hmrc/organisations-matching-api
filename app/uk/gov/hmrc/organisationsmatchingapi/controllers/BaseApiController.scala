@@ -30,7 +30,7 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
 
   protected val logger: Logger = play.api.Logger(this.getClass)
 
-  override implicit def hc(implicit rh: RequestHeader): HeaderCarrier =
+  protected override implicit def hc(implicit rh: RequestHeader): HeaderCarrier =
     HeaderCarrierConverter.fromRequest(rh)
 
   def withValidJson[T](f: T => Future[Result])(implicit ec: ExecutionContext,

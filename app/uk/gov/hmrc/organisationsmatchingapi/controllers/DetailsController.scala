@@ -22,13 +22,14 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.Future
 
 @Singleton
 class DetailsController @Inject()(val authConnector: AuthConnector,
                                   cc: ControllerComponents,
-                                  detailsService: DetailsService) extends BaseApiController(cc) with ErrorHandling {
+                                  detailsService: DetailsService) extends BackendController(cc) with ErrorHandling {
 
   def crnDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]): Action[AnyContent] =
     Action.async { implicit request =>

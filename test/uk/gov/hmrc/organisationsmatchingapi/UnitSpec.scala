@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.helpers
-
-import java.nio.charset.Charset
+package uk.gov.hmrc.organisationsmatchingapi
 
 import akka.stream.Materializer
 import akka.util.ByteString
-import org.scalatest.{Matchers, OptionValues, WordSpecLike}
+import org.scalatest.OptionValues
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AsyncWordSpec
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.language.implicitConversions
+import java.nio.charset.Charset
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
-trait UnitSpec extends WordSpecLike with Matchers with OptionValues {
-
-  import scala.concurrent.duration._
-  import scala.concurrent.{Await, Future}
+trait UnitSpec extends AsyncWordSpec with Matchers with OptionValues {
 
   implicit val defaultTimeout: FiniteDuration = 5 seconds
 
