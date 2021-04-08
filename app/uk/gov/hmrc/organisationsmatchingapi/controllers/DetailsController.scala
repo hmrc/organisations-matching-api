@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 HM Revenue & Customs
+ * Copyright 2021 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,39 +17,28 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import java.util.UUID
-
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.ControllerComponents
+import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.actions.{PrivilegedAuthAction, ValidatedAction, VersionTransformer}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
+import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class DetailsController @Inject()(val authConnector: AuthConnector,
                                   cc: ControllerComponents,
-                                  privilegedAuthAction: PrivilegedAuthAction,
-                                  validatedAction: ValidatedAction,
-                                  versionTransformer: VersionTransformer,
                                   detailsService: DetailsService) extends BaseApiController(cc) with ErrorHandling {
 
-  private def commonAction = privilegedAuthAction
-    .andThen(validatedAction)
-    .andThen(versionTransformer)
-
-  def crnDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]) = commonAction.async { implicit request =>
-    handleErrors {
-      Future successful Ok
+  def crnDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]): Action[AnyContent] =
+    Action.async { implicit request =>
+      Future.successful(Ok("IMPLEMENT ME!"))
     }
-  }
 
-  def saUtrDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]) = commonAction.async { implicit request =>
-    handleErrors {
-      Future successful Ok
+  def saUtrDetails(matchId: UUID, fromYear: Int, toYear: Option[Int]) : Action[AnyContent] =
+    Action.async { implicit request =>
+      Future.successful(Ok("IMPLEMENT ME!"))
     }
-  }
 
 }
