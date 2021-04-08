@@ -1,0 +1,5 @@
+POST        /matching/crn                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCrn
+GET         /details/crn/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.crnDetails(matchId: java.util.UUID, fromYear: Int, toYear: Option[Int])
+
+POST        /matching/sautr              uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchSaUtr
+GET         /details/sautr/:matchId      uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.saUtrDetails(matchId: java.util.UUID, fromYear: Int, toYear: Option[Int])
