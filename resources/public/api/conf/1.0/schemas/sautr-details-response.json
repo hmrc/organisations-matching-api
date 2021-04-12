@@ -1,5 +1,5 @@
 {
-  "tyoe": "object",
+  "type": "object",
   "properties": {
     "details": {
       "type": "array",
@@ -8,11 +8,11 @@
         "properties": {
           "year": {
             "type": "number",
-            "example": 2019
+            "example": "2019"
           },
           "turnover": {
             "type": "number",
-            "example": 1000000.00
+            "example": "1000000.00"
           },
           "registrationDate": {
             "type": "string",

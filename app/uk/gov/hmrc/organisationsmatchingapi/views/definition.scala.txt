@@ -1,0 +1,27 @@
+@import play.api.libs.json.Json
+@(
+ v1EndpointsEnabled: Boolean,
+ v1Status: String
+)
+ {
+   "scopes": [
+     {
+       "key": "assigned",
+       "name": "The scopes you have been assigned",
+       "description": "An OAuth 2.0 Bearer Token with the scopes you have been assigned"
+     }
+   ],
+     "api": {
+       "name": "Organisations Matching",
+       "description": "Retrieves matching information for an organisation",
+       "context": "organisations/matching",
+       "versions": [
+         {
+           "version": "1.0",
+           "status":@Json.toJson(v1Status),
+           "endpointsEnabled":@Json.toJson(v1EndpointsEnabled),
+           "access" : {"type":"PRIVATE"}
+         }
+       ]
+     }
+ }

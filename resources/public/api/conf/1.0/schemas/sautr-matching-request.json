@@ -21,7 +21,7 @@
       "pattern": "^[0-9]{10}$"
     },
     "name": {
-      "type": "string",
+      "type": "string"
     },
     "address": {
       "type": "object",
@@ -44,7 +44,7 @@
       }
     },
     "postcode": {
-      "type": "string",
+      "type": "string"
     }
   }
 }
