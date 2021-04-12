@@ -49,7 +49,6 @@ class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets
 
   def raml(version: String, file: String) =
     {
-      println("==============")
       assets.at(s"/public/api/conf/$version", file)
     }
 }
