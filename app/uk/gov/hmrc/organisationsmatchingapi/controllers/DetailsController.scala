@@ -22,7 +22,6 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
-import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import scala.concurrent.Future
 
