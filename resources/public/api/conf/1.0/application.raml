@@ -29,8 +29,8 @@ uses:
         displayName: CRN Matching Request
         description: This endpoint takes a JSON body that contains a Company's CRN and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:individuals-matching scope.
@@ -77,8 +77,8 @@ uses:
         displayName: SAUTR Matching Request
         description: This endpoint takes a JSON body that contains a UTR, Organisation Type and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
@@ -130,8 +130,8 @@ uses:
         displayName: CRN Details
         description: This endpoint takes a matchId and returns corporation tax information for the company
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
@@ -178,8 +178,8 @@ uses:
         displayName: SAUTR Details
         description: This endpoint takes a matchId and returns self assessment information for the organisation
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
