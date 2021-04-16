@@ -16,46 +16,45 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import java.util.UUID
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Configuration, Environment}
+import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
 import play.api.test.Helpers._
+import play.api.{Configuration, Environment}
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
-import org.scalatestplus.mockito.MockitoSugar
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
+import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
+import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-class DetailsControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar {
+import java.util.UUID
 
+class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
   private val fakeRequest = FakeRequest("GET", "/")
 
   private val env           = Environment.simple()
   private val configuration = Configuration.load(env)
 
   private val mockAuthConnector = mock[AuthConnector]
-  private val mockDetailsService = mock[DetailsService]
+  private val mockMatchingService = mock[MatchingService]
 
   private val serviceConfig = new ServicesConfig(configuration)
   private val appConfig     = new AppConfig(configuration, serviceConfig)
 
-  private val controller = new DetailsController(mockAuthConnector, Helpers.stubControllerComponents(), mockDetailsService)
+  private val controller = new MatchingController(mockAuthConnector, Helpers.stubControllerComponents(), mockMatchingService)
 
 
-  "GET crnDetails TO BE IMPLEMENTED /" should {
+  "GET matchCrn TO BE IMPLEMENTED /" should {
     "return 200" in {
-      val result = controller.crnDetails(UUID.randomUUID(), 0, None)(fakeRequest)
+      val result = controller.matchCrn()(fakeRequest)
       status(result) shouldBe Status.OK
     }
   }
 
-  "GET saUtrDetails TO BE IMPLEMENTED /" should {
+  "GET matchSaUtr TO BE IMPLEMENTED /" should {
     "return 200" in {
-      val result = controller.saUtrDetails(UUID.randomUUID(), 0, None)(fakeRequest)
+      val result = controller.matchSaUtr()(fakeRequest)
       status(result) shouldBe Status.OK
     }
   }
