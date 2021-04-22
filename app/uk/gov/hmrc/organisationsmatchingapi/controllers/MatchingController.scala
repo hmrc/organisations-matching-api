@@ -20,14 +20,14 @@ import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
+import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 
 import scala.concurrent.Future
 
 @Singleton
 class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
-                                   matchingService: MatchingService) extends BaseApiController(cc) with ErrorHandling {
+                                   cacheService: CacheService) extends BaseApiController(cc) with ErrorHandling {
 
   def matchCrn() : Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok("IMPLEMENT ME!"))

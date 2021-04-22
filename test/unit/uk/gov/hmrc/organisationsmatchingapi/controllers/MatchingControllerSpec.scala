@@ -26,7 +26,7 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
 import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
-import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
+import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
@@ -36,12 +36,11 @@ class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar
   private val configuration = Configuration.load(env)
 
   private val mockAuthConnector = mock[AuthConnector]
-  private val mockMatchingService = mock[MatchingService]
+  private val mockCacheService = mock[CacheService]
 
   private val serviceConfig = new ServicesConfig(configuration)
-  private val appConfig     = new AppConfig(configuration, serviceConfig)
 
-  private val controller = new MatchingController(mockAuthConnector, Helpers.stubControllerComponents(), mockMatchingService)
+  private val controller = new MatchingController(mockAuthConnector, Helpers.stubControllerComponents(), mockCacheService)
 
 
   "GET matchCrn TO BE IMPLEMENTED /" should {

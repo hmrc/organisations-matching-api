@@ -19,15 +19,11 @@ package it.uk.gov.hmrc.organisationsmatchingapi.platform
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import com.github.tomakehurst.wiremock.WireMockServer
-import util.UnitSpec
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
-import play.api.test.Helpers._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
-import uk.gov.hmrc.organisationsmatchingapi.controllers.DocumentationController
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
-import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, TestData}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
@@ -36,6 +32,8 @@ import play.api.libs.json.JsValue
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
+import uk.gov.hmrc.organisationsmatchingapi.controllers.DocumentationController
+import util.UnitSpec
 
 import scala.concurrent.Future
 
@@ -102,18 +100,6 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
         }
         .foreach { case (version, endpointName) => verifyDocumentationPresent(version, endpointName) }
     }
-
-//    "provide definition including the whitelisted app ids" in new Setup {
-//      val result: Future[Result] = documentationController.definition()(request)
-//      status(result) shouldBe 200
-//
-//      val jsonResponse: JsValue = jsonBodyOf(result).futureValue
-//
-//      val whitelistedIds: Seq[String] =
-//        (jsonResponse \ "api" \ "versions" \ 0 \ "access" \ "whitelistedApplicationIds").as[Seq[String]]
-//
-//      whitelistedIds should contain("1234567890")
-//    }
 
     "provide raml documentation" in new Setup {
       val result: Future[Result] = documentationController.raml("1.0", "application.raml")(request)

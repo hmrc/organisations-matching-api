@@ -18,14 +18,14 @@ package it.uk.gov.hmrc.organisationsmatchingapi.repository
 
 import java.util.UUID
 
-import org.scalatest.{BeforeAndAfterEach, TestData}
+import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Application, Configuration, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Json, OFormat}
+import play.api.{Application, Configuration, Mode}
 import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
 import uk.gov.hmrc.organisationsmatchingapi.repository.ShortLivedCache
