@@ -11,7 +11,9 @@ object AppDependencies {
     ws,
     hmrcMongo             %% "hmrc-mongo-play-27"         % "0.47.0",
     hmrc                  %% "bootstrap-backend-play-27"  % "4.1.0",
-    hmrc                  %% "play-hmrc-api"              % "6.2.0-play-27"
+    hmrc                  %% "play-hmrc-api"              % "6.2.0-play-27",
+    hmrc                  %% "mongo-caching"              % "6.16.0-play-27",
+    hmrc                  %% "json-encryption"            % "4.10.0-play-27"
   )
 
   def test(scope: String = "test, it") = Seq(

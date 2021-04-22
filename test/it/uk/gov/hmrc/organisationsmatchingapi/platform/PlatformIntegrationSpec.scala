@@ -1,26 +1,45 @@
-package uk.gov.hmrc.organisationsmatchingapi.platform
+/*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package it.uk.gov.hmrc.organisationsmatchingapi.platform
 
 import akka.actor.ActorSystem
 import akka.stream.Materializer
 import com.github.tomakehurst.wiremock.WireMockServer
+import util.UnitSpec
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
+import play.api.test.Helpers._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
+import uk.gov.hmrc.organisationsmatchingapi.controllers.DocumentationController
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, TestData}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
-import play.api.{Application, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
-import uk.gov.hmrc.organisationsmatchingapi.helpers.UnitSpec
-import uk.gov.hmrc.organisationsmatchingapi.platform.controllers.DocumentationController
+import play.api.{Application, Mode}
 
 import scala.concurrent.Future
 
-class PlatformIntegrationSpec extends UnitSpec with GuiceOneAppPerTest with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPerTest with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val stubHost: String = "localhost"
   val stubPort: Int    = 11111
@@ -84,23 +103,24 @@ class PlatformIntegrationSpec extends UnitSpec with GuiceOneAppPerTest with Mock
         .foreach { case (version, endpointName) => verifyDocumentationPresent(version, endpointName) }
     }
 
-    "provide definition including the whitelisted app ids" in new Setup {
-      val result: Future[Result] = documentationController.definition()(request)
-      status(result) shouldBe 200
-
-      val jsonResponse: JsValue = jsonBodyOf(result).futureValue
-
-      val whitelistedIds: Seq[String] =
-        (jsonResponse \ "api" \ "versions" \ 0 \ "access" \ "whitelistedApplicationIds").as[Seq[String]]
-
-      whitelistedIds should contain("1234567890")
-    }
+//    "provide definition including the whitelisted app ids" in new Setup {
+//      val result: Future[Result] = documentationController.definition()(request)
+//      status(result) shouldBe 200
+//
+//      val jsonResponse: JsValue = jsonBodyOf(result).futureValue
+//
+//      val whitelistedIds: Seq[String] =
+//        (jsonResponse \ "api" \ "versions" \ 0 \ "access" \ "whitelistedApplicationIds").as[Seq[String]]
+//
+//      whitelistedIds should contain("1234567890")
+//    }
 
     "provide raml documentation" in new Setup {
       val result: Future[Result] = documentationController.raml("1.0", "application.raml")(request)
 
       status(result) shouldBe 200
-      bodyOf(result).futureValue should startWith("#%RAML 1.0")
+      bodyOf(await(result)) should startWith("#%RAML 1.0")
+
     }
   }
 

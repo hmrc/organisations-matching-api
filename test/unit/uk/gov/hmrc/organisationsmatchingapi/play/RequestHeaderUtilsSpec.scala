@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.play
+package unit.uk.gov.hmrc.organisationsmatchingapi.play
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec

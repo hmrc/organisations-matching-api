@@ -19,7 +19,7 @@ package uk.gov.hmrc.organisationsmatchingapi.errorhandler
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.BadRequest
+import ErrorResponse.BadRequest
 
 class ErrorResponseSpec extends AnyWordSpec with Matchers {
 

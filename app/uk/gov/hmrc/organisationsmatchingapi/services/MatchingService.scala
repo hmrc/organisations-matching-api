@@ -30,7 +30,7 @@ class MatchingService @Inject()(crnMatchRepository: CrnMatchRepository, saUtrMat
   }
 
   def getCrnMatch(matchId: UUID) = {
-    crnMatchRepository.read(matchId)
+    crnMatchRepository.fetchAndGetEntry(matchId.toString, matchId.toString)
   }
 
   def matchSaUtr(request: SaUtrMatchingRequest) = {
@@ -39,7 +39,6 @@ class MatchingService @Inject()(crnMatchRepository: CrnMatchRepository, saUtrMat
   }
 
   def getSaUtrMatch(matchId: UUID) = {
-    saUtrMatchRepository.read(matchId)
+//    saUtrMatchRepository.findAndUpdate()
   }
-
 }

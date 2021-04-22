@@ -16,32 +16,16 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.repository
 
-import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import uk.gov.hmrc.http.NotImplementedException
-import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
-import uk.gov.hmrc.mongo.MongoComponent
+import play.modules.reactivemongo.ReactiveMongoComponent
+import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
 import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatch
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class CrnMatchRepository @Inject()(mongo: MongoComponent, config: Configuration)
-  extends PlayMongoRepository[CrnMatch] (
-    collectionName = "crn-match",
-    mongoComponent =  mongo,
-    domainFormat = CrnMatch.formats,
-    indexes = Seq.empty) {
-
-  private lazy val matchTtl: Int = config.get[Int]("mongodb.matchTtlInSeconds")
-
-  def create(record: CrnMatch): Future[CrnMatch] = {
-   throw new NotImplementedException("Im not implemented")
-  }
-
-  def read(uuid: UUID): Future[Option[CrnMatch]] = findById(uuid)
-
-  def findById(id: UUID)(implicit ec: ExecutionContext): Future[Option[CrnMatch]] = Future.successful(None)
-}
+class CrnMatchRepository @Inject()( cacheConfig: CacheConfiguration,
+                                    configuration: Configuration,
+                                    mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
+  extends ShortLivedCache[CrnMatch](cacheConfig, configuration, mongo, cacheConfig.crnColName)
