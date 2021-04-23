@@ -18,7 +18,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, Not
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import utils.TestSupport
+import util.UnitSpec
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext
@@ -27,7 +27,7 @@ import scala.concurrent.ExecutionContext
 class IfConnectorSpec
   extends AnyWordSpec
     with BeforeAndAfterEach
-    with TestSupport
+    with UnitSpec
     with MockitoSugar
     with Matchers
     with GuiceOneAppPerSuite {
