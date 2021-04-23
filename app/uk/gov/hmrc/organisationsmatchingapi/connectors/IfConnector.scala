@@ -19,6 +19,8 @@ package uk.gov.hmrc.organisationsmatchingapi.connectors
 import play.api.Logger
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject

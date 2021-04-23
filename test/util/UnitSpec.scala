@@ -33,7 +33,7 @@ trait UnitSpec extends AnyWordSpec {
 
   implicit val defaultTimeout: FiniteDuration = 5 seconds
 
-  def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future,
+  def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
 
   def bindModules: Seq[GuiceableModule] = Seq()
 
