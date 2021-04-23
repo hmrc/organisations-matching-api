@@ -30,11 +30,7 @@ import util.UnitSpec
 
 import scala.concurrent.Future
 
-class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
-
-
-  override def beforeEach() {
-  }
+class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Setup {
     val uuid:UUID = randomUUID()

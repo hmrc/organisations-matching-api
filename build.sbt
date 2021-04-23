@@ -1,6 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 
-//import uk.gov.hmrc.ServiceManagerPlugin.Keys.itDependenciesList
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "organisations-matching-api"
