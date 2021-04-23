@@ -1,4 +1,4 @@
-package it.uk.gov.hmrc.organisationsmatchingapi.cache
+package it.uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
