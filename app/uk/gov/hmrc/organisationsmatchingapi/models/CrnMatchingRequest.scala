@@ -18,6 +18,7 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
+//TODO: Leaving these in from original repository - they will need updated
 case class CrnMatchingRequest(crn: String, name: String, address: Address, postcode: String)
 
 object CrnMatchingRequest {

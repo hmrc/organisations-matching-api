@@ -1,4 +1,5 @@
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
+
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "organisations-matching-api"
@@ -23,6 +24,10 @@ lazy val scoverageSettings = {
   )
 }
 
+def intTestFilter(name: String): Boolean = name startsWith "it"
+def unitFilter(name: String): Boolean = name startsWith "unit"
+def componentFilter(name: String): Boolean = name startsWith "component"
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .settings(
@@ -35,13 +40,23 @@ lazy val microservice = Project(appName, file("."))
     libraryDependencies ++= Seq(
       compilerPlugin("com.github.ghik" % "silencer-plugin" % silencerVersion cross CrossVersion.full),
       "com.github.ghik" % "silencer-lib" % silencerVersion % Provided cross CrossVersion.full
-    )
+    ),
+    testOptions in Test := Seq(Tests.Filter(unitFilter))
     // ***************
   )
-  .settings(publishingSettings: _*)
+
   .configs(IntegrationTest)
-  .settings(integrationTestSettings(): _*)
+  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .settings(
+    Keys.fork in IntegrationTest := false,
+    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(
+      base => Seq(base / "test")).value,
+    testOptions in IntegrationTest := Seq(Tests.Filter(intTestFilter))
+  )
+
+  .settings(publishingSettings: _*)
   .settings(scoverageSettings: _*)
+
   .settings(resolvers ++= Seq(
     Resolver.bintrayRepo("hmrc", "releases"),
     Resolver.jcenterRepo

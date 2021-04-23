@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.repository
+package uk.gov.hmrc.organisationsmatchingapi.cache
 
 import javax.inject.{Inject, Singleton}
 import play.api.Configuration
-import play.modules.reactivemongo.ReactiveMongoComponent
-import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.SaUtrMatch
-
-import scala.concurrent.ExecutionContext
 
 @Singleton
-class SaUtrMatchRepository @Inject()( cacheConfig: CacheConfiguration,
-                                    configuration: Configuration,
-                                    mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache[SaUtrMatch](cacheConfig, configuration, mongo, cacheConfig.saUtrColName)
+class CacheConfiguration @Inject()(configuration: Configuration) {
+
+  lazy val cacheEnabled = configuration.getOptional[Boolean]("cache.enabled")
+    .getOrElse(true)
+
+  lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds")
+    .getOrElse(60 * 15)
+
+  lazy val saUtrColName = configuration.getOptional[String]("cache.sautr-colName")
+    .getOrElse("sautr-matching-cache")
+
+  lazy val crnColName = configuration.getOptional[String]("cache.crn-colName")
+    .getOrElse("crn-matching-cache")
+
+  lazy val key = configuration.getOptional[String]("cache.key")
+    .getOrElse("organisations-matching")
+
+}

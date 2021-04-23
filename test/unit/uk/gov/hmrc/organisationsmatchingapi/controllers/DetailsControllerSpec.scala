@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.controllers
+package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import java.util.UUID
+
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import play.api.{Configuration, Environment}
 import play.api.http.Status
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
-import org.scalatestplus.mockito.MockitoSugar
+import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
+import uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController
 import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class DetailsControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar {
 
