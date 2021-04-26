@@ -41,12 +41,11 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       "name",
       Address(
         "line1",
-        Some("line2"),
+        "line2",
         Some("line3"),
-        Some("line4")
-      ),
+        Some("line4"),
       "postcode"
-    )
+    ))
 
     val crnMatch = CrnMatch(
       crnRequest,
@@ -55,12 +54,11 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
 
     val saUtrRequest = SaUtrMatchingRequest("", "", "", Address(
       "line1",
-      Some("line2"),
+      "line2",
       Some("line3"),
-      Some("line4")
-    ),
+      Some("line4"),
       "postcode"
-    )
+    ))
 
     val saUtrMatch = SaUtrMatch(
       saUtrRequest,
