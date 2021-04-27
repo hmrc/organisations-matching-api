@@ -38,11 +38,17 @@ class addressSpec extends AnyWordSpec with Matchers {
       }
     }
 
-    "ignoreCase" should {
+    "ignoreCaseAndSpaces" should {
       "ignore case" in {
         val address = models.Address("Foo", "Bar", Some("One"), Some("Two"), "Code")
 
-        address.ignoreCase shouldBe "foo bar one two code"
+        address.ignoreCaseAndSpaces shouldBe "foobaronetwocode"
+      }
+
+      "ignore case and space" in {
+        val address = models.Address("Foo  ", "Bar ", Some("One"), Some(" Two"), " Code")
+
+        address.ignoreCaseAndSpaces shouldBe "foobaronetwocode"
       }
     }
 
@@ -50,15 +56,7 @@ class addressSpec extends AnyWordSpec with Matchers {
       "ignore case and remove punctuation" in {
         val address = models.Address("foo!", "bar,", Some("one"), Some("two"), "code*")
 
-        address.withoutPunctuation shouldBe "foo bar one two code"
-      }
-    }
-
-    "withoutWhitepace" should {
-      "ignore case and remove punctuation without whitespace" in {
-        val address = models.Address(" foo!", "bar,", Some("one "), Some("two"), "co de*")
-
-        address.withoutWitespace shouldBe "foobaronetwocode"
+        address.withoutPunctuation shouldBe "foobaronetwocode"
       }
     }
 

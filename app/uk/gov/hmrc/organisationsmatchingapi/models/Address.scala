@@ -36,20 +36,16 @@ case class Address(
     ).flatten.mkString(" ")
   }
 
-  def ignoreCase = {
-    asString.toLowerCase
+  def ignoreCaseAndSpaces = {
+    asString.toLowerCase.filterNot((x: Char) => x.isWhitespace)
   }
 
   def withoutPunctuation = {
-    ignoreCase.replaceAll("""[\p{Punct}&&[^.]]""", "")
-  }
-
-  def withoutWitespace = {
-    withoutPunctuation.replace(" ", "")
+    ignoreCaseAndSpaces.replaceAll("""[\p{Punct}]""", "")
   }
 
   def cleanPostOfficeBox = {
-    withoutWitespace.replaceAll("p.o.|p.0|p0|p.0|postoffice", "po")
+    withoutPunctuation.replaceAll("p.o.|p.0|p0|p.0|postoffice", "po")
   }
 
   def cleanAll = {
