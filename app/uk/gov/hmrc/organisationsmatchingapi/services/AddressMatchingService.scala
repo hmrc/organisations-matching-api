@@ -26,7 +26,7 @@ class AddressMatchingService {
   }
 
   // Option 2: A full match by cleaning both objects prior to the comparison
-  def cleanMatch(knownAddress: Address, ifAddress: Address): Unit = {
+  def cleanMatch(knownAddress: Address, ifAddress: Address) = {
     knownAddress.cleanAll.equals(ifAddress.cleanAll)
   }
 
@@ -52,7 +52,7 @@ class AddressMatchingService {
 
   // Option 5: Logic could clean the known facts first if no match; clean the IF (HoDs) data and
   // make a second pass (combine options 3 and 4)
-  def tryMatch(knownAddress: Address, ifAddress: Address): Unit = {
+  def tryMatch(knownAddress: Address, ifAddress: Address) = {
     matchAddressCleanKnownFacts(knownAddress, ifAddress) ||
       matchAddressCleanBoth(knownAddress, ifAddress)
   }
