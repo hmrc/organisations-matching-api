@@ -30,8 +30,14 @@ class AddressMatchingService {
     knownAddress.cleanAll.equals(ifAddress.cleanAll)
   }
 
-  // Option 3: Try a series of data cleanses on the known facts with a match attempt in between
-  def matchAddressCleanKnownFacts(knownAddress: Address, ifAddress: Address) = {
+  // Option 3: Logic could clean the known facts first if no match; clean the IF (HoDs) data and
+  // make a second pass (combine options 3 and 4)
+  def tryMatch(knownAddress: Address, ifAddress: Address) = {
+    matchAddressCleanKnownFacts(knownAddress, ifAddress) ||
+      matchAddressCleanBoth(knownAddress, ifAddress)
+  }
+
+  private def matchAddressCleanKnownFacts(knownAddress: Address, ifAddress: Address) = {
 
     def check1 = knownAddress.ignoreCaseAndSpaces.equals(ifAddress.ignoreCaseAndSpaces)
     def check2 = knownAddress.withoutPunctuation.equals(ifAddress.ignoreCaseAndSpaces)
@@ -40,20 +46,12 @@ class AddressMatchingService {
     check1 || check2 || check3
   }
 
-  // Option 4: Try a series of data cleanses on both sets of data with a match attempt in between
-  def matchAddressCleanBoth(knownAddress: Address, ifAddress: Address) = {
+  private def matchAddressCleanBoth(knownAddress: Address, ifAddress: Address) = {
 
     def check1 = knownAddress.ignoreCaseAndSpaces.equals(ifAddress.ignoreCaseAndSpaces)
     def check2 = knownAddress.withoutPunctuation.equals(ifAddress.withoutPunctuation)
     def check3 = knownAddress.cleanPostOfficeBox.equals(ifAddress.cleanPostOfficeBox)
 
     check1 || check2 || check3
-  }
-
-  // Option 5: Logic could clean the known facts first if no match; clean the IF (HoDs) data and
-  // make a second pass (combine options 3 and 4)
-  def tryMatch(knownAddress: Address, ifAddress: Address) = {
-    matchAddressCleanKnownFacts(knownAddress, ifAddress) ||
-      matchAddressCleanBoth(knownAddress, ifAddress)
   }
 }

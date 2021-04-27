@@ -97,66 +97,6 @@ class addressMatchingServiceSpec extends AnyWordSpec with Matchers {
       }
     }
 
-    "matchAddressCleanKnownFacts" should {
-      "match an exact address" in new Fixture {
-        val knownFacts = models.Address("foo", "bar", None, None, "code")
-        val ifAddress = models.Address("foo", "bar", None, None, "code")
-
-        addressMatchingService.matchAddressCleanKnownFacts(knownFacts, ifAddress) shouldBe true
-      }
-
-      "match an address where case differs" in new Fixture {
-        val knownFacts = models.Address("Foo", "Bar", None, None, "Code")
-        val ifAddress = models.Address("foo", "bar", None, None, "code")
-
-        addressMatchingService.matchAddressCleanKnownFacts(knownFacts, ifAddress) shouldBe true
-      }
-
-      "match an address where known facts has punctuation marks" in new Fixture {
-        val knownFacts = models.Address("foo.", "bar!", None, None, "code,")
-        val ifAddress = models.Address("foo", "bar", None, None, "code")
-
-        addressMatchingService.matchAddressCleanKnownFacts(knownFacts, ifAddress) shouldBe true
-      }
-
-      "match an address where known facts has whitespace" in new Fixture {
-        val knownFacts = models.Address(" foo ", " ba  r", None, None, " c ode")
-        val ifAddress = models.Address("foo", "bar", None, None, "code")
-
-        addressMatchingService.matchAddressCleanKnownFacts(knownFacts, ifAddress) shouldBe true
-      }
-    }
-
-    "matchAddressCleanBoth" should {
-      "match an exact address" in new Fixture {
-        val knownFacts = models.Address("foo", "bar", None, None, "code")
-        val ifAddress = models.Address("foo", "bar", None, None, "code")
-
-        addressMatchingService.matchAddressCleanBoth(knownFacts, ifAddress) shouldBe true
-      }
-
-      "match an address where case differs in the HoDs" in new Fixture {
-        val knownFacts = models.Address("Foo", "Bar", None, None, "Code")
-        val ifAddress = models.Address("foo", "baR", None, None, "cOde")
-
-        addressMatchingService.matchAddressCleanBoth(knownFacts, ifAddress) shouldBe true
-      }
-
-      "match an address where known facts has punctuation marks in the HoDs" in new Fixture {
-        val knownFacts = models.Address("foo.", "bar!", None, None, "code,")
-        val ifAddress = models.Address("foo", "bar.", None, None, "co^de")
-
-        addressMatchingService.matchAddressCleanBoth(knownFacts, ifAddress) shouldBe true
-      }
-
-      "match an address where known facts has whitespace in the HoDs" in new Fixture {
-        val knownFacts = models.Address(" foo ", " ba  r", None, None, " c ode")
-        val ifAddress = models.Address("foo", "b ar", None, None, "cod    e")
-
-        addressMatchingService.matchAddressCleanBoth(knownFacts, ifAddress) shouldBe true
-      }
-    }
-
     "tryMatch" should {
       "match an exact address" in new Fixture {
         val knownFacts = models.Address("foo", "bar", None, None, "code")
