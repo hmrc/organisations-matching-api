@@ -1,39 +1,56 @@
+/*
+ * Copyright 2021 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.organisationsmatchingapi.services
 
 import uk.gov.hmrc.organisationsmatchingapi.models.Address
 
 class AddressMatchingService {
 
-  // Option 1 will try a series of data cleanses with a match attempt in between.
+  // Option 1 will try a series of data cleanses on the known facts with a match attempt in between.
   // This means we could potentially trigger a match prior to manipulating the data too much.
-  def matchAddress(knownAddress: Address, ifAddress: Address) = {
-    knownAddress.ignoreCase match {
-      case ifAddress.ignoreCase => true
-      case _ => {
-        knownAddress.withoutPunctuation match {
-          case ifAddress.withoutPunctuation => true
-          case _ => {
-            knownAddress.withoutWitespace match {
-              case ifAddress.withoutWitespace => true
-              case _ => {
-                knownAddress.cleanPostOfficeBox match {
-                  case ifAddress.cleanPostOfficeBox => true
-                  case _ => false
-                }
-              }
-            }
-          }
-        }
-      }
-    }
+  // Minimum manipulation of the HoDs data
+  def matchAddressPreserveHoDsData(knownAddress: Address, ifAddress: Address) = {
+
+    def check1 = knownAddress.ignoreCase.equals(ifAddress.ignoreCase)
+    def check2 = knownAddress.withoutPunctuation.equals(ifAddress.ignoreCase)
+    def check3 = knownAddress.withoutWitespace.equals(ifAddress.ignoreCase)
+    def check4 = knownAddress.cleanPostOfficeBox.equals(ifAddress.ignoreCase)
+
+    check1 || check2 || check3 || check4
   }
 
-  // Option two fully cleanses (manipulates) the data prior to the match.
+  // Option 2 will try a series of data cleanses on both sets of data with a match attempt in between.
+  // This means we could potentially trigger a match prior to manipulating the data too much.
+  // Some manipulation of the HoDs data
+  def matchAddressFormatHoDsData(knownAddress: Address, ifAddress: Address) = {
+
+    def check1 = knownAddress.ignoreCase.equals(ifAddress.ignoreCase)
+    def check2 = knownAddress.withoutPunctuation.equals(ifAddress.withoutPunctuation)
+    def check3 = knownAddress.withoutWitespace.equals(ifAddress.withoutWitespace)
+    def check4 = knownAddress.cleanPostOfficeBox.equals(ifAddress.cleanPostOfficeBox)
+
+    check1 || check2 || check3 || check4
+  }
+
+  // Option 3 fully cleanses (manipulates) the data prior to the match.
   // This means we may get a quicker match however; we have heavily manipulated the data. Possibly unnecessarily.
-  def matchAddressCleanAll(knownAddress: Address, ifAddress: Address) = {
-    knownAddress.cleanAll match {
-      case ifAddress.cleanAll => true
-      case _                  => false
-    }
+  def matchAddressFormatAll(knownAddress: Address, ifAddress: Address) = {
+
+    knownAddress.cleanAll.equals(ifAddress.cleanAll)
+
   }
 }
