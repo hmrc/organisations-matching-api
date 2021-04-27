@@ -20,22 +20,12 @@ import uk.gov.hmrc.organisationsmatchingapi.models.Address
 
 class AddressMatchingService {
 
-  // TODO - Logic could run option one followed by option 2 if no match
-  // This means we could potentially trigger a match prior to manipulating the data too much.
-  def tryMatch(knownAddress: Address, ifAddress: Address): Unit = {
-    matchAddressCleanKnownFacts(knownAddress, ifAddress) ||
-      matchAddressCleanBoth(knownAddress, ifAddress)
-  }
-
-  // TODO - A full match could be to full clean both objects prior to the comparison
-  // Full manipulation and then attempt to match
+  // Option 1: A full match by cleaning both objects prior to the comparison
   def cleanMatch(knownAddress: Address, ifAddress: Address): Unit = {
-    matchAddressQuick(knownAddress, ifAddress)
+    knownAddress.cleanAll.equals(ifAddress.cleanAll)
   }
 
-  // Option 1 will try a series of data cleanses on the known facts with a match attempt in between.
-  // This means we could potentially trigger a match prior to manipulating the data too much.
-  // Minimum manipulation of the HoDs data
+  // Option 2: Try a series of data cleanses on the known facts with a match attempt in between
   def matchAddressCleanKnownFacts(knownAddress: Address, ifAddress: Address) = {
 
     def check1 = knownAddress.ignoreCaseAndSpaces.equals(ifAddress.ignoreCaseAndSpaces)
@@ -45,9 +35,7 @@ class AddressMatchingService {
     check1 || check2 || check3
   }
 
-  // Option 2 will try a series of data cleanses on both sets of data with a match attempt in between.
-  // This means we could potentially trigger a match prior to manipulating the data too much.
-  // Some manipulation of the HoDs data
+  // Option 3: Try a series of data cleanses on both sets of data with a match attempt in between
   def matchAddressCleanBoth(knownAddress: Address, ifAddress: Address) = {
 
     def check1 = knownAddress.ignoreCaseAndSpaces.equals(ifAddress.ignoreCaseAndSpaces)
@@ -57,11 +45,10 @@ class AddressMatchingService {
     check1 || check2 || check3
   }
 
-  // Option 3 fully cleanses (manipulates) the data prior to the match.
-  // This means we may get a quicker match however; we have heavily manipulated the data. Possibly unnecessarily.
-  def matchAddressQuick(knownAddress: Address, ifAddress: Address) = {
-
-    knownAddress.cleanAll.equals(ifAddress.cleanAll)
-
+  // Option 4: Logic could clean the known facts first if no match; clean the IF (HoDs) data and
+  // make a second pass (combine options 2 and 3)
+  def tryMatch(knownAddress: Address, ifAddress: Address): Unit = {
+    matchAddressCleanKnownFacts(knownAddress, ifAddress) ||
+      matchAddressCleanBoth(knownAddress, ifAddress)
   }
 }
