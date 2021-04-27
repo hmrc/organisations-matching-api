@@ -2,8 +2,8 @@
   "type": "object",
   "description": "Company's CRN and known facts",
   "required": [
-    "crn",
-    "name",
+    "companyRegistrationNumber",
+    "employerName",
     "address",
     "postcode"
   ],
@@ -11,15 +11,15 @@
     "crn": {
       "type": "string",
       "description": "Company Registration Number",
-      "pattern": "^([A-Za-z0-9]{0,2})?([0-9]{1,6})$"
+      "pattern": "^[A-Z0-9]{1,10}$"
     },
-    "name": {
+    "employerName": {
       "type": "string",
-      "description": "Company name"
+      "description": "Employer name"
     },
     "address": {
       "type": "object",
-      "description": "Company address",
+      "description": "Address",
       "required": [
         "addressLine1"
       ],
@@ -35,12 +35,12 @@
         },
         "addressLine4": {
           "type": "string"
+        },
+        "postcode": {
+          "type": "string",
+          "description": "Postcode"
         }
       }
-    },
-    "postcode": {
-      "type": "string",
-      "description": "Company's postcode"
     }
   }
 }

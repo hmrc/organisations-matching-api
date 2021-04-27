@@ -25,36 +25,36 @@ uses:
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
 /organisations:
-  /matching/crn:
+  /matching/paye:
     /:
       post:
-        displayName: CRN Matching Request
-        description: This endpoint takes a JSON body that contains a Company's CRN and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls.
+        displayName: PAYE Matching Request
+        description: Matches posted information with known facts and generates the matchID
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         headers:
-          Authorization:
-            description: OAuth 2.0 Bearer Token with the read:individuals-matching scope.
-            type: string
-            required: true
-            example: Bearer <BEARER_TOKEN>
-          Content-Type:
-            description: Specifies the content-type of the body.
-            type: string
-            required: true
-            example: application/json
+           CorrelationId:
+             description: !include ./includes/correlationId.md
+             type: string
+             required: true
+             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+         queryParameters:
+           matchId:
+             description: "A short-lived universally unique identifier (UUID), typically valid for several hours. Generated through the Organisations Matching API."
+             type: string
+             example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
         body:
           application/json:
-            type: !include schemas/crn-matching-request.json
-            example: !include examples/crn-matching-request-example.json
+            type: !include schemas/paye-matching-request.json
+            example: !include examples/paye-matching-request-example.json
         responses:
           200:
             description: Returns a matchId which can be used to make calls to details endpoints
             body:
               application/json:
-                type: !include schemas/crn-matching-response.json
-                example: !include examples/crn-matching-response-example.json
+                type: !include schemas/paye-matching-response.json
+                example: !include examples/paye-matching-response-example.json
           400:
             body:
               application/json:
@@ -158,8 +158,8 @@ uses:
             description: The company's Corporation Tax details
             body:
               application/json:
-                type: !include schemas/crn-details-response.json
-                example: !include examples/crn-details-response-example.json
+                type: !include schemas/paye-details-response.json
+                example: !include examples/paye-details-response-example.json
           404:
             body:
               application/json:

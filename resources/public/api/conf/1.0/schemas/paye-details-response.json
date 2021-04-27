@@ -1,0 +1,43 @@
+{
+  "type": "object",
+  "description": "Company Details Response",
+  "properties": {
+    "details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "employerName": {
+            "type": "string",
+            "example": "Employer Name"
+          },
+          "address": {
+            "type": "object",
+            "description": "Address",
+            "required": [
+              "addressLine1"
+            ],
+            "properties": {
+              "addressLine1": {
+                "type": "string"
+              },
+              "addressLine2": {
+                "type": "string"
+              },
+              "addressLine3": {
+                "type": "string"
+              },
+              "addressLine4": {
+                "type": "string"
+              },
+              "postcode": {
+                "type": "string",
+                "description": "Postcode"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
