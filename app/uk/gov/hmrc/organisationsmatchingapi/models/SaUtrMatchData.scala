@@ -18,30 +18,14 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-case class SaUtrMatchData(utr: String, taxPayerName: String, taxPayerType: String, address: Address) {
-  def asString = {
+case class SaUtrMatchData(utr: String, taxPayerName: String, taxPayerType: String, address: Address) extends MatchDataBase {
+  override def asString = {
     List[Option[String]](
       Some(utr),
       Some(taxPayerName),
       Some(taxPayerType),
       Some(address.asString),
     ).flatten.mkString(" ")
-  }
-
-  def ignoreCaseAndSpaces = {
-    asString.toLowerCase.filterNot((x: Char) => x.isWhitespace)
-  }
-
-  def withoutPunctuation = {
-    ignoreCaseAndSpaces.replaceAll("""[\p{Punct}]""", "")
-  }
-
-  def cleanPostOfficeBox = {
-    withoutPunctuation.replaceAll("p.o.|p.0|p0|p.0|postoffice", "po")
-  }
-
-  def cleanAll = {
-    cleanPostOfficeBox
   }
 }
 
