@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.organisationsmatchingapi.models
 
-class addressSpec extends AnyWordSpec with Matchers {
+class AddressSpec extends AnyWordSpec with Matchers {
 
   "Address" should {
 

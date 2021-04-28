@@ -20,12 +20,12 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.organisationsmatchingapi.models
 
-class crnMatchDataSpec extends AnyWordSpec with Matchers {
+class CrnMatchDataSpec extends AnyWordSpec with Matchers {
 
-  "Address" should {
+  "crnMatchData" should {
 
-    "crnMatchData" should {
-      "Write the data as String" in {
+    "asString" should {
+      "write the data as String" in {
         val data = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
         data.asString shouldBe "mycrn myname foo bar code"

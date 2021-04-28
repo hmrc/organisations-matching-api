@@ -18,21 +18,21 @@ package uk.gov.hmrc.organisationsmatchingapi.services
 
 import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatchData}
 
-class OrganisationsMatchingService {
+class CrnMatchingService {
 
   //Option 1: Basic match no manipulation
-  def basicMatchCrn(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
+  def basicMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
     knownFactsData.asString.equals(ifData.asString)
   }
 
   // Option 2: A full match by cleaning both objects prior to the comparison
-  def cleanMatchCrn(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
+  def cleanMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
     knownFactsData.cleanAll.equals(ifData.cleanAll)
   }
 
   // Option 3: Logic could clean the known facts first if no match; clean the IF (HoDs) data and
   // make a second pass (combine options 3 and 4)
-  def tryMatchCrn(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
+  def tryMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
     matchCleanKnownFacts(knownFactsData, ifData) ||
       matchCleanBothSets(knownFactsData, ifData)
   }

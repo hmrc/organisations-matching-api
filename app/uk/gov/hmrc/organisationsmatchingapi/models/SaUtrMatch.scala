@@ -22,8 +22,7 @@ import java.util.UUID.randomUUID
 
 import play.api.libs.json.Json
 
-//TODO: Leaving these in from original repository - they will need updated
-case class SaUtrMatch(request: SaUtrMatchingRequest, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
+case class SaUtrMatch(request: SaUtrMatchData, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
 
 object SaUtrMatch {
   implicit val formats = Json.format[SaUtrMatch]

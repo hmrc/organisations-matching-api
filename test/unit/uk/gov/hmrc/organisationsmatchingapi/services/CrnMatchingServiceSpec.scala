@@ -19,131 +19,131 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.services
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.organisationsmatchingapi.models
-import uk.gov.hmrc.organisationsmatchingapi.services.OrganisationsMatchingService
+import uk.gov.hmrc.organisationsmatchingapi.services.CrnMatchingService
 
-class addressMatchingServiceSpec extends AnyWordSpec with Matchers {
+class CrnMatchingServiceSpec extends AnyWordSpec with Matchers {
 
   trait Fixture {
-    val addressMatchingService = new OrganisationsMatchingService
+    val crnMatchingService = new CrnMatchingService
   }
 
-  "addressMatchingService" should {
-    "basicMatchCrn" should {
+  "crnMatchingService" should {
+    "basicMatch" should {
       "match a basic address" in new Fixture {
 
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.basicMatchCrn(knownFactsData, ifData)
+        crnMatchingService.basicMatch(knownFactsData, ifData)
       }
 
       "fail to match where white space differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn ", " myname", models.Address("foo ", "b ar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.basicMatchCrn(knownFactsData, ifData) shouldBe false
+        crnMatchingService.basicMatch(knownFactsData, ifData) shouldBe false
       }
 
       "fail to match where punctuation differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("myc!rn ", " my'name", models.Address("foo .", "b ar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.basicMatchCrn(knownFactsData, ifData) shouldBe false
+        crnMatchingService.basicMatch(knownFactsData, ifData) shouldBe false
       }
 
       "fail to match where PO box differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("myc!rn ", " my'name", models.Address("P.O. Box787", "bar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("PO Box787", "bar", None, None, "code"))
 
-        addressMatchingService.basicMatchCrn(knownFactsData, ifData) shouldBe false
+        crnMatchingService.basicMatch(knownFactsData, ifData) shouldBe false
       }
     }
 
-    "cleanMatchCrn" should {
+    "cleanMatch" should {
       "match a basic address" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.cleanMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.cleanMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match where white space differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn ", " myname", models.Address("foo ", "b ar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.cleanMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.cleanMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match where punctuation differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("myc!rn ", " my'name", models.Address("foo .", "b ar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.cleanMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.cleanMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match where PO box differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("myc!rn ", " my'name", models.Address("P.O. Box787", "bar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("PO Box787", "bar", None, None, "code"))
 
-        addressMatchingService.cleanMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.cleanMatch(knownFactsData, ifData) shouldBe true
       }
 
       "fail to match where the address itself differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bat", None, None, "code"))
 
-        addressMatchingService.cleanMatchCrn(knownFactsData, ifData) shouldBe false
+        crnMatchingService.cleanMatch(knownFactsData, ifData) shouldBe false
       }
     }
 
-    "tryMatchCrn" should {
+    "tryMatch" should {
       "match an exact address" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match an address where case differs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("Foo", "Bar", None, None, "Code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match an address where known facts has punctuation marks" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("foo.", "bar!", None, None, "code,"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match an address where known facts has whitespace" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address(" foo ", " ba  r", None, None, " c ode"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar", None, None, "code"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match an address where case differs in the HoDs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("Foo", "Bar", None, None, "Code"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "baR", None, None, "cOde"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match an address where known facts has punctuation marks in the HoDs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address("foo.", "bar!", None, None, "code,"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "bar.", None, None, "co^de"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match an address where known facts has whitespace in the HoDs" in new Fixture {
         val knownFactsData = models.CrnMatchData("mycrn", "myname", models.Address(" foo ", " ba  r", None, None, " c ode"))
         val ifData = models.CrnMatchData("mycrn", "myname", models.Address("foo", "b ar", None, None, "cod    e"))
 
-        addressMatchingService.tryMatchCrn(knownFactsData, ifData) shouldBe true
+        crnMatchingService.tryMatch(knownFactsData, ifData) shouldBe true
       }
     }
   }

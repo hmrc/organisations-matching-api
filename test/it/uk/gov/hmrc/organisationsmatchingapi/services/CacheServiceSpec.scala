@@ -24,7 +24,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatch, CrnMatchData, SaUtrMatch, SaUtrMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatch, CrnMatchData, SaUtrMatch, SaUtrMatchData}
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 import util.UnitSpec
 
@@ -52,7 +52,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       uuid
     )
 
-    val saUtrRequest = SaUtrMatchingRequest("", "", "", Address(
+    val saUtrRequest = SaUtrMatchData("", "", "", Address(
       "line1",
       "line2",
       Some("line3"),
