@@ -18,8 +18,7 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-//TODO: Leaving these in from original repository - they will need updated
-case class SaUtrMatchingRequest(organisationType: String, utr: String, name: String, address: Address)
+case class SaUtrMatchingRequest(utr: String, taxPayerName: String, taxPayerType: String, address: Address)
 
 object SaUtrMatchingRequest {
   implicit val formats = Json.format[SaUtrMatchingRequest]

@@ -18,9 +18,32 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-//TODO: Leaving these in from original repository - they will need updated
-case class CrnMatchingRequest(crn: String, name: String, address: Address)
+case class CrnMatchData(crn: String, employerName: String, address: Address) {
+  def asString = {
+    List[Option[String]](
+      Some(crn),
+      Some(employerName),
+      Some(address.asString),
+    ).flatten.mkString(" ")
+  }
 
-object CrnMatchingRequest {
-  implicit val formats = Json.format[CrnMatchingRequest]
+  def ignoreCaseAndSpaces = {
+    asString.toLowerCase.filterNot((x: Char) => x.isWhitespace)
+  }
+
+  def withoutPunctuation = {
+    ignoreCaseAndSpaces.replaceAll("""[\p{Punct}]""", "")
+  }
+
+  def cleanPostOfficeBox = {
+    withoutPunctuation.replaceAll("p.o.|p.0|p0|p.0|postoffice", "po")
+  }
+
+  def cleanAll = {
+    cleanPostOfficeBox
+  }
+}
+
+object CrnMatchData {
+  implicit val formats = Json.format[CrnMatchData]
 }

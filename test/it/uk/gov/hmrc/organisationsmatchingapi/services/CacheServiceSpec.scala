@@ -24,7 +24,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatch, CrnMatchingRequest, SaUtrMatch, SaUtrMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatch, CrnMatchData, SaUtrMatch, SaUtrMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 import util.UnitSpec
 
@@ -36,7 +36,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     val uuid:UUID = randomUUID()
     val cacheService = app.injector.instanceOf(classOf[CacheService])
 
-    val crnRequest = CrnMatchingRequest(
+    val crnRequest = CrnMatchData(
       "crn",
       "name",
       Address(
