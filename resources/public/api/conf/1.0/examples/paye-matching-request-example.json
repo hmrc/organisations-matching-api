@@ -1,6 +1,6 @@
 {
-  "crn": "AA123456",
-  "name": "Example Company Ltd",
+  "companyRegistrationNumber": "AA123456",
+  "employerName": "Example Company Ltd",
   "address": {
     "addressLine1": "123 Long Road",
     "addressLine2": "Some City",
