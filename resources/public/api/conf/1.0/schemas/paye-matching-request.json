@@ -8,7 +8,7 @@
     "postcode"
   ],
   "properties": {
-    "crn": {
+    "companyRegistrationNumber": {
       "type": "string",
       "description": "Company Registration Number",
       "pattern": "^[A-Z0-9]{1,10}$"
@@ -21,7 +21,9 @@
       "type": "object",
       "description": "Address",
       "required": [
-        "addressLine1"
+        "addressLine1",
+        "addressLine2",
+        "postcode"
       ],
       "properties": {
         "addressLine1": {
