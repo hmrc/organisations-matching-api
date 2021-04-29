@@ -4,8 +4,7 @@
   "required": [
     "companyRegistrationNumber",
     "employerName",
-    "address",
-    "postcode"
+    "address"
   ],
   "properties": {
     "companyRegistrationNumber": {
