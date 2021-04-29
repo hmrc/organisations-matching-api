@@ -1,50 +1,61 @@
 {
   "type": "object",
   "required": [
-    "organisationType",
-    "utr",
-    "name",
-    "address",
-    "postcode"
+    "taxPayerType",
+    "selfAssessmentUniqueTaxPayerRef",
+    "taxPayerName",
+    "address"
   ],
   "properties": {
-    "organisationType": {
+    "selfAssessmentUniqueTaxPayerRef": {
       "type": "string",
-      "description": "S = Sole Trader, P = Partnership",
+      "pattern": "^[0-9]{10}$",
+      "example": "1234567890"
+    },
+    "taxPayerType": {
+      "type": "string",
+      "description": "Individual, Partnership",
       "enum": [
-        "S",
-        "P"
+        "Individual",
+        "Partnership"
       ]
     },
-    "utr": {
+    "taxPayerName": {
       "type": "string",
-      "pattern": "^[0-9]{10}$"
-    },
-    "name": {
-      "type": "string"
+      "description": "The name of the organisation.",
+      "example": "Example Partnership"
     },
     "address": {
       "type": "object",
+      "description": "The organisation's address.",
       "required": [
-        "addressLine1"
+        "addressLine1",
+        "addressLine2",
+        "postcode"
       ],
       "properties": {
         "addressLine1": {
-          "type": "string"
+          "type": "string",
+          "description": "The first line of the organisation's address.",
+          "example": "123 Long Road"
         },
         "addressLine2": {
-          "type": "string"
+          "type": "string",
+          "description": "The second line of the organisation's address.",
+          "example": "Some City"
         },
         "addressLine3": {
-          "type": "string"
+          "type": "string",
+          "example": "Some County"
         },
         "addressLine4": {
           "type": "string"
+        },
+        "postcode": {
+          "type": "string",
+          "example": "AB12 3CD"
         }
       }
-    },
-    "postcode": {
-      "type": "string"
     }
   }
 }

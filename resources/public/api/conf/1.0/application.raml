@@ -73,9 +73,9 @@ uses:
                     value:
                       code: MATCHING_FAILED
 
-  /matching/sautr:
+  /matching/self-assessment:
       post:
-        displayName: SAUTR Matching Request
+        displayName: Self Assessment Matching Request
         description: "This endpoint takes a JSON body that contains a UTR, Organisation Type and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls."
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
@@ -120,7 +120,7 @@ uses:
                     description: "The organisation's details provided did not match with HMRC's records"
                     value:
                       code: MATCHING_FAILED
-  /details/crn:
+  /details/paye:
     /{matchId}:
       uriParameters:
         matchId:
@@ -128,7 +128,7 @@ uses:
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: "CRN Details"
+        displayName: "PAYE Details"
         description: "This endpoint takes a matchId and returns corporation tax information for the company"
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
@@ -168,7 +168,7 @@ uses:
                     description: "Not Found"
                     value:
                       code: NOT_FOUND
-  /details/sautr:
+  /details/self-assessment:
     /{matchId}:
       uriParameters:
         matchId:
@@ -176,7 +176,7 @@ uses:
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: "SAUTR Details"
+        displayName: "Self Assessment Details"
         description: "This endpoint takes a matchId and returns self assessment information for the organisation"
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"

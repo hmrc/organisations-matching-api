@@ -1,22 +1,28 @@
 {
-  "details": [
-    {
-      "year": 2017,
-      "turnover": 1000000.00,
-      "registrationDate": "2001-01-01",
-      "taxSolvencyStatus": "S"
+  "taxPayerType": "Partnership",
+  "taxPayerName": "Example Partnership",
+  "address": {
+    "addressLine1": "123 Long Road",
+    "addressLine2": "Some City",
+    "addressLine3": "Some County",
+    "addressLine4": "",
+    "postcode": "AB12 3CD"
+  },
+  "_links": {
+    "self": {
+      "href": "organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "name": "GET",
+      "title": "Get the organisation's sa data."
     },
-    {
-      "year": 2018,
-      "turnover": 1500000.00,
-      "registrationDate": "2001-01-01",
-      "taxSolvencyStatus": "S"
+    "getDetails": {
+      "href": "organisations/details/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "name": "GET",
+      "title": "Get the organisation's self-assessment details data."
     },
-    {
-      "year": 2019,
-      "turnover": 2000000.00,
-      "registrationDate": "2001-01-01",
-      "taxSolvencyStatus": "S"
+    "getEmployeeCount": {
+      "href": "organisations/details/number-of-employees/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "name": "GET",
+      "title": "Get the organisation's self-assessment employee count data."
     }
-  ]
+  }
 }

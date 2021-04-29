@@ -1,12 +1,12 @@
 {
-  "organisationType": "P",
-  "utr": "1234567890",
-  "name": "Example Partnership",
+  "selfAssessmentUniqueTaxPayerRef": "1234567890",
+  "taxPayerType": "Partnership",
+  "taxPayerName": "Example Partnership",
   "address": {
     "addressLine1": "123 Long Road",
     "addressLine2": "Some City",
     "addressLine3": "Some County",
-    "addressLine4": ""
-  },
-  "postcode": "AB12 3CD"
+    "addressLine4": "",
+    "postcode": "AB12 3CD"
+  }
 }
