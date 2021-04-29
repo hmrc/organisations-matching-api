@@ -33,16 +33,16 @@ uses:
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         headers:
-           CorrelationId:
-             description: !include ./includes/correlationId.md
-             type: string
-             required: true
-             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+          CorrelationId:
+            description: !include ./includes/correlationId.md
+            type: string
+            required: true
+            example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
         queryParameters:
-           matchId:
-             description: "A short-lived universally unique identifier (UUID), typically valid for several hours. Generated through the Organisations Matching API."
-             type: string
-             example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+          matchId:
+            description: "A short-lived universally unique identifier (UUID), typically valid for several hours. Generated through the Organisations Matching API."
+            type: string
+            example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
         body:
           application/json:
             type: !include schemas/paye-matching-request.json
