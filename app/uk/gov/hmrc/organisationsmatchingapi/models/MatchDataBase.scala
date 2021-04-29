@@ -27,15 +27,18 @@ class MatchDataBase {
   }
 
   def withoutPunctuation = {
-    ignoreCaseAndSpaces.replaceAll("""[\p{Punct}]""", "")
+    asString.replaceAll("""[\p{Punct}]""", "")
   }
 
   def cleanPostOfficeBox = {
-    withoutPunctuation.replaceAll("p.o.|p.0|p0|p.0|postoffice", "po")
+    asString.replaceAll("p.o.|p.0|p0|p.0|post office|P.O.|P.0|P0|P.0|POST OFFICE|Post Office", "PO")
   }
 
   def cleanAll = {
-    cleanPostOfficeBox
+    asString
+      .replaceAll("""[\p{Punct}]""", "")
+      .replaceAll("p.o.|p.0|p0|p.0|post office|P.O.|P.0|P0|P.0|POST OFFICE|Post Office", "PO")
+      .toLowerCase.filterNot((x: Char) => x.isWhitespace)
   }
 
 }

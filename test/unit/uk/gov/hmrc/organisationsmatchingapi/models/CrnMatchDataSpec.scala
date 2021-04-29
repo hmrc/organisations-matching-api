@@ -53,24 +53,24 @@ class CrnMatchDataSpec extends AnyWordSpec with Matchers {
     }
 
     "withoutPunctuation" should {
-      "ignore case and remove punctuation" in {
+      "remove punctuation" in {
         val data = models.CrnMatchData("mycrn!", "myname,", models.Address("foo!", "bar,", Some("one"), Some("two"), "code*"))
 
-        data.withoutPunctuation shouldBe "mycrnmynamefoobaronetwocode"
+        data.withoutPunctuation shouldBe "mycrn myname foo bar one two code"
       }
     }
 
     "cleanPostOfficeBox" should {
-      "ignore case and remove punctuation without whitespace and clean post office box" in {
-        val data = models.CrnMatchData("mycrn", "myname", models.Address(" P.O. Box 7169!", "bar,", Some("one "), Some("two"), "co de*"))
+      "clean post office box" in {
+        val data = models.CrnMatchData("mycrn", "myname", models.Address("P.O. Box 7169", "bar", Some("one"), Some("two"), "code"))
 
-        data.cleanPostOfficeBox shouldBe "mycrnmynamepobox7169baronetwocode"
+        data.cleanPostOfficeBox shouldBe "mycrn myname PO Box 7169 bar one two code"
       }
 
-      "ignore case and remove punctuation without whitespace and clean post office box full" in {
-        val data = models.CrnMatchData("mycrn", "myname", models.Address(" POST OFFICE Box 7169!", "bar,  ", Some("one "), Some("two"), "co de*"))
+      "clean post office box full" in {
+        val data = models.CrnMatchData("mycrn", "myname", models.Address("POST OFFICE Box 7169", "bar", Some("one"), Some("two"), "code"))
 
-        data.cleanPostOfficeBox shouldBe "mycrnmynamepobox7169baronetwocode"
+        data.cleanPostOfficeBox shouldBe "mycrn myname PO Box 7169 bar one two code"
       }
     }
   }

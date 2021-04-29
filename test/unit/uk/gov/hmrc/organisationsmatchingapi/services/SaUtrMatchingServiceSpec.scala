@@ -45,14 +45,14 @@ class SaUtrMatchingServiceSpec extends AnyWordSpec with Matchers {
       }
 
       "fail to match where punctuation differs" in new Fixture {
-        val knownFactsData = models.SaUtrMatchData("myu!tr ", " my'name", "PARTNER", models.Address("foo .", "b ar", None, None, "code"))
+        val knownFactsData = models.SaUtrMatchData("myu!tr ", " my'name", "PARTNER", models.Address("foo.", "bar", None, None, "code"))
         val ifData = models.SaUtrMatchData("myutr", "myname", "PARTNER", models.Address("foo", "bar", None, None, "code"))
 
         saUtrMatchingService.basicMatch(knownFactsData, ifData) shouldBe false
       }
 
       "fail to match where PO box differs" in new Fixture {
-        val knownFactsData = models.SaUtrMatchData("myu!tr ", " my'name", "PARTNER", models.Address("P.O. Box787", "bar", None, None, "code"))
+        val knownFactsData = models.SaUtrMatchData("myutr ", " myname", "PARTNER", models.Address("P.O. Box787", "bar", None, None, "code"))
         val ifData = models.SaUtrMatchData("myutr", "myname", "PARTNER", models.Address("PO Box787", "bar", None, None, "code"))
 
         saUtrMatchingService.basicMatch(knownFactsData, ifData) shouldBe false
@@ -75,14 +75,14 @@ class SaUtrMatchingServiceSpec extends AnyWordSpec with Matchers {
       }
 
       "match where punctuation differs" in new Fixture {
-        val knownFactsData = models.SaUtrMatchData("myu!tr ", " my'name", "PARTNER", models.Address("foo .", "b ar", None, None, "code"))
+        val knownFactsData = models.SaUtrMatchData("myu!tr ", " my'name", "PARTNER", models.Address("foo.", "bar", None, None, "code"))
         val ifData = models.SaUtrMatchData("myutr", "myname", "PARTNER", models.Address("foo", "bar", None, None, "code"))
 
         saUtrMatchingService.cleanMatch(knownFactsData, ifData) shouldBe true
       }
 
       "match where PO box differs" in new Fixture {
-        val knownFactsData = models.SaUtrMatchData("myu!tr ", " my'name", "PARTNER", models.Address("P.O. Box787", "bar", None, None, "code"))
+        val knownFactsData = models.SaUtrMatchData("myutr ", " myname", "PARTNER", models.Address("P.O. Box787", "bar", None, None, "code"))
         val ifData = models.SaUtrMatchData("myutr", "myname", "PARTNER", models.Address("PO Box787", "bar", None, None, "code"))
 
         saUtrMatchingService.cleanMatch(knownFactsData, ifData) shouldBe true
