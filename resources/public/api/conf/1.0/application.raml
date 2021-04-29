@@ -122,15 +122,14 @@ uses:
                     description: "The organisation's details provided did not match with HMRC's records"
                     value:
                       code: MATCHING_FAILED
-  /details/paye:
-    /{matchId}:
+  /matching/paye/{matchId}:
       uriParameters:
         matchId:
           description: "A short-lived UUID, typically valid for 5 hours"
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: "PAYE Details"
+        displayName: "Get matched organisation's PAYE details"
         description: "This endpoint takes a matchId and returns corporation tax information for the company"
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
@@ -171,15 +170,14 @@ uses:
                     description: "Not Found"
                     value:
                       code: NOT_FOUND
-  /details/self-assessment:
-    /{matchId}:
+  /matching/self-assessment/{matchId}:
       uriParameters:
         matchId:
           description: "A short-lived UUID, typically valid for several hours"
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: "Self Assessment Details"
+        displayName: "Get matched organisation's self-assessment details"
         description: "This endpoint takes a matchId and returns self assessment information for the organisation"
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
