@@ -32,6 +32,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
         headers:
           CorrelationId:
             description: !include ./includes/correlationId.md
@@ -80,6 +81,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
         headers:
           Authorization:
             description: "OAuth 2.0 Bearer Token with the read:organisations-matching scope."
@@ -133,6 +135,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
         headers:
           Authorization:
             description: "OAuth 2.0 Bearer Token with the read:organisations-matching scope."
@@ -181,6 +184,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
         headers:
           Authorization:
             description: "OAuth 2.0 Bearer Token with the read:organisations-matching scope."
