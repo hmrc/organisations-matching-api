@@ -26,20 +26,28 @@
       ],
       "properties": {
         "addressLine1": {
-          "type": "string"
+          "type": "string",
+          "description": "Address line 1.",
+          "example": "123 Long Road"
         },
         "addressLine2": {
-          "type": "string"
+          "type": "string",
+          "description": "Address line 2.",
+          "example": "Some City"
         },
         "addressLine3": {
-          "type": "string"
+          "type": "string",
+          "description": "Address line 3.",
+          "example": "Some County"
         },
         "addressLine4": {
-          "type": "string"
+          "type": "string",
+          "description": "Address line 4."
         },
         "postcode": {
           "type": "string",
-          "description": "Postcode"
+          "description": "The postcode for the address.",
+          "example": "AB12 3CD"
         }
       }
     }

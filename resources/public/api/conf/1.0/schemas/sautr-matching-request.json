@@ -36,23 +36,26 @@
       "properties": {
         "addressLine1": {
           "type": "string",
-          "description": "The first line of the organisation's address.",
+          "description": "Address line 1.",
           "example": "123 Long Road"
         },
         "addressLine2": {
           "type": "string",
-          "description": "The second line of the organisation's address.",
+          "description": "Address line 2.",
           "example": "Some City"
         },
         "addressLine3": {
           "type": "string",
+          "description": "Address line 3.",
           "example": "Some County"
         },
         "addressLine4": {
-          "type": "string"
+          "type": "string",
+          "description": "Address line 4."
         },
         "postcode": {
           "type": "string",
+          "description": "The postcode for the address.",
           "example": "AB12 3CD"
         }
       }
