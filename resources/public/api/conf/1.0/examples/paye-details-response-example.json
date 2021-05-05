@@ -1,6 +1,5 @@
 {
-  "taxPayerType": "Partnership",
-  "taxPayerName": "Example Partnership",
+  "employerName": "Employer Name",
   "address": {
     "addressLine1": "123 Long Road",
     "addressLine2": "Some City",

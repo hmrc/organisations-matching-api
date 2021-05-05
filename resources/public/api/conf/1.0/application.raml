@@ -93,6 +93,11 @@ uses:
             type: string
             required: true
             example: application/json
+          CorrelationId:
+            description: !include ./includes/correlationId.md
+            type: string
+            required: true
+            example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
         body:
           application/json:
             type: !include schemas/sautr-matching-request.json
@@ -141,6 +146,11 @@ uses:
             type: string
             required: true
             example: Bearer <BEARER_TOKEN>
+          CorrelationId:
+            description: !include ./includes/correlationId.md
+            type: string
+            required: true
+            example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
         queryParameters:
           fromYear:
             displayName: From Year
@@ -189,6 +199,11 @@ uses:
             type: string
             required: true
             example: Bearer <BEARER_TOKEN>
+          CorrelationId:
+            description: !include ./includes/correlationId.md
+            type: string
+            required: true
+            example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
         queryParameters:
           fromYear:
             displayName: From Year
