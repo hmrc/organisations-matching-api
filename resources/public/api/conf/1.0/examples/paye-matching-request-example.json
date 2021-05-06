@@ -1,7 +1,6 @@
 {
-  "selfAssessmentUniqueTaxPayerRef": "1234567890",
-  "taxPayerType": "Partnership",
-  "taxPayerName": "Example Partnership",
+  "companyRegistrationNumber": "AA123456",
+  "employerName": "Example Company Ltd",
   "address": {
     "addressLine1": "123 Long Road",
     "addressLine2": "Some City",
