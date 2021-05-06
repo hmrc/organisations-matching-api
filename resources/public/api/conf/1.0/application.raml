@@ -83,11 +83,6 @@ uses:
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
         headers:
-          Authorization:
-            description: "OAuth 2.0 Bearer Token with the read:organisations-matching scope."
-            type: string
-            required: true
-            example: Bearer <BEARER_TOKEN>
           Content-Type:
             description: "Specifies the content-type of the body."
             type: string
@@ -141,29 +136,11 @@ uses:
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
         headers:
-          Authorization:
-            description: "OAuth 2.0 Bearer Token with the read:organisations-matching scope."
-            type: string
-            required: true
-            example: Bearer <BEARER_TOKEN>
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
             required: true
             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
-        queryParameters:
-          fromYear:
-            displayName: From Year
-            type: number
-            description: "The earliest Tax Year from which you would like details"
-            example: 2017
-            required: true
-          toYear:
-            displayName: To Year
-            type: number
-            description: "The latest Tax Year from which you would like details, if not provided then current year will be used"
-            example: 2019
-            required: false
         responses:
           200:
             description: "The company's Corporation Tax details"
@@ -194,29 +171,11 @@ uses:
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
         headers:
-          Authorization:
-            description: "OAuth 2.0 Bearer Token with the read:organisations-matching scope."
-            type: string
-            required: true
-            example: Bearer <BEARER_TOKEN>
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
             required: true
             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
-        queryParameters:
-          fromYear:
-            displayName: From Year
-            type: number
-            description: "The earliest Tax Year from which you would like details"
-            example: 2017
-            required: true
-          toYear:
-            displayName: To Year
-            type: number
-            description: "The latest Tax Year from which you would like details, if not provided then current year will be used"
-            example: 2019
-            required: false
         responses:
           200:
             description: "The Organisation's Self Assessment details"
