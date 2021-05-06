@@ -33,6 +33,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/paye-organisations-matching-request.md
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:individuals-matching scope.
@@ -81,6 +82,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/self-assessment-matching-request.md
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
@@ -134,6 +136,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/matched-organisation-details-test-data.md
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
@@ -182,6 +185,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.sandboxData): !include sandbox/matched-organisation-details-test-data.md
         headers:
           Authorization:
             description: OAuth 2.0 Bearer Token with the read:organisations-matching scope.
