@@ -30,8 +30,8 @@ uses:
         displayName: "PAYE Matching Request"
         description: "Matches posted information with known facts and generates the matchID"
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "assigned"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.scope): "read:organisations-matching"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
         headers:
           CorrelationId:
@@ -79,8 +79,8 @@ uses:
         displayName: Self Assessment Matching Request
         description: "This endpoint takes a JSON body that contains a UTR, Organisation Type and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls."
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "assigned"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.scope): "read:organisations-matching"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
         headers:
           Content-Type:
@@ -132,8 +132,8 @@ uses:
         displayName: "Get matched organisation's PAYE details"
         description: "This endpoint takes a matchId and returns corporation tax information for the company"
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "assigned"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.scope): "read:organisations-matching"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
         headers:
           CorrelationId:
@@ -167,8 +167,8 @@ uses:
         displayName: "Get matched organisation's self-assessment details"
         description: "This endpoint takes a matchId and returns self assessment information for the organisation"
         is: [headers.acceptHeader, headers.contentHeader]
-        (annotations.scope): "assigned"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
+        (annotations.scope): "read:organisations-matching"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
         headers:
           CorrelationId:
