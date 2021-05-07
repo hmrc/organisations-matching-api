@@ -14,7 +14,8 @@
     },
     "employerName": {
       "type": "string",
-      "description": "Employer name"
+      "description": "Employer name",
+      "example": "Example Company Ltd"
     },
     "address": {
       "type": "object",
