@@ -32,7 +32,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
-        (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
+        (annotations.sandboxData): !include sandbox/paye-organisations-matching-request.md
         headers:
           CorrelationId:
             description: !include ./includes/correlationId.md
@@ -81,7 +81,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
-        (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
+        (annotations.sandboxData): !include sandbox/self-assessment-matching-request.md
         headers:
           Content-Type:
             description: "Specifies the content-type of the body."
@@ -134,7 +134,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
-        (annotations.sandboxData): !include sandbox/paye-sandbox-data.md
+        (annotations.sandboxData): !include sandbox/paye-matched-details-response.md
         headers:
           CorrelationId:
             description: !include ./includes/correlationId.md
@@ -169,7 +169,7 @@ uses:
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
-        (annotations.sandboxData): !include sandbox/sa-sandbox-data.md
+        (annotations.sandboxData): !include sandbox/self-assessment-matched-details-response.md
         headers:
           CorrelationId:
             description: !include ./includes/correlationId.md
