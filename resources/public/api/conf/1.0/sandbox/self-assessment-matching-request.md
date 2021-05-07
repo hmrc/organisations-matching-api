@@ -62,9 +62,7 @@
                     taxPayerType &#47; 
                     taxPayerName &#47;
                     addressLine1 &#47; 
-                    addressLine2 &#47; 
-                    addressLine3 &#47; 
-                    addressLine4 &#47; 
+                    addressLine2 &#47;
                     postcode
             </p>
           </td>
