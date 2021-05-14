@@ -20,10 +20,7 @@
            "version": "1.0",
            "status":@Json.toJson(v1Status),
            "endpointsEnabled":@Json.toJson(v1EndpointsEnabled),
-           access":{
-             "type":"PRIVATE",
-             "whitelistedApplicationIds": @Json.toJson("")
-           }
+           "access" : {"type":"PRIVATE"}
          }
        ]
      }
