@@ -15,6 +15,7 @@
        "name": "Organisations Matching",
        "description": "Retrieves matching information for an organisation",
        "context": "organisations/matching",
+       "categories": ["PRIVATE_GOVERNMENT"],
        "versions": [
          {
            "version": "1.0",
