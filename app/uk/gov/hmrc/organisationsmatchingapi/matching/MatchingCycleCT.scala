@@ -17,18 +17,18 @@
 package uk.gov.hmrc.organisationsmatchingapi.matching
 
 import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatchData
+import uk.gov.hmrc.organisationsmatchingapi.models.MatchDataCT
 import uk.gov.hmrc.organisationsmatchingapi.services.MatchingAlgorithm
 
-class CrnMatchingCycle @Inject() extends MatchingAlgorithm {
+class MatchingCycleCT @Inject() extends MatchingAlgorithm {
 
-  override def performMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData): Match = {
+  override def performMatch(knownFactsData: MatchDataCT, ifData: MatchDataCT): Match = {
 
-    val crn = performCrnMatch(knownFactsData.crn, ifData.crn)
-    val empName = performEmployerNameMatch(knownFactsData, ifData)
-    val addrLineOne = performAddressLine1Match(knownFactsData, ifData)
-    val pcode = performPostcodeMatch(knownFactsData.address.postCode, ifData.address.postCode)
+    val crn          = performCrnMatch(knownFactsData.crn, ifData.crn)
+    val empName      = performEmployerNameMatch(knownFactsData, ifData)
+    val addressLine1 = performAddressLine1Match(knownFactsData.address.addressLine1, ifData.address.addressLine1)
+    val postcode     = performPostcodeMatch(knownFactsData.address.postCode, ifData.address.postCode)
 
-    crn and empName and addrLineOne and pcode
+    crn and empName and addressLine1 and postcode
   }
 }

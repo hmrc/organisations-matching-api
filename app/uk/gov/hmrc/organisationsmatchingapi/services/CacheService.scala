@@ -21,7 +21,7 @@ import java.util.UUID
 
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, SaUtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.models.{MatchCT, MatchSA}
 import uk.gov.hmrc.organisationsmatchingapi.repository.{CrnMatchRepository, SaUtrMatchRepository, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -33,10 +33,10 @@ class CacheService @Inject()(
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def getCtUtr(cacheId: UUID, fallbackFunction: () => Future[CrnMatch]): Future[CrnMatch] =
+  def getCtUtr(cacheId: UUID, fallbackFunction: () => Future[MatchCT]): Future[MatchCT] =
     get(cacheId, crnMatchRepository, fallbackFunction)
 
-  def getSaUtr(cacheId: UUID, fallbackFunction: () => Future[SaUtrMatch]): Future[SaUtrMatch] =
+  def getSaUtr(cacheId: UUID, fallbackFunction: () => Future[MatchSA]): Future[MatchSA] =
     get(cacheId, saUtrMatchRepository, fallbackFunction)
 
   private def get[T: Format](cacheId: UUID,

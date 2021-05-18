@@ -18,8 +18,8 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-case class SaMatchingResult(matchedIfData: Option[SaUtrMatchData], errorCodes: Set[Int])
+case class MatchDataSA(utr: Option[String], taxPayerName: Option[String], taxPayerType: Option[String], address: Address)
 
-object SaMatchingResult {
-  implicit val writes = Json.writes[CrnMatchingResult]
+object MatchDataSA {
+  implicit val formats = Json.format[MatchDataSA]
 }

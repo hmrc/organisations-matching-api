@@ -18,19 +18,17 @@ package uk.gov.hmrc.organisationsmatchingapi.services
 
 import uk.gov.hmrc.organisationsmatchingapi.matching.FailureReasons._
 import uk.gov.hmrc.organisationsmatchingapi.matching.{Bad, Good, Homoglyph, Match}
-import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatchData, SaUtrMatchData}
+import uk.gov.hmrc.organisationsmatchingapi.models.{MatchDataCT, MatchDataSA}
 
 trait MatchingAlgorithm {
 
   lazy val homoglyphs: List[Homoglyph] = List(Homoglyph("apostrophe", '\'', Set('\'', '’')))
 
-  def performMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData): Match = {
+  def performMatch(knownFactsData: MatchDataCT, ifData: MatchDataCT): Match =
     throw new Exception("Override me")
-  }
 
-  def performMatch(knownFactsData: SaUtrMatchData, ifData: SaUtrMatchData): Match = {
+  def performMatch(knownFactsData: MatchDataSA, ifData: MatchDataSA): Match =
     throw new Exception("Override me")
-  }
 
   protected def performCrnMatch(knownFactsCrn: Option[String], ifCrn: Option[String]): Match =
     matching[String](knownFactsCrn, ifCrn, CRN_FIELD_CODE, (a, b) => a.equalsIgnoreCase(b))
@@ -41,17 +39,17 @@ trait MatchingAlgorithm {
   protected def peformTaxPayerTypeMatch(knownFactsType: Option[String], ifType: Option[String]): Match =
     matching[String](knownFactsType, ifType, TAXPAYER_TYPE_FIELD_CODE, (a, b) => a.equalsIgnoreCase(b))
 
-  protected def performIndividualTaxpayerNameMatch(knownFactsData: SaUtrMatchData, ifData: SaUtrMatchData): Match =
+  protected def performIndividualTaxpayerNameMatch(knownFactsData: MatchDataSA, ifData: MatchDataSA): Match =
     namesMatch(4)(knownFactsData.taxPayerName, ifData.taxPayerName, TAX_PAYER_NAME_FIELD_CODE)
 
-  protected def performPartnershipTaxpayerNameMatch(knownFactsData: SaUtrMatchData, ifData: SaUtrMatchData): Match =
+  protected def performPartnershipTaxpayerNameMatch(knownFactsData: MatchDataSA, ifData: MatchDataSA): Match =
     namesMatch(8)(knownFactsData.taxPayerName, ifData.taxPayerName, TAX_PAYER_NAME_FIELD_CODE)
 
-  protected def performEmployerNameMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData): Match =
+  protected def performEmployerNameMatch(knownFactsData: MatchDataCT, ifData: MatchDataCT): Match =
     namesMatch(4)(knownFactsData.employerName, ifData.employerName, EMPLOYER_NAME_FIELD_CODE)
 
-  protected def performAddressLine1Match(knownFactsData: CrnMatchData, ifData: CrnMatchData): Match =
-    addressLine1Match(4)(knownFactsData.address.addressLine1, ifData.address.addressLine1)
+  protected def performAddressLine1Match(knownFactsAddressLine: Option[String], ifAddressLine: Option[String]): Match =
+    addressLine1Match(4)(knownFactsAddressLine, ifAddressLine)
 
   protected def performPostcodeMatch(knownFactsPostcode: Option[String], ifPostcode: Option[String]): Match =
     matching[String](knownFactsPostcode, ifPostcode, POSTCODE_FIELD_CODE, (a, b) => a.equalsIgnoreCase(b))

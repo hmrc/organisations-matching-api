@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatch
+import uk.gov.hmrc.organisationsmatchingapi.models.MatchCT
 
 import scala.concurrent.ExecutionContext
 
@@ -28,4 +28,4 @@ import scala.concurrent.ExecutionContext
 class CrnMatchRepository @Inject()( cacheConfig: CacheConfiguration,
                                     configuration: Configuration,
                                     mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache[CrnMatch](cacheConfig, configuration, mongo, cacheConfig.crnColName)
+  extends ShortLivedCache[MatchCT](cacheConfig, configuration, mongo, cacheConfig.crnColName)

@@ -19,27 +19,28 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.matching
 import uk.gov.hmrc.organisationsmatchingapi.models
 import util.UnitSpec
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.organisationsmatchingapi.matching.{Bad, CrnMatchingCycle, Good, Match}
+import uk.gov.hmrc.organisationsmatchingapi.matching.{Bad, MatchingCycleCT, Good, Match, MatchingCycleSA}
 
 class MatchingAlgorithmSpec extends UnitSpec with Matchers {
 
   trait Setup {
-    val crnMatching = new CrnMatchingCycle
+    val ctMatching = new MatchingCycleCT
+    val saMatching = new MatchingCycleSA
   }
 
-  "The matching algorithm for CRN" should {
+  "The matching algorithm for CT" should {
 
     "return a GoodMatch with no error code when everything matches" in new Setup {
 
-      val knownFactsData = models.CrnMatchData(
+      val knownFactsData = models.MatchDataCT(
         Some("mycrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
       )
 
-      val ifData = models.CrnMatchData(
+      val ifData = models.MatchDataCT(
         Some("mycrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
       )
 
-      val matchResult: Match = crnMatching.performMatch(knownFactsData, ifData)
+      val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
 
       matchResult shouldBe Good()
 
@@ -47,17 +48,53 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
 
     "return a BadMatch with error code when crn does not match" in new Setup {
 
-      val knownFactsData = models.CrnMatchData(
-        Some("mycrn"), Some("mname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      val knownFactsData = models.MatchDataCT(
+        Some("mcrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
       )
 
-      val ifData = models.CrnMatchData(
+      val ifData = models.MatchDataCT(
         Some("mycrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
       )
 
-      val matchResult: Match = crnMatching.performMatch(knownFactsData, ifData)
+      val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
 
-      matchResult shouldBe Bad(Set(34))
+      matchResult shouldBe Bad(Set(31))
+
+    }
+
+  }
+
+  "The matching algorithm for SA" should {
+
+    "return a GoodMatch with no error code when everything matches" in new Setup {
+
+      val knownFactsData = models.MatchDataSA(
+        Some("myutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val ifData = models.MatchDataSA(
+        Some("myutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
+
+      matchResult shouldBe Good()
+
+    }
+
+    "return a BadMatch with error code when crn does not match" in new Setup {
+
+      val knownFactsData = models.MatchDataSA(
+        Some("mutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val ifData = models.MatchDataSA(
+        Some("myutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
+
+      matchResult shouldBe Bad(Set(32))
 
     }
 

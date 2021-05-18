@@ -20,7 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.SaUtrMatch
+import uk.gov.hmrc.organisationsmatchingapi.models.MatchSA
 
 import scala.concurrent.ExecutionContext
 
@@ -28,4 +28,4 @@ import scala.concurrent.ExecutionContext
 class SaUtrMatchRepository @Inject()( cacheConfig: CacheConfiguration,
                                     configuration: Configuration,
                                     mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache[SaUtrMatch](cacheConfig, configuration, mongo, cacheConfig.saUtrColName)
+  extends ShortLivedCache[MatchSA](cacheConfig, configuration, mongo, cacheConfig.saUtrColName)

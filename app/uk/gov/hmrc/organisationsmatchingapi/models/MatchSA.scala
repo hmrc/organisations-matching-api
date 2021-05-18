@@ -16,16 +16,16 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.models
 
+import java.time.LocalDateTime
+import java.util.UUID
+import java.util.UUID.randomUUID
+
 import play.api.libs.json.Json
 
-case class CrnMatchData(crn: Option[String], employerName: Option[String], address: Address)
+case class MatchSA(request: MatchDataSA, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
 
-object CrnMatchData {
-  implicit val formats = Json.format[CrnMatchData]
+object MatchSA {
+  implicit val formats = Json.format[MatchSA]
 }
 
-case class MatchingResult(matchedIFData: Option[CrnMatchData], errorCodes: Set[Int])
 
-object MatchingResult {
-  implicit val writes = Json.writes[MatchingResult]
-}

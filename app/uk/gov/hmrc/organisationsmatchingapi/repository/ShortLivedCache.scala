@@ -25,7 +25,7 @@ import uk.gov.hmrc.cache.repository.CacheMongoRepository
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatch
+import uk.gov.hmrc.organisationsmatchingapi.models.MatchCT
 
 import scala.concurrent.{ExecutionContext, Future}
 

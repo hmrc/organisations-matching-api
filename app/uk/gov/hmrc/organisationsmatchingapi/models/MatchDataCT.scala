@@ -18,8 +18,9 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-case class SaUtrMatchData(utr: Option[String], taxPayerName: Option[String], taxPayerType: Option[String], address: Address)
+case class MatchDataCT(crn: Option[String], employerName: Option[String], address: Address)
 
-object SaUtrMatchData {
-  implicit val formats = Json.format[SaUtrMatchData]
+object MatchDataCT {
+  implicit val formats = Json.format[MatchDataCT]
 }
+
