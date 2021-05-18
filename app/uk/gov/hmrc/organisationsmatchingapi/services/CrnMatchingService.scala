@@ -17,7 +17,7 @@
 package uk.gov.hmrc.organisationsmatchingapi.services
 
 import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.matching.CrnMatchingCycle
+import uk.gov.hmrc.organisationsmatchingapi.matching.{Bad, CrnMatchingCycle, Good}
 import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatchData, MatchingResult}
 
 import scala.concurrent.Future

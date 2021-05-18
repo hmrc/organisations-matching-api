@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.organisationsmatchingapi.matching.CrnMatchingCycle
 import uk.gov.hmrc.organisationsmatchingapi.models
 import uk.gov.hmrc.organisationsmatchingapi.models.MatchingResult
-import uk.gov.hmrc.organisationsmatchingapi.services.{CrnMatchingService, Good}
+import uk.gov.hmrc.organisationsmatchingapi.services.CrnMatchingService
 import util.UnitSpec
 
 class CrnMatchingServiceSpec extends UnitSpec with Matchers {

@@ -17,10 +17,9 @@
 package unit.uk.gov.hmrc.organisationsmatchingapi.matching
 
 import uk.gov.hmrc.organisationsmatchingapi.models
-import uk.gov.hmrc.organisationsmatchingapi.services.{Bad, Good, Match}
 import util.UnitSpec
 import org.scalatest.matchers.should.Matchers
-import uk.gov.hmrc.organisationsmatchingapi.matching.CrnMatchingCycle
+import uk.gov.hmrc.organisationsmatchingapi.matching.{Bad, CrnMatchingCycle, Good, Match}
 
 class MatchingAlgorithmSpec extends UnitSpec with Matchers {
 
