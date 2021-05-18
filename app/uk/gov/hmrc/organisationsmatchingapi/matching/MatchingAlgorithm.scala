@@ -40,10 +40,10 @@ trait MatchingAlgorithm {
     matching[String](knownFactsType, ifType, TAXPAYER_TYPE_FIELD_CODE, (a, b) => a.equalsIgnoreCase(b))
 
   protected def performIndividualTaxpayerNameMatch(knownFactsData: MatchDataSA, ifData: MatchDataSA): Match =
-    namesMatch(4)(knownFactsData.taxPayerName, ifData.taxPayerName, TAX_PAYER_NAME_FIELD_CODE)
+    namesMatch(8)(knownFactsData.taxPayerName, ifData.taxPayerName, TAX_PAYER_NAME_FIELD_CODE)
 
   protected def performPartnershipTaxpayerNameMatch(knownFactsData: MatchDataSA, ifData: MatchDataSA): Match =
-    namesMatch(8)(knownFactsData.taxPayerName, ifData.taxPayerName, TAX_PAYER_NAME_FIELD_CODE)
+    namesMatch(4)(knownFactsData.taxPayerName, ifData.taxPayerName, TAX_PAYER_NAME_FIELD_CODE)
 
   protected def performEmployerNameMatch(knownFactsData: MatchDataCT, ifData: MatchDataCT): Match =
     namesMatch(4)(knownFactsData.employerName, ifData.employerName, EMPLOYER_NAME_FIELD_CODE)
@@ -63,7 +63,7 @@ trait MatchingAlgorithm {
       compose[String, String](_ equalsIgnoreCase _, firstNLetters(length).andThen(homoglyphs.canonicalize)))
 
   protected def compose[T, U](equate: (U, U) => Boolean, mutate: T => U): (T, T) => Boolean =
-    (lhs, rhs) => equate(mutate(lhs), mutate(rhs))
+    (lhs, rhs) =>equate(mutate(lhs), mutate(rhs))
 
   protected def firstNLetters(length: Int): String => String = name =>
     name.trim.take(length)
