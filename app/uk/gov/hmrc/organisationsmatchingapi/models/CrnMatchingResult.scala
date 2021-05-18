@@ -16,29 +16,10 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.models
 
-class MatchDataBase {
+import play.api.libs.json.Json
 
-  def asString = {
-    "override me"
-  }
+case class CrnMatchingResult(matchedIfData: Option[CrnMatchData], errorCodes: Set[Int])
 
-  def ignoreCaseAndSpaces = {
-    asString.toLowerCase.filterNot((x: Char) => x.isWhitespace)
-  }
-
-  def withoutPunctuation = {
-    asString.replaceAll("""[\p{Punct}]""", "")
-  }
-
-  def cleanPostOfficeBox = {
-    asString.replaceAll("p.o.|p.0|p0|p.0|post office|P.O.|P.0|P0|P.0|POST OFFICE|Post Office", "PO")
-  }
-
-  def cleanAll = {
-    asString
-      .replaceAll("""[\p{Punct}]""", "")
-      .replaceAll("p.o.|p.0|p0|p.0|post office|P.O.|P.0|P0|P.0|POST OFFICE|Post Office", "PO")
-      .toLowerCase.filterNot((x: Char) => x.isWhitespace)
-  }
-
+object CrnMatchingResult {
+  implicit val writes = Json.writes[CrnMatchingResult]
 }

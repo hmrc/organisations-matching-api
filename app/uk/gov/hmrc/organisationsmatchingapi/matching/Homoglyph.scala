@@ -14,12 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.matching
 
-import play.api.libs.json.Json
+case class Homoglyph(name: String, canonical: Char, all: Set[Char])
 
-case class SaUtrMatchData(utr: Option[String], taxPayerName: Option[String], taxPayerType: Option[String], address: Address)
+object Homoglyph {
 
-object SaUtrMatchData {
-  implicit val formats = Json.format[SaUtrMatchData]
+  private [matching] implicit class HomoglyphOps(target: Homoglyph) {
+    def canonicalize(input: String): String = target.all.foldLeft(input) { (result, character) =>
+      result.replace(character, target.canonical)
+    }
+  }
+
+  implicit class HomoglyphsOps(target: List[Homoglyph]) {
+    def canonicalize(input: String): String = target.foldLeft(input) { (result, homoglyph) =>
+      homoglyph canonicalize result
+    }
+  }
+
 }

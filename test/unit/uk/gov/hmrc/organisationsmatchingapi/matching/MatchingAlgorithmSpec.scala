@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.organisationsmatchingapi.services
+package unit.uk.gov.hmrc.organisationsmatchingapi.matching
 
+import uk.gov.hmrc.organisationsmatchingapi.models
+import uk.gov.hmrc.organisationsmatchingapi.services.{Bad, Good, Match}
+import util.UnitSpec
 import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.organisationsmatchingapi.matching.CrnMatchingCycle
-import uk.gov.hmrc.organisationsmatchingapi.models
-import uk.gov.hmrc.organisationsmatchingapi.models.MatchingResult
-import uk.gov.hmrc.organisationsmatchingapi.services.{CrnMatchingService, Good}
-import util.UnitSpec
 
-class CrnMatchingServiceSpec extends UnitSpec with Matchers {
+class MatchingAlgorithmSpec extends UnitSpec with Matchers {
 
   trait Setup {
     val crnMatching = new CrnMatchingCycle
-    val crnMatchingService = new CrnMatchingService(crnMatching)
   }
 
   "The matching algorithm for CRN" should {
@@ -42,15 +40,13 @@ class CrnMatchingServiceSpec extends UnitSpec with Matchers {
         Some("mycrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
       )
 
-      val expected =  MatchingResult(Some(ifData),Set())
+      val matchResult: Match = crnMatching.performMatch(knownFactsData, ifData)
 
-      val result = await(crnMatchingService.performMatch(knownFactsData, ifData))
-
-      result shouldBe expected
+      matchResult shouldBe Good()
 
     }
 
-    "return a BadMatch with error codes when crn does not match in known facts" in new Setup {
+    "return a BadMatch with error code when crn does not match" in new Setup {
 
       val knownFactsData = models.CrnMatchData(
         Some("mycrn"), Some("mname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
@@ -60,29 +56,9 @@ class CrnMatchingServiceSpec extends UnitSpec with Matchers {
         Some("mycrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
       )
 
-      val expected =  MatchingResult(None,Set(34))
+      val matchResult: Match = crnMatching.performMatch(knownFactsData, ifData)
 
-      val result = await(crnMatchingService.performMatch(knownFactsData, ifData))
-
-      result shouldBe expected
-
-    }
-
-    "return a BadMatch with error codes when crn does not match as not present in IF" in new Setup {
-
-      val knownFactsData = models.CrnMatchData(
-        Some("mycrn"), Some("mname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
-      )
-
-      val ifData = models.CrnMatchData(
-        Some("mycrn"), None, models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
-      )
-
-      val expected =  MatchingResult(None,Set(24))
-
-      val result = await(crnMatchingService.performMatch(knownFactsData, ifData))
-
-      result shouldBe expected
+      matchResult shouldBe Bad(Set(34))
 
     }
 

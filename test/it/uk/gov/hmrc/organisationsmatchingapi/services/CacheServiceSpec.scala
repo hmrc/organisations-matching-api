@@ -37,14 +37,14 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     val cacheService = app.injector.instanceOf(classOf[CacheService])
 
     val crnRequest = CrnMatchData(
-      "crn",
-      "name",
+      Some("crn"),
+      Some("name"),
       Address(
-        "line1",
-        "line2",
+        Some("line1"),
+        Some("line2"),
         Some("line3"),
         Some("line4"),
-      "postcode"
+      Some("postcode")
     ))
 
     val crnMatch = CrnMatch(
@@ -52,12 +52,12 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       uuid
     )
 
-    val saUtrRequest = SaUtrMatchData("", "", "", Address(
-      "line1",
-      "line2",
+    val saUtrRequest = SaUtrMatchData(Some(""), Some(""), Some(""), Address(
+      Some("line1"),
+      Some("line2"),
       Some("line3"),
       Some("line4"),
-      "postcode"
+      Some("postcode")
     ))
 
     val saUtrMatch = SaUtrMatch(

@@ -16,42 +16,21 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
-import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatchData}
+import javax.inject.Inject
+import uk.gov.hmrc.organisationsmatchingapi.matching.CrnMatchingCycle
+import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatchData, MatchingResult}
 
-class CrnMatchingService {
+import scala.concurrent.Future
 
-  //Option 1: Basic match no manipulation
-  def basicMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
-    knownFactsData.asString.equals(ifData.asString)
+class CrnMatchingService @Inject() (crnMatchingCycle: CrnMatchingCycle) {
+
+  def performMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData): Future[MatchingResult] = {
+
+    crnMatchingCycle.performMatch(knownFactsData, ifData) match {
+      case Good(codes) => Future.successful(MatchingResult(Some(ifData), codes))
+      case Bad(codes) => Future.successful(MatchingResult(None, codes))
+    }
+
   }
 
-  // Option 2: A full match by cleaning both objects prior to the comparison
-  def cleanMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
-    knownFactsData.cleanAll.equals(ifData.cleanAll)
-  }
-
-  // Option 3: Logic could clean the known facts first if no match; clean the IF (HoDs) data and
-  // make a second pass (combine options 3 and 4)
-  def tryMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
-    matchCleanKnownFacts(knownFactsData, ifData) ||
-      matchCleanBothSets(knownFactsData, ifData)
-  }
-
-  private def matchCleanKnownFacts(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
-
-    def check1 = knownFactsData.ignoreCaseAndSpaces.equals(ifData.ignoreCaseAndSpaces)
-    def check2 = knownFactsData.withoutPunctuation.equals(ifData.ignoreCaseAndSpaces)
-    def check3 = knownFactsData.cleanPostOfficeBox.equals(ifData.ignoreCaseAndSpaces)
-
-    check1 || check2 || check3
-  }
-
-  private def matchCleanBothSets(knownFactsData: CrnMatchData, ifData: CrnMatchData) = {
-
-    def check1 = knownFactsData.ignoreCaseAndSpaces.equals(ifData.ignoreCaseAndSpaces)
-    def check2 = knownFactsData.withoutPunctuation.equals(ifData.withoutPunctuation)
-    def check3 = knownFactsData.cleanPostOfficeBox.equals(ifData.cleanPostOfficeBox)
-
-    check1 || check2 || check3
-  }
 }

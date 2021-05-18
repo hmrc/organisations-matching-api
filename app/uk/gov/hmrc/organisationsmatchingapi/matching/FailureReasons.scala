@@ -14,8 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.services
+package uk.gov.hmrc.organisationsmatchingapi.matching
 
-class DetailsService {
+object FailureReasons {
+
+	val REQUEST_CODE_RANGE        = 10
+  val CID_CODE_RANGE            = 20
+	val MATCHING_CODE_RANGE       = 30
+  val CRN_FIELD_CODE            = 1
+  val UTR_FIELD_CODE            = 2
+  val TAXPAYER_TYPE_FIELD_CODE  = 3
+  val EMPLOYER_NAME_FIELD_CODE  = 4
+  val TAX_PAYER_NAME_FIELD_CODE = 5
+  val ADDRESS_LINE1_FIELD_CODE  = 6
+  val POSTCODE_FIELD_CODE       = 7
+  val MULTIPLE_MATCHES          = 39
 
 }

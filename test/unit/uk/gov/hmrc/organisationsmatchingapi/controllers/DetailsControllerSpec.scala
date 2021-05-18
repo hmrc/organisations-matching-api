@@ -29,7 +29,6 @@ import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
 import uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController
-import uk.gov.hmrc.organisationsmatchingapi.services.DetailsService
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 class DetailsControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar {
@@ -40,12 +39,11 @@ class DetailsControllerSpec extends AnyWordSpec with Matchers with GuiceOneAppPe
   private val configuration = Configuration.load(env)
 
   private val mockAuthConnector = mock[AuthConnector]
-  private val mockDetailsService = mock[DetailsService]
 
   private val serviceConfig = new ServicesConfig(configuration)
   private val appConfig     = new AppConfig(configuration, serviceConfig)
 
-  private val controller = new DetailsController(mockAuthConnector, Helpers.stubControllerComponents(), mockDetailsService)
+  private val controller = new DetailsController(mockAuthConnector, Helpers.stubControllerComponents())
 
 
   "GET crnDetails TO BE IMPLEMENTED /" should {

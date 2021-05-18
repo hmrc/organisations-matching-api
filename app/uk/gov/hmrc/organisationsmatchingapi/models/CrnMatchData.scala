@@ -18,16 +18,14 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-case class CrnMatchData(crn: String, employerName: String, address: Address) extends MatchDataBase {
-  override def asString = {
-    List[Option[String]](
-      Some(crn),
-      Some(employerName),
-      Some(address.asString),
-    ).flatten.mkString(" ")
-  }
-}
+case class CrnMatchData(crn: Option[String], employerName: Option[String], address: Address)
 
 object CrnMatchData {
   implicit val formats = Json.format[CrnMatchData]
+}
+
+case class MatchingResult(matchedIFData: Option[CrnMatchData], errorCodes: Set[Int])
+
+object MatchingResult {
+  implicit val writes = Json.writes[MatchingResult]
 }
