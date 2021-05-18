@@ -16,37 +16,9 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
-import java.nio.channels.NotYetBoundException
-
 import uk.gov.hmrc.organisationsmatchingapi.matching.FailureReasons._
-import uk.gov.hmrc.organisationsmatchingapi.matching.Homoglyph
+import uk.gov.hmrc.organisationsmatchingapi.matching.{Bad, Good, Homoglyph, Match}
 import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatchData, SaUtrMatchData}
-
-sealed abstract class Match {
-  def codes: Set[Int]
-
-  def or(other: Match): Match = (this, other) match {
-    case (Bad(a), Bad(b)) => Bad(a ++ b)
-    case _ => Good(codes ++ other.codes)
-  }
-
-  def and(other: Match): Match = (this, other) match {
-    case (Good(a), Good(b)) => Good(a ++ b)
-    case _ => Bad(codes ++ other.codes)
-  }
-}
-
-case class Good(codes: Set[Int]) extends Match
-
-case class Bad(codes: Set[Int]) extends Match
-
-case object Good extends (Set[Int] => Match) {
-  def apply(codes: Int*): Good = Good(codes.toSet)
-}
-
-case object Bad extends (Set[Int] => Match) {
-  def apply(codes: Int*): Bad = Bad(codes.toSet)
-}
 
 trait MatchingAlgorithm {
 

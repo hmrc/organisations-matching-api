@@ -16,19 +16,28 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.matching
 
-import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatchData
-import uk.gov.hmrc.organisationsmatchingapi.services.MatchingAlgorithm
+sealed abstract class Match {
+  def codes: Set[Int]
 
-class CrnMatchingCycle @Inject() extends MatchingAlgorithm {
-
-  override def performMatch(knownFactsData: CrnMatchData, ifData: CrnMatchData): Match = {
-
-    val crn = performCrnMatch(knownFactsData.crn, ifData.crn)
-    val empName = performEmployerNameMatch(knownFactsData, ifData)
-    val addrLineOne = performAddressLine1Match(knownFactsData, ifData)
-    val pcode = performPostcodeMatch(knownFactsData.address.postCode, ifData.address.postCode)
-
-    crn and empName and addrLineOne and pcode
+  def or(other: Match): Match = (this, other) match {
+    case (Bad(a), Bad(b)) => Bad(a ++ b)
+    case _ => Good(codes ++ other.codes)
   }
+
+  def and(other: Match): Match = (this, other) match {
+    case (Good(a), Good(b)) => Good(a ++ b)
+    case _ => Bad(codes ++ other.codes)
+  }
+}
+
+case class Good(codes: Set[Int]) extends Match
+
+case class Bad(codes: Set[Int]) extends Match
+
+case object Good extends (Set[Int] => Match) {
+  def apply(codes: Int*): Good = Good(codes.toSet)
+}
+
+case object Bad extends (Set[Int] => Match) {
+  def apply(codes: Int*): Bad = Bad(codes.toSet)
 }
