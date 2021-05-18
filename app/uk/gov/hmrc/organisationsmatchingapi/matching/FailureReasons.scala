@@ -18,9 +18,9 @@ package uk.gov.hmrc.organisationsmatchingapi.matching
 
 object FailureReasons {
 
-	val REQUEST_CODE_RANGE        = 10
+  val REQUEST_CODE_RANGE        = 10
   val CID_CODE_RANGE            = 20
-	val MATCHING_CODE_RANGE       = 30
+  val MATCHING_CODE_RANGE       = 30
   val CRN_FIELD_CODE            = 1
   val UTR_FIELD_CODE            = 2
   val TAXPAYER_TYPE_FIELD_CODE  = 3
