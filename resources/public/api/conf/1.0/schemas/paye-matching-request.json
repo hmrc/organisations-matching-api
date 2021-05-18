@@ -1,33 +1,25 @@
 {
   "type": "object",
+  "description": "Company's CRN and known facts",
   "required": [
-    "taxPayerType",
-    "selfAssessmentUniqueTaxPayerRef",
-    "taxPayerName",
+    "companyRegistrationNumber",
+    "employerName",
     "address"
   ],
   "properties": {
-    "selfAssessmentUniqueTaxPayerRef": {
+    "companyRegistrationNumber": {
       "type": "string",
-      "pattern": "^[0-9]{10}$",
-      "example": "1234567890"
+      "description": "Company Registration Number",
+      "pattern": "^[A-Z0-9]{1,10}$"
     },
-    "taxPayerType": {
+    "employerName": {
       "type": "string",
-      "description": "Individual, Partnership",
-      "enum": [
-        "Individual",
-        "Partnership"
-      ]
-    },
-    "taxPayerName": {
-      "type": "string",
-      "description": "The name of the organisation.",
-      "example": "Example Partnership"
+      "description": "Employer name",
+      "example": "Example Company Ltd"
     },
     "address": {
       "type": "object",
-      "description": "The organisation's address.",
+      "description": "Address",
       "required": [
         "addressLine1",
         "addressLine2",

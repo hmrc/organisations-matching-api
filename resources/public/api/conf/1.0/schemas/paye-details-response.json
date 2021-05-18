@@ -1,27 +1,14 @@
 {
   "type": "object",
-  "required": [
-    "taxPayerType",
-    "taxPayerName",
-    "address"
-  ],
+  "description": "Company Details Response",
   "properties": {
-    "taxPayerType": {
+    "employerName": {
       "type": "string",
-      "description": "Individual, Partnership",
-      "enum": [
-        "Individual",
-        "Partnership"
-      ]
-    },
-    "taxPayerName": {
-      "type": "string",
-      "description": "The name of the organisation.",
-      "example": "Example Partnership"
+      "example": "Employer Name"
     },
     "address": {
       "type": "object",
-      "description": "An address for the organisation",
+      "description": "Address",
       "required": [
         "addressLine1",
         "addressLine2",
@@ -65,7 +52,7 @@
       "properties": {
         "self": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment data.",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the paye data.",
           "required": [
             "href"
           ],
@@ -82,13 +69,13 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's sa data."
+              "description": "Get the organisation's paye data."
             }
           }
         },
         "getDetails": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment details data.",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the paye details data.",
           "required": [
             "href"
           ],
@@ -105,13 +92,13 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's self-assessment details data."
+              "description": "Get the organisation's paye details data."
             }
           }
         },
         "getEmployeeCount": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment employee count data.",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the paye employee count data.",
           "required": [
             "href"
           ],
@@ -128,7 +115,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's self-assessment employee count data."
+              "description": "Get the organisation's paye employee count data."
             }
           }
         }

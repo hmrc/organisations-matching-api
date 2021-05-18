@@ -17,10 +17,10 @@
 package util
 
 import java.nio.charset.Charset
-
 import akka.stream.Materializer
 import akka.util.ByteString
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.inject.guice.GuiceableModule
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 
@@ -34,6 +34,8 @@ trait UnitSpec extends AnyWordSpec {
   implicit val defaultTimeout: FiniteDuration = 5 seconds
 
   def await[A](future: Future[A])(implicit timeout: Duration): A = Await.result(future, timeout)
+
+  def bindModules: Seq[GuiceableModule] = Seq()
 
   // Convenience to avoid having to wrap andThen() parameters in Future.successful
   implicit def liftFuture[A](v: A): Future[A] = Future.successful(v)

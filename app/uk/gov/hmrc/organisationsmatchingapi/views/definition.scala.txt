@@ -6,15 +6,16 @@
  {
    "scopes": [
      {
-       "key": "assigned",
-       "name": "The scopes you have been assigned",
-       "description": "An OAuth 2.0 Bearer Token with the scopes you have been assigned"
+       "key": "read:organisations-matching",
+       "name": "The organisations matching scope",
+       "description": "An OAuth 2.0 Bearer Token with the read:organisations-matching scope"
      }
    ],
      "api": {
        "name": "Organisations Matching",
        "description": "Retrieves matching information for an organisation",
        "context": "organisations/matching",
+       "categories": ["PRIVATE_GOVERNMENT"],
        "versions": [
          {
            "version": "1.0",
