@@ -33,7 +33,7 @@ trait ErrorHandling {
         NotFound.toResult
 
       case e: BadRequestException =>
-        Logger.error(s"Bad request: ${e.getMessage}")
+        Logger.error(s"Bad knownFacts: ${e.getMessage}")
         BadRequest.toResult
 
       case e: Exception =>

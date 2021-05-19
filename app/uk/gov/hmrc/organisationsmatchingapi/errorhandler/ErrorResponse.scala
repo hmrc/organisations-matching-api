@@ -31,7 +31,7 @@ sealed abstract class ErrorResponse(val httpStatusCode: Int,
 object ErrorResponse {
 
   case object BadRequest
-    extends ErrorResponse(400, "BAD_REQUEST", "Bad request")
+    extends ErrorResponse(400, "BAD_REQUEST", "Bad knownFacts")
   case object Unauthorized
     extends ErrorResponse(401, "UNAUTHORIZED", "Bearer token is missing or not authorized")
   case object MatchingFailed

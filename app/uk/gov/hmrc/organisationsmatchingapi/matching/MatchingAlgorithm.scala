@@ -68,10 +68,10 @@ trait MatchingAlgorithm {
   protected def firstNLetters(length: Int): String => String = name =>
     name.trim.take(length)
 
-  protected def matching[T](request: Option[T], cid: Option[T], fieldCode: Int, matchFunction: (T, T) => Boolean): Match = {
-    (request, cid) match {
-      case (Some(request), Some(cid)) => {
-        if (matchFunction(request, cid)) {
+  protected def matching[T](knownFacts: Option[T], ifData: Option[T], fieldCode: Int, matchFunction: (T, T) => Boolean): Match = {
+    (knownFacts, ifData) match {
+      case (Some(request), Some(ifData)) => {
+        if (matchFunction(request, ifData)) {
           Good()
         }
         else {
@@ -79,13 +79,13 @@ trait MatchingAlgorithm {
         }
       }
       case (None, Some(_)) => {
-        Bad(Set(fieldCode + REQUEST_CODE_RANGE))
+        Bad(Set(fieldCode + KNOWN_FACTS_CODE_RANGE))
       }
       case (Some(_), None) => {
-        Bad(Set(fieldCode + CID_CODE_RANGE))
+        Bad(Set(fieldCode + IF_CODE_RANGE))
       }
       case (None, None) => {
-        Bad(Set(fieldCode + REQUEST_CODE_RANGE, fieldCode + CID_CODE_RANGE))
+        Bad(Set(fieldCode + KNOWN_FACTS_CODE_RANGE, fieldCode + IF_CODE_RANGE))
       }
     }
   }

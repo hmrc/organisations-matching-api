@@ -28,7 +28,7 @@ class ErrorResponseSpec extends AnyWordSpec with Matchers {
 
     val result = Json.toJson(request)
 
-    result shouldBe  Json.obj("code" -> "BAD_REQUEST", "message" -> "Bad request")
+    result shouldBe  Json.obj("code" -> "BAD_REQUEST", "message" -> "Bad knownFacts")
   }
 
 }

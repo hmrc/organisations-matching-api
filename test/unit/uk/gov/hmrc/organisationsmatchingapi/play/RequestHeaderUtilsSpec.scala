@@ -31,14 +31,14 @@ import java.util.UUID
 class RequestHeaderUtilsSpec extends AnyWordSpec with Matchers {
 
   "getVersionedUri" should {
-    "return the versioned request when the Accept header is set" in {
+    "return the versioned knownFacts when the Accept header is set" in {
       val fooRequest = FakeRequest(GET, "/foo")
 
       getVersionedRequest(fooRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.2.0+json")).uri shouldBe "/v2.0/foo"
       getVersionedRequest(fooRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.2.0+json")).path shouldBe "/v2.0/foo"
     }
 
-    "return the versioned request for the root endpoint when the Accept header is set" in {
+    "return the versioned knownFacts for the root endpoint when the Accept header is set" in {
       val fooRequest = FakeRequest(GET, "/")
 
       getVersionedRequest(fooRequest.withHeaders(ACCEPT -> "application/vnd.hmrc.2.0+json")).uri shouldBe "/v2.0"
@@ -62,7 +62,7 @@ class RequestHeaderUtilsSpec extends AnyWordSpec with Matchers {
   }
 
   "getClientIdHeader" should {
-    "extract the client id header from the request if present" in {
+    "extract the client id header from the knownFacts if present" in {
       val clientId = UUID.randomUUID().toString
       val fooRequest = FakeRequest(GET, "/")
 

@@ -48,7 +48,7 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
       BadRequest(
         Json.obj(
           "code" -> "BAD_REQUEST",
-          "message" -> "The request body does not conform to the schema.",
+          "message" -> "The knownFacts body does not conform to the schema.",
           "errors" -> Json.toJson(errors.toList))))
 
 }

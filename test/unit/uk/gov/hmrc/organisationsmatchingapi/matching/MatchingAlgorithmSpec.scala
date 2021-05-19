@@ -41,7 +41,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -57,7 +56,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -73,7 +71,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(31))
 
     }
@@ -89,7 +86,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(34))
 
     }
@@ -105,7 +101,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -121,7 +116,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(36))
 
     }
@@ -137,7 +131,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -153,7 +146,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(37))
 
     }
@@ -169,7 +161,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = ctMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(31, 34, 36, 37))
 
     }
@@ -189,7 +180,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -205,7 +195,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(32))
 
     }
@@ -221,7 +210,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(33))
 
     }
@@ -237,7 +225,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(35))
 
     }
@@ -253,7 +240,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(35))
 
     }
@@ -269,7 +255,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -285,7 +270,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(36))
 
     }
@@ -301,7 +285,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Good()
 
     }
@@ -317,12 +300,11 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(37))
 
     }
 
-    "return a BadMatch with error code when muitlple properties do not match" in new Setup {
+    "return a BadMatch with error code when multiple properties do not match" in new Setup {
 
       val knownFactsData = models.MatchDataSA(
         Some("mutr"), Some("mnameis"), Some("partnership"), models.Address(Some("oo"), Some("bar"), None, None, Some("codes"))
@@ -333,7 +315,6 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
       )
 
       val matchResult: Match = saMatching.performMatch(knownFactsData, ifData)
-
       matchResult shouldBe Bad(Set(32, 36, 37, 35))
 
     }

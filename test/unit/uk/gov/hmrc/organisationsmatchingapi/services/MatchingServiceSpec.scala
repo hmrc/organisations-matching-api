@@ -26,8 +26,8 @@ import util.UnitSpec
 class MatchingServiceSpec extends UnitSpec with Matchers {
 
   trait Setup {
-    val crnMatching = new MatchingCycleCT
-    val saMatching = new MatchingCycleSA
+    val crnMatching        = new MatchingCycleCT
+    val saMatching         = new MatchingCycleSA
     val crnMatchingService = new MatchingService(crnMatching, saMatching)
   }
 
@@ -44,14 +44,12 @@ class MatchingServiceSpec extends UnitSpec with Matchers {
       )
 
       val expected =  MatchingResultCT(Some(ifData),Set())
-
-      val result = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
-
+      val result   = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
       result shouldBe expected
 
     }
 
-    "return a BadMatch with error codes when crn does not match in known facts" in new Setup {
+    "return a BadMatch with error codes when something does not match" in new Setup {
 
       val knownFactsData = models.MatchDataCT(
         Some("myrn"), Some("myname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
@@ -62,14 +60,12 @@ class MatchingServiceSpec extends UnitSpec with Matchers {
       )
 
       val expected =  MatchingResultCT(None,Set(31))
-
-      val result = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
-
+      val result   = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
       result shouldBe expected
 
     }
 
-    "return a BadMatch with error codes when crn does not match as not present in IF" in new Setup {
+    "return a BadMatch with error codes when something is not present in IF" in new Setup {
 
       val knownFactsData = models.MatchDataCT(
         Some("mycrn"), Some("mname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
@@ -80,9 +76,23 @@ class MatchingServiceSpec extends UnitSpec with Matchers {
       )
 
       val expected =  MatchingResultCT(None,Set(21))
+      val result   = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
+      result shouldBe expected
 
-      val result = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
+    }
 
+    "return a BadMatch with error codes when something is not present in known facts" in new Setup {
+
+      val knownFactsData = models.MatchDataCT(
+        None, Some("mname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val ifData = models.MatchDataCT(
+        Some("mycrn"), Some("mname"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val expected =  MatchingResultCT(None,Set(11))
+      val result   = await(crnMatchingService.performMatchCT(knownFactsData, ifData))
       result shouldBe expected
 
     }
@@ -102,14 +112,12 @@ class MatchingServiceSpec extends UnitSpec with Matchers {
       )
 
       val expected =  MatchingResultSA(Some(ifData),Set())
-
-      val result = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
-
+      val result   = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
       result shouldBe expected
 
     }
 
-    "return a BadMatch with error codes when utr does not match in known facts" in new Setup {
+    "return a BadMatch with error codes when something does not match" in new Setup {
 
       val knownFactsData = models.MatchDataSA(
         Some("mutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
@@ -120,14 +128,12 @@ class MatchingServiceSpec extends UnitSpec with Matchers {
       )
 
       val expected =  MatchingResultSA(None,Set(32))
-
-      val result = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
-
+      val result   = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
       result shouldBe expected
 
     }
 
-    "return a BadMatch with error codes when utr does not match as not present in IF" in new Setup {
+    "return a BadMatch with error codes when something is not present in IF" in new Setup {
 
       val knownFactsData = models.MatchDataSA(
         Some("mutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
@@ -138,9 +144,23 @@ class MatchingServiceSpec extends UnitSpec with Matchers {
       )
 
       val expected =  MatchingResultSA(None,Set(22))
+      val result   = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
+      result shouldBe expected
 
-      val result = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
+    }
 
+    "return a BadMatch with error codes when something is not present in known facts" in new Setup {
+
+      val knownFactsData = models.MatchDataSA(
+        None, Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val ifData = models.MatchDataSA(
+        Some("mutr"), Some("myname"), Some("individual"), models.Address(Some("foo"), Some("bar"), None, None, Some("code"))
+      )
+
+      val expected =  MatchingResultSA(None,Set(12))
+      val result   = await(crnMatchingService.performMatchSA(knownFactsData, ifData))
       result shouldBe expected
 
     }
