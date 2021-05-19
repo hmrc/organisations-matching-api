@@ -120,7 +120,7 @@ class MatchingAlgorithmSpec extends UnitSpec with Matchers {
 
     }
 
-    "return a GoodMatch when first line of the address does not match" in new Setup {
+    "return a GoodMatch when first line of the address does not match but after 4 characters" in new Setup {
 
       val knownFactsData = models.MatchDataCT(
         Some("mycrn"), Some("myname"), models.Address(Some("foobor"), Some("bar"), None, None, Some("code"))
