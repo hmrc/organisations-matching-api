@@ -30,6 +30,7 @@ class ScopesAuditEventModelSpec extends AnyWordSpec with Matchers {
       "test",
       "test",
       "test",
+      "test",
       "test"
     )
 
@@ -42,6 +43,7 @@ class ScopesAuditEventModelSpec extends AnyWordSpec with Matchers {
       "userAgent" -> "test",
       "apiVersion" -> "test",
       "matchId" -> "test",
+      "clientId" -> "test",
       "scopes" -> "test"
     )
   }
@@ -54,12 +56,14 @@ class ScopesAuditEventModelSpec extends AnyWordSpec with Matchers {
       "userAgent" -> "test",
       "apiVersion" -> "test",
       "matchId" -> "test",
+      "clientId" -> "test",
       "scopes" -> "test"
     )
 
     val result = Json.fromJson[ScopesAuditEventModel](json)
 
     result.get shouldBe ScopesAuditEventModel(
+      "test",
       "test",
       "test",
       "test",
