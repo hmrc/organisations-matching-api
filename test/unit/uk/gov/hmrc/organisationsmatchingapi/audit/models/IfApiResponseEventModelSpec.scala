@@ -32,6 +32,7 @@ class IfApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "test",
       "test",
       "test",
+      "test",
       "test"
     )
 
@@ -45,6 +46,7 @@ class IfApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
+      "clientId" -> "test",
       "requestUrl" -> "test",
       "ifResponse" -> "test"
     )
@@ -59,6 +61,7 @@ class IfApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
+      "clientId" -> "test",
       "requestUrl" -> "test",
       "ifResponse" -> "test"
     )
@@ -66,6 +69,7 @@ class IfApiResponseEventModelSpec extends AnyWordSpec with Matchers {
     val result = Json.fromJson[IfApiResponseEventModel](json)
 
     result.get shouldBe IfApiResponseEventModel(
+      "test",
       "test",
       "test",
       "test",
