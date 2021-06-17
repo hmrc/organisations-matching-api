@@ -43,7 +43,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "1.0",
         matchId = matchId,
         correlationId = Some(correlationId),
-        request.headers.get("X-Client-ID").getOrElse("-"),
+        request.headers.get("X-Application-ID").getOrElse("-"),
         scopes = scopes,
         returnLinks = selfLink
       )
@@ -65,7 +65,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "1.0",
         matchId = matchId,
         correlationId = correlationId,
-        request.headers.get("X-Client-ID").getOrElse("-"),
+        request.headers.get("X-Application-ID").getOrElse("-"),
         requestUrl,
         msg
       )
@@ -87,7 +87,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "1.0",
         matchId = matchId,
         correlationId = correlationId,
-        request.headers.get("X-Client-ID").getOrElse("-"),
+        request.headers.get("X-Application-ID").getOrElse("-"),
         requestUrl = requestUrl,
         ifResponse = ifDetailsResponse
       )
@@ -109,7 +109,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         apiVersion = "1.0",
         matchId = matchId,
         correlationId = Some(correlationId),
-        request.headers.get("X-Client-ID").getOrElse("-"),
+        request.headers.get("X-Application-ID").getOrElse("-"),
         requestUrl,
         msg
       )
@@ -128,7 +128,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         userAgent = request.headers.get("User-Agent").getOrElse("-"),
         apiVersion = "1.0",
         matchId = matchId,
-        request.headers.get("X-Client-ID").getOrElse("-"),
+        request.headers.get("X-Application-ID").getOrElse("-"),
         scopes
       )
     )
