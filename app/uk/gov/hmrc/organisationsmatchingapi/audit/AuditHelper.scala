@@ -19,6 +19,8 @@ package uk.gov.hmrc.organisationsmatchingapi.audit
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.audit.models._
+import uk.gov.hmrc.organisationsmatchingapi.audit.models.matching.{CtMatchingResultEventModel, SaMatchingResultEventModel}
+import uk.gov.hmrc.organisationsmatchingapi.models.{MatchingResultCT, MatchingResultSA}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import javax.inject.Inject
@@ -130,6 +132,46 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         matchId = matchId,
         request.headers.get("X-Application-ID").getOrElse("-"),
         scopes
+      )
+    )
+
+  def auditMatchResultCT(correlationId: String,
+                         matchId: String,
+                         request: RequestHeader,
+                         result:  MatchingResultCT)
+                        (implicit hc: HeaderCarrier) =
+    auditConnector.sendExplicitAudit(
+      "MatchResultCTAuditEvent",
+      detail = CtMatchingResultEventModel(
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "1.0",
+        matchId = matchId,
+        correlationId = Some(correlationId),
+        applicationId = request.headers.get("X-Application-ID").getOrElse("-"),
+        matchingResultCT = result
+      )
+    )
+
+  def auditMatchResultSA(correlationId: String,
+                         matchId: String,
+                         request: RequestHeader,
+                         result:  MatchingResultSA)
+                        (implicit hc: HeaderCarrier) =
+    auditConnector.sendExplicitAudit(
+      "MatchResultCTAuditEvent",
+      detail = SaMatchingResultEventModel(
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "1.0",
+        matchId = matchId,
+        correlationId = Some(correlationId),
+        applicationId = request.headers.get("X-Application-ID").getOrElse("-"),
+        matchingResultSA = result
       )
     )
 }

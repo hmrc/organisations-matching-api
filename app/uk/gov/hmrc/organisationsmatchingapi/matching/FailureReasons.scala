@@ -29,6 +29,5 @@ object FailureReasons {
   val TAX_PAYER_NAME_FIELD_CODE = 5
   val ADDRESS_LINE1_FIELD_CODE  = 6
   val POSTCODE_FIELD_CODE       = 7
-  val MULTIPLE_MATCHES          = 39
 
 }

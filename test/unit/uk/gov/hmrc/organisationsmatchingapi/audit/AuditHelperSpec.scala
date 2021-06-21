@@ -22,10 +22,14 @@ import org.mockito.{ArgumentCaptor, Mockito}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AsyncWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.audit.models._
+import uk.gov.hmrc.organisationsmatchingapi.audit.models.matching.{CtMatchingResultEventModel, SaMatchingResultEventModel}
+import uk.gov.hmrc.organisationsmatchingapi.models
+import uk.gov.hmrc.organisationsmatchingapi.models.{Address, MatchDataCT, MatchDataSA, MatchingResultCT, MatchingResultSA}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
@@ -43,6 +47,32 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
   val crn = "12345678"
   val scopes = "test"
   val ifUrl = s"host/organisations/corporation-tax/$crn/company/details"
+  val knownFactsCt = MatchDataCT(
+    Some("crn"),
+    Some("name"),
+    Address(
+      Some("line1"),
+      Some("line2"),
+      Some("line3"),
+      Some("line4"),
+      Some("postcode")
+    ))
+
+  val knownFactsSa = MatchDataSA(
+    Some("mutr"),
+    Some("myname"),
+    Some("individual"),
+    Address(
+      Some("line1"),
+      Some("line2"),
+      Some("line3"),
+      Some("line4"),
+      Some("postcode")
+    )
+  )
+
+  val matchingResultCT = new MatchingResultCT(Some(knownFactsCt), Set(34))
+  val matchingResultSA = new MatchingResultSA(Some(knownFactsSa), Set(33))
 
   "auditAuthScopes" in {
 
@@ -126,4 +156,49 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
     capturedEvent.applicationId shouldBe applicationId
 
   }
+
+  "audit CT Match Result" in {
+
+    Mockito.reset(auditConnector)
+
+    val captor = ArgumentCaptor.forClass(classOf[CtMatchingResultEventModel])
+
+    auditHelper.auditMatchResultCT(correlationId, matchId, request,  matchingResultCT)
+
+    verify(auditConnector, times(1)).sendExplicitAudit(eqTo("MatchResultCTAuditEvent"),
+      captor.capture())(any(), any(), any())
+
+    val capturedEvent = captor.getValue.asInstanceOf[CtMatchingResultEventModel]
+
+    println("CT: " + Json.toJson(capturedEvent))
+
+    capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchId shouldEqual matchId
+    capturedEvent.asInstanceOf[CtMatchingResultEventModel].correlationId shouldEqual Some(correlationId)
+    capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchingResultCT.errorCodes shouldEqual matchingResultCT.errorCodes
+    capturedEvent.applicationId shouldBe applicationId
+
+  }
+
+  "audit SA Match Result" in {
+
+    Mockito.reset(auditConnector)
+
+    val captor = ArgumentCaptor.forClass(classOf[SaMatchingResultEventModel])
+
+    auditHelper.auditMatchResultSA(correlationId, matchId, request,  matchingResultSA)
+
+    verify(auditConnector, times(1)).sendExplicitAudit(eqTo("MatchResultCTAuditEvent"),
+      captor.capture())(any(), any(), any())
+
+    val capturedEvent = captor.getValue.asInstanceOf[SaMatchingResultEventModel]
+
+    println("SA: " + Json.toJson(capturedEvent))
+
+    capturedEvent.asInstanceOf[SaMatchingResultEventModel].matchId shouldEqual matchId
+    capturedEvent.asInstanceOf[SaMatchingResultEventModel].correlationId shouldEqual Some(correlationId)
+    capturedEvent.asInstanceOf[SaMatchingResultEventModel].matchingResultSA.errorCodes shouldEqual matchingResultSA.errorCodes
+    capturedEvent.applicationId shouldBe applicationId
+
+  }
+
 }
