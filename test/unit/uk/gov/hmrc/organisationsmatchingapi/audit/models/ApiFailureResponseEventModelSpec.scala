@@ -46,7 +46,7 @@ class ApiFailureResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "requestUrl" -> "test",
       "response" -> "test"
     )
@@ -61,7 +61,7 @@ class ApiFailureResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "requestUrl" -> "test",
       "response" -> "test"
     )
