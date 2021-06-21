@@ -46,7 +46,7 @@ class IfApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "requestUrl" -> "test",
       "ifResponse" -> "test"
     )
@@ -61,7 +61,7 @@ class IfApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "requestUrl" -> "test",
       "ifResponse" -> "test"
     )

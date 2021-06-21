@@ -43,7 +43,7 @@ class ScopesAuditEventModelSpec extends AnyWordSpec with Matchers {
       "userAgent" -> "test",
       "apiVersion" -> "test",
       "matchId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "scopes" -> "test"
     )
   }
@@ -56,7 +56,7 @@ class ScopesAuditEventModelSpec extends AnyWordSpec with Matchers {
       "userAgent" -> "test",
       "apiVersion" -> "test",
       "matchId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "scopes" -> "test"
     )
 
