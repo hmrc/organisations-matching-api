@@ -25,6 +25,7 @@ case class IfApiResponseEventModel(deviceId: String,
                                    apiVersion: String,
                                    matchId: String,
                                    correlationId: String,
+                                   applicationId: String,
                                    requestUrl: String,
                                    ifResponse: String)
 
