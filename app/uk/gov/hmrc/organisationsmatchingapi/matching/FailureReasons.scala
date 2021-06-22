@@ -30,4 +30,23 @@ object FailureReasons {
   val ADDRESS_LINE1_FIELD_CODE  = 6
   val POSTCODE_FIELD_CODE       = 7
 
+  def range(code: Int) =
+    code.toString.head match {
+      case '1' => "Not present in known facts => "
+      case '2' => "Not present in IF response => "
+      case '3' => "Match error => "
+    }
+
+  def dataItem(code: Int) =
+    code.toString.tail match {
+      case "1" => "'crn'"
+      case "2" => "'utr'"
+      case "3" => "'taxpayerType'"
+      case "4" => "'employerName'"
+      case "5" => "'taxPayerName'"
+      case "6" => "'addressLine1'"
+      case "7" => "'postcode'"
+      case _   => "'unknown field'"
+    }
+
 }

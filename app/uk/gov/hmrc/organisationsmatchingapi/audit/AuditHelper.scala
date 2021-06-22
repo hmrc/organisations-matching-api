@@ -151,7 +151,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         matchId = matchId,
         correlationId = Some(correlationId),
         applicationId = request.headers.get("X-Application-ID").getOrElse("-"),
-        matchingResultCT = result
+        matchResult = result.matchErrors
       )
     )
 

@@ -16,9 +16,16 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
+import uk.gov.hmrc.organisationsmatchingapi.matching.FailureReasons._
 
-case class MatchingResultCT(knownFacts: Option[MatchDataCT], errorCodes: Set[Int])
+case class MatchingResultCT(knownFacts: Option[MatchDataCT], errorCodes: Set[Int]) {
+
+  def matchErrors: JsValue = if(errorCodes.isEmpty)
+    Json.toJson("Matched")
+  else
+    Json.toJson("Not Matched", errorCodes.map(c => (c, range(c).concat(dataItem(c)))).toMap)
+}
 
 object MatchingResultCT {
   implicit val formatMatchingResultCT = Json.format[MatchingResultCT]

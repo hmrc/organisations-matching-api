@@ -174,7 +174,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchId shouldEqual matchId
     capturedEvent.asInstanceOf[CtMatchingResultEventModel].correlationId shouldEqual Some(correlationId)
-    capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchingResultCT.errorCodes shouldEqual matchingResultCT.errorCodes
+    capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchResult shouldEqual matchingResultCT.matchErrors
     capturedEvent.applicationId shouldBe applicationId
 
   }
