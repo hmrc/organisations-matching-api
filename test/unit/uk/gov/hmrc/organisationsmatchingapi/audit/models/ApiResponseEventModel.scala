@@ -46,7 +46,7 @@ class ApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "scopes" -> "test",
       "returnLinks" -> "test"
     )
@@ -61,7 +61,7 @@ class ApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "apiVersion" -> "test",
       "matchId" -> "test",
       "correlationId" -> "test",
-      "clientId" -> "test",
+      "applicationId" -> "test",
       "scopes" -> "test",
       "returnLinks" -> "test"
     )
