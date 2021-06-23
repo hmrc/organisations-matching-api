@@ -119,7 +119,7 @@ class IfConnectorSpec
 
     }
 
-    "Fail when IF returns a bad knownFacts" in new Setup {
+    "Fail when IF returns a bad request" in new Setup {
 
       Mockito.reset(underTest.auditHelper)
 
