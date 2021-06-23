@@ -72,7 +72,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
   )
 
   val matchingResultCT = new MatchingResultCT(Some(knownFactsCt), Set(34))
-  val matchingResultSA = new MatchingResultSA(Some(knownFactsSa), Set(33))
+  val matchingResultSA = new MatchingResultSA(Some(knownFactsSa), Set())
 
   "auditAuthScopes" in {
 
@@ -174,7 +174,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchId shouldEqual matchId
     capturedEvent.asInstanceOf[CtMatchingResultEventModel].correlationId shouldEqual Some(correlationId)
-    capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchResult shouldEqual matchingResultCT.matchErrors
+    capturedEvent.asInstanceOf[CtMatchingResultEventModel].matchResult shouldEqual matchingResultCT.matchResult
     capturedEvent.applicationId shouldBe applicationId
 
   }
@@ -196,7 +196,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     capturedEvent.asInstanceOf[SaMatchingResultEventModel].matchId shouldEqual matchId
     capturedEvent.asInstanceOf[SaMatchingResultEventModel].correlationId shouldEqual Some(correlationId)
-    capturedEvent.asInstanceOf[SaMatchingResultEventModel].matchingResultSA.errorCodes shouldEqual matchingResultSA.errorCodes
+    capturedEvent.asInstanceOf[SaMatchingResultEventModel].matchResult shouldEqual matchingResultSA.matchResult
     capturedEvent.applicationId shouldBe applicationId
 
   }

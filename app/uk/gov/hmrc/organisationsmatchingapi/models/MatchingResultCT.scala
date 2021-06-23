@@ -21,7 +21,7 @@ import uk.gov.hmrc.organisationsmatchingapi.matching.FailureReasons._
 
 case class MatchingResultCT(knownFacts: Option[MatchDataCT], errorCodes: Set[Int]) {
 
-  def matchErrors: JsValue = if(errorCodes.isEmpty)
+  def matchResult: JsValue = if(errorCodes.isEmpty)
     Json.toJson("Matched")
   else
     Json.toJson("Not Matched", errorCodes.map(c => (c, range(c).concat(dataItem(c)))).toMap)

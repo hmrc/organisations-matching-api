@@ -151,7 +151,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         matchId = matchId,
         correlationId = Some(correlationId),
         applicationId = request.headers.get("X-Application-ID").getOrElse("-"),
-        matchResult = result.matchErrors
+        matchResult = result.matchResult
       )
     )
 
@@ -171,7 +171,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         matchId = matchId,
         correlationId = Some(correlationId),
         applicationId = request.headers.get("X-Application-ID").getOrElse("-"),
-        matchingResultSA = result
+        matchResult = result.matchResult
       )
     )
 }

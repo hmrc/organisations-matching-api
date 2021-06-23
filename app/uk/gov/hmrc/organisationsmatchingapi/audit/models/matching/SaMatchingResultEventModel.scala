@@ -16,8 +16,7 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.audit.models.matching
 
-import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.models.MatchingResultSA
+import play.api.libs.json.{JsValue, Json}
 
 case class SaMatchingResultEventModel(deviceId: String,
                                       input: String,
@@ -27,7 +26,7 @@ case class SaMatchingResultEventModel(deviceId: String,
                                       matchId: String,
                                       correlationId: Option[String],
                                       applicationId: String,
-                                      matchingResultSA: MatchingResultSA)
+                                      matchResult: JsValue)
 
 object SaMatchingResultEventModel {
   implicit val formatSaMatchingResultEventModel = Json.format[SaMatchingResultEventModel]
