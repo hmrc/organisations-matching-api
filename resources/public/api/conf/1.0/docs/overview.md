@@ -2,7 +2,7 @@ This API allows government departments to check HM Revenue and Customs (HMRC) re
 
 On a successful match, the API will give you a MatchId. 
 
-##PAYE and Self Assessment
+###PAYE and Self Assessment
 If you have a Company Registration number (CRN), you will need to use the PAYE endpoint. This is described in the endpoint documentation.
 
 If you have a Self Assessment Unique Taxpayer Reference (UTR), you will need to use the Self Assessment endpoint. This is described in the endpoint documentation.
@@ -10,7 +10,7 @@ If you have a Self Assessment Unique Taxpayer Reference (UTR), you will need to 
 They will return a MatchId and HATEOAS links that you can use to get further details about the matched organisation.
 
 
-##HAL HATEOS RESTful APIs
+###HAL HATEOS RESTful APIs
 This API is a HAL HATEOAS RESTful API. It has been designed to promote discoverability and to be self documenting.
 
 A HATEOAS API makes it clear to client software what further actions are available when an action is completed. Responses from an endpoint include URLs to further endpoints you can call. New functionality can be added without breaking your client software.
