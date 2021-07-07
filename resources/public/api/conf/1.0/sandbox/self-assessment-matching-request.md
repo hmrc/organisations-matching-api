@@ -38,20 +38,13 @@
     <tbody>
     <tr>
         <td><p>Successful match</p>
-        <td><p>selfAssessmentUniqueTaxPayerRef = &quot;1234567890&quot;
-            <br/>taxPayerType = &quot;Partnership&quot;
-            <br/>taxPayerName = &quot;Example Partnership&quot;
-            <br/>addressLine1 = &quot;123 Long Road&quot;
-            <br/>addressLine2 = &quot;Some City&quot;
-            <br/>addressLine3 = &quot;Some County&quot;
-            <br/>addressLine4 = &quot;&quot;
-            <br/>postcode = &quot;AB12 3CD&quot;</p></td>
+        <td>As outlined in the valid payload.</td>
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
         <td><p>No match</p></td>
         <td>
-            <p>Any details that are not an exact match.</p>
+            <p>There is no match for the information provided.</p>
         </td>
         <td><p>403 (Forbidden)</p>
         <p>{ &quot;code&quot; : &quot;MATCHING_FAILED&quot;,<br/>&quot;message&quot; : &quot;There is no match for the information provided&quot; }</p></td>
@@ -66,13 +59,13 @@
                     postcode
             </p>
           </td>
-          <td><p>Any field missing</p></td>
+          <td><p>There is at least one required field missing.</p></td>
           <td><p>400 (Bad Request)</p>
           <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;&#60;field_name&#62; is required&quot; }</p></td>
     </tr>
     <tr>
         <td><p>Malformed selfAssessmentUniqueTaxPayerRef</p></td>
-        <td><p>Any SAUTR that does not meet the validation rule</p></td>
+        <td><p>Any selfAssessmentUniqueTaxPayerRef that is not in the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed SAUTR submitted&quot; }</p></td>
@@ -80,7 +73,7 @@
     </tr>
     <tr>
         <td><p>Missing CorrelationId</p></td>
-        <td><p>CorrelationId header is missing</p></td>
+        <td><p>CorrelationId is missing. Check the request headers section for what should be included</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;CorrelationId is required&quot; }</p></td>
@@ -88,7 +81,7 @@
     </tr>
     <tr>
         <td><p>Malformed CorrelationId</p></td>
-        <td><p>CorrelationId header is malformed</p></td>
+        <td><p>CorrelationId is not in the correct format. Check the request headers section for the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed CorrelationId&quot; }</p></td>

@@ -4,11 +4,12 @@
   "properties": {
     "employerName": {
       "type": "string",
-      "example": "Employer Name"
+      "example": "Example Company Ltd",
+      "description": "The name of the employer."
     },
     "address": {
       "type": "object",
-      "description": "Address",
+      "description": "The employer's address details.",
       "required": [
         "addressLine1",
         "addressLine2",
@@ -32,7 +33,8 @@
         },
         "addressLine4": {
           "type": "string",
-          "description": "Address line 4."
+          "description": "Address line 4.",
+          "example": "United Kingdom"
         },
         "postcode": {
           "type": "string",
@@ -52,7 +54,7 @@
       "properties": {
         "self": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the paye data.",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
           "required": [
             "href"
           ],
@@ -66,10 +68,6 @@
               "type": "string",
               "description": "The HTTP Action to use on this endpoint.",
               "example": "GET"
-            },
-            "title": {
-              "type": "string",
-              "description": "Get the organisation's paye data."
             }
           }
         },

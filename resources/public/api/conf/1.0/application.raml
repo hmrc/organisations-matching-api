@@ -27,9 +27,9 @@ uses:
 /organisations:
   /matching/corporation-tax:
       post:
-        displayName: "PAYE Matching Request"
-        description: "Matches posted information with known facts and generates the matchID"
-        is: [headers.acceptHeader, headers.contentHeader]
+        displayName: "Match Corporation Tax details for an organisation "
+        description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include: company registration number (CRN), employer name, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
+        is: [headers.acceptHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/paye-organisations-matching-request.md
@@ -39,11 +39,11 @@ uses:
             type: string
             required: true
             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
-        queryParameters:
-          matchId:
-            description: "A short-lived universally unique identifier (UUID), typically valid for several hours. Generated through the Organisations Matching API."
+          Content-Type:
+            description: Specifies the format of the request body. This must be JSON.
             type: string
-            example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+            required: true
+            example: application/vnd.hmrc.1.0+json
         body:
           application/json:
             type: !include schemas/corporation-tax-matching-request.json
@@ -76,18 +76,18 @@ uses:
 
   /matching/self-assessment:
       post:
-        displayName: Self Assessment Matching Request
-        description: "This endpoint takes a JSON body that contains a UTR, Organisation Type and Known Facts in order to match against HMRC's records. Upon a successful match, a matchId is returned which can be used in subsequent calls."
+        displayName: Match Self Assessment details for an organisation
+        description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matching-request.md
         headers:
           Content-Type:
-            description: "Specifies the content-type of the body."
+            description: Specifies the format of the request body. This must be JSON.
             type: string
             required: true
-            example: application/json
+            example: application/vnd.hmrc.1.0+json
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
@@ -125,17 +125,22 @@ uses:
   /matching/corporation-tax/{matchId}:
       uriParameters:
         matchId:
-          description: "A short-lived UUID, typically valid for 5 hours"
+          description: "A short-lived universally unique identifier (UUID), typically valid for 5 hours."
           type: string
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
-        displayName: "Get matched organisation's PAYE details"
-        description: "This endpoint takes a matchId and returns corporation tax information for the company"
+        displayName: "Get links to Corporation Tax and number of employee details for a matched organisation"
+        description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Corporation Tax and number of employees details for a matched organisation."
         is: [headers.acceptHeader, headers.contentHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/paye-matched-details-response.md
         headers:
+          Content-Type:
+            description: Specifies the format of the request body. This must be JSON.
+            type: string
+            required: true
+          example: application/vnd.hmrc.1.0+json
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
