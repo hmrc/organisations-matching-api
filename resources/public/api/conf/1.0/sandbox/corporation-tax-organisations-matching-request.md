@@ -35,7 +35,6 @@
     <tr>
         <td><p>Successful match</p>
         <td>As outlined in the valid payload.</td>
-        <td>As outlined in the valid payload.</td>
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
