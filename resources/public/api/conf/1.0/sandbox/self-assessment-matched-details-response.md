@@ -11,27 +11,27 @@
     </thead>
     <tbody>
     <tr>
-        <td><p>Self Assessment Organisations matching data found</p></td>
-        <td><p>matchId=&lt;obtained from Organisations Matching API. example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430&gt;</p></td>
+        <td><p>A valid, successful request for Self Assessment data</p></td>
+        <td><p>The matchID. For example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430</p></td>
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
-        <td><p>Missing matchId</p></td>
-        <td><p>matchId query parameter missing</p></td>
+        <td><p>MatchId is not included</p></td>
+        <td><p>The request is missing the matchId. Check the path parameters section for what should be included.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;matchId is required&quot; }</p>
         </td>
     </tr>
     <tr>
-        <td><p>Incorrect matchId</p></td>
-        <td><p>The matchId is not valid</p></td>
+        <td><p>No data found for the provided match </p></td>
+        <td><p>A matchId with no related data.</p></td>
         <td><p>404 (Not Found)</p>
         <p>{ &quot;code&quot; : &quot;NOT_FOUND&quot;,<br/>&quot;message&quot; : &quot;The resource cannot be found&quot; }</p></td>
     </tr>
     <tr>
         <td><p>Missing CorrelationId</p></td>
-        <td><p>CorrelationId header is missing</p></td>
+        <td><p>CorrelationId is missing. Check the request headers section for what should be included.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;CorrelationId is required&quot; }</p></td>
@@ -39,7 +39,7 @@
     </tr>
     <tr>
         <td><p>Malformed CorrelationId</p></td>
-        <td><p>CorrelationId header is malformed</p></td>
+        <td><p>CorrelationId is in the incorrect format. Check the request headers section for the correct format.</p></td>
         <td>
             <p>400 (Bad Request)</p>
             <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;Malformed CorrelationId&quot; }</p></td>

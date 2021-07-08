@@ -12,9 +12,6 @@
                 &quot;employerName&quot;:&quot;Waitrose&quot;,
                 &quot;address&quot;:{
                     &quot;addressLine1&quot;:&quot;123 Long Road&quot;,
-                    &quot;addressLine2&quot;:&quot;Some City&quot;,
-                    &quot;addressLine3&quot;:&quot;Some County&quot;,
-                    &quot;addressLine4&quot;:&quot;&quot;,
                     &quot;postcode&quot;:&quot;AB12 3CD&quot}
                 }
             </p>
@@ -38,6 +35,7 @@
     <tr>
         <td><p>Successful match</p>
         <td>As outlined in the valid payload.</td>
+        <td>As outlined in the valid payload.</td>
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
@@ -52,8 +50,7 @@
           <td>
             <p>Missing companyRegistrationNumber &#47; 
                     employerName &#47; 
-                    addressLine1 &#47; 
-                    addressLine2 &#47;
+                    addressLine1 &#47;
                     postcode
             </p>
           </td>

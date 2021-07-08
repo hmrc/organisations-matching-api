@@ -4,9 +4,6 @@
   "taxPayerName": "Example Partnership",
   "address": {
     "addressLine1": "123 Long Road",
-    "addressLine2": "Some City",
-    "addressLine3": "Some County",
-    "addressLine4": "",
     "postcode": "AB12 3CD"
   }
 }

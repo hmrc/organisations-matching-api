@@ -23,7 +23,6 @@
       "description": "The employer's address details.",
       "required": [
         "addressLine1",
-        "addressLine2",
         "postcode"
       ],
       "properties": {

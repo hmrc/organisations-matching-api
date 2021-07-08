@@ -31,7 +31,6 @@
       "description": "The organisation's address.",
       "required": [
         "addressLine1",
-        "addressLine2",
         "postcode"
       ],
       "properties": {
@@ -39,21 +38,6 @@
           "type": "string",
           "description": "Address line 1.",
           "example": "123 Long Road"
-        },
-        "addressLine2": {
-          "type": "string",
-          "description": "Address line 2.",
-          "example": "Some City"
-        },
-        "addressLine3": {
-          "type": "string",
-          "description": "Address line 3.",
-          "example": "Some County"
-        },
-        "addressLine4": {
-          "type": "string",
-          "description": "Address line 4.",
-          "example": "United Kingdom"
         },
         "postcode": {
           "type": "string",

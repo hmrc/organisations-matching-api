@@ -13,9 +13,6 @@
                 &quot;taxPayerName&quot;:&quot;Example Partnership&quot;,
                 &quot;address&quot;:{
                     &quot;addressLine1&quot;:&quot;123 Long Road&quot;,
-                    &quot;addressLine2&quot;:&quot;Some City&quot;,
-                    &quot;addressLine3&quot;:&quot;Some County&quot;,
-                    &quot;addressLine4&quot;:&quot;&quot;,
                     &quot;postcode&quot;:&quot;AB12 3CD&quot}
                 }
             </p>
@@ -54,8 +51,7 @@
             <p>Missing selfAssessmentUniqueTaxPayerRef &#47; 
                     taxPayerType &#47; 
                     taxPayerName &#47;
-                    addressLine1 &#47; 
-                    addressLine2 &#47;
+                    addressLine1 &#47;
                     postcode
             </p>
           </td>

@@ -1,6 +1,10 @@
 {
   "type": "object",
   "description": "Company Details Response",
+  "required": [
+    "employerName",
+    "address"
+  ],
   "properties": {
     "employerName": {
       "type": "string",
@@ -12,7 +16,6 @@
       "description": "The employer's address details.",
       "required": [
         "addressLine1",
-        "addressLine2",
         "postcode"
       ],
       "properties": {
@@ -20,21 +23,6 @@
           "type": "string",
           "description": "Address line 1.",
           "example": "123 Long Road"
-        },
-        "addressLine2": {
-          "type": "string",
-          "description": "Address line 2.",
-          "example": "Some City"
-        },
-        "addressLine3": {
-          "type": "string",
-          "description": "Address line 3.",
-          "example": "Some County"
-        },
-        "addressLine4": {
-          "type": "string",
-          "description": "Address line 4.",
-          "example": "United Kingdom"
         },
         "postcode": {
           "type": "string",
@@ -48,7 +36,7 @@
       "description": "A list of links for possible actions related to this endpoint.",
       "required": [
         "self",
-        "getDetails",
+        "getCorporationTaxDetails",
         "getEmployeeCount"
       ],
       "properties": {
@@ -62,7 +50,7 @@
             "href": {
               "type": "string",
               "description": "The URL of the endpoint.",
-              "example": "/organisations/matching/paye/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+              "example": "/organisations/matching/corporation-tax/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
             },
             "name": {
               "type": "string",
@@ -71,9 +59,9 @@
             }
           }
         },
-        "getDetails": {
+        "getCorporationTaxDetails": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the paye details data.",
+          "description": "The URI for the endpoint to get Corporation Tax details for the matched organisation.",
           "required": [
             "href"
           ],
@@ -81,7 +69,7 @@
             "href": {
               "type": "string",
               "description": "The URL of the endpoint.",
-              "example": "/organisations/details/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+              "example": "/organisations/details/corporation-tax/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
             },
             "name": {
               "type": "string",
@@ -90,13 +78,13 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's paye details data."
+              "description": "Get the organisation's PAYE details"
             }
           }
         },
         "getEmployeeCount": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the paye employee count data.",
+          "description": "The URI for the endpoint to get number of employees data.",
           "required": [
             "href"
           ],
@@ -113,7 +101,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's paye employee count data."
+              "description": "Get the organisation's number of employees data"
             }
           }
         }
