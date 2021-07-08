@@ -25,29 +25,35 @@ import uk.gov.hmrc.cache.repository.CacheMongoRepository
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.CrnMatch
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ShortLivedCache[T] (cacheConfig: CacheConfiguration,
-                                   configuration: Configuration,
-                                   mongo: ReactiveMongoComponent,
-                                   collName: String)(implicit ec: ExecutionContext)
-  extends CacheMongoRepository(collName, cacheConfig.cacheTtl)(mongo.mongoConnector.db, ec)
-  with TimeToLive {
+@Singleton
+class ShortLivedCache @Inject()(
+                                 val cacheConfig: CacheConfiguration,
+                                 configuration: Configuration,
+                                 mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
+  extends CacheMongoRepository(
+    cacheConfig.colName,
+    cacheConfig.cacheTtl
+  )(
+    mongo.mongoConnector.db,
+    ec
+  ) with TimeToLive {
 
-  implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(
-    configuration.underlying).JsonCrypto
+  implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(configuration.underlying).JsonCrypto
 
-  def cache(id: String, key: String, value: T)(
-    implicit formats: Format[T]): Future[Unit] = {
+  def cache[T](id: String, key: String, value: T)(implicit formats: Format[T]): Future[Unit] = {
+
     val jsonEncryptor = new JsonEncryptor[T]()
     val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
+
     createOrUpdate(id, key, encryptedValue).map(_ => ())
+
   }
 
-  def fetchAndGetEntry(id: String, key: String)(
-    implicit formats: Format[T]): Future[Option[T]] = {
+  def fetchAndGetEntry[T](id: String, key: String)(implicit formats: Format[T]): Future[Option[T]] = {
+
     val decryptor = new JsonDecryptor[T]()
 
     findById(id) map {
@@ -60,4 +66,5 @@ class ShortLivedCache[T] (cacheConfig: CacheConfiguration,
       case None => None
     }
   }
+
 }

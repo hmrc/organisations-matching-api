@@ -16,65 +16,70 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.services
 
+import org.mockito.ArgumentMatchers.any
+import org.mockito.BDDMockito.`given`
+
 import java.util.UUID
 import java.util.UUID.randomUUID
-
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CrnMatch, CrnMatchingRequest, SaUtrMatch, SaUtrMatchingRequest}
+import play.api.libs.json.{Json, OFormat}
+import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
+import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CtMatch, CtMatchRequest, SaMatch, SaMatchRequest}
+import uk.gov.hmrc.organisationsmatchingapi.repository.{MatchRepository, ShortLivedCache}
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
+import org.mockito.ArgumentMatchers.{eq => eqTo}
+import uk.gov.hmrc.cache.repository.CacheRepository
 import util.UnitSpec
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Setup {
-    val uuid:UUID = randomUUID()
-    val cacheService = app.injector.instanceOf(classOf[CacheService])
-
-    val crnRequest = CrnMatchingRequest(
-      "crn",
-      "name",
-      Address(
-        "line1",
-        Some("line2"),
-        Some("line3"),
-        Some("line4")
-      ),
-      "postcode"
-    )
-
-    val crnMatch = CrnMatch(
-      crnRequest,
-      uuid
-    )
-
-    val saUtrRequest = SaUtrMatchingRequest("", "", "", Address(
-      "line1",
-      Some("line2"),
-      Some("line3"),
-      Some("line4")
-    ),
-      "postcode"
-    )
-
-    val saUtrMatch = SaUtrMatch(
-      saUtrRequest,
-      uuid
-    )
+    val mockCacheConfig = mock[CacheConfiguration]
+    val mockMatchRepo = mock[MatchRepository]
+    val matchId:UUID = UUID.fromString("69f0da0d-4e50-4161-badc-fa39f769bed3")
+    val cacheService = new CacheService(mockMatchRepo, mockCacheConfig)
+    val ctRequest    = CtMatchRequest("crn", "name", Address("line1", "postcode"))
+    val ctMatch      = CtMatch(ctRequest, matchId)
+    val saRequest    = SaMatchRequest("utr", "Individual", "name", Address("line1", "postcode"))
+    val saMatch      = SaMatch(saRequest, matchId)
   }
 
-  "Retrieve CtUtr from cache service" in new Setup {
-    val result = cacheService.getCtUtr(uuid, () => Future.successful(crnMatch))
-    await(result) shouldBe crnMatch
+  "Retrieve CT match details from cache service" in new Setup {
+    given(mockMatchRepo.fetchAndGetEntry[CtMatch](any(), any())(any()))
+      .willReturn(Future.successful(Some(ctMatch)))
+
+    val result = cacheService.getByMatchIdCT[CtMatch](matchId)
+    await(result) shouldBe Some(ctMatch)
   }
 
-  "Retrieve SaUtr from cache service" in new Setup {
-    val result = cacheService.getSaUtr(uuid, () => Future.successful(saUtrMatch))
-    await(result) shouldBe saUtrMatch
+  "Retrieve SA match details from cache service" in new Setup {
+    given(mockMatchRepo.fetchAndGetEntry[SaMatch](any(), any())(any()))
+      .willReturn(Future.successful(Some(saMatch)))
+
+    val result = cacheService.getByMatchIdSA[SaMatch](matchId)
+    await(result) shouldBe Some(saMatch)
   }
+
+  "CT return none where no details found in cache" in new Setup {
+    given(mockMatchRepo.fetchAndGetEntry[CtMatch](any(), any())(any()))
+      .willReturn(Future.successful(None))
+
+    val result = cacheService.getByMatchIdCT[CtMatch](matchId)
+    await(result) shouldBe None
+  }
+
+  "SA return none where no details found in cache" in new Setup {
+    given(mockMatchRepo.fetchAndGetEntry[SaMatch](any(), any())(any()))
+      .willReturn(Future.successful(None))
+
+    val result = cacheService.getByMatchIdSA[SaMatch](matchId)
+    await(result) shouldBe None
+  }
+
 }
