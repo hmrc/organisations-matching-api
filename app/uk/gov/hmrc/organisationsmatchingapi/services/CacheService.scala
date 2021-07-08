@@ -30,13 +30,11 @@ class CacheService @Inject()(
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def getByMatchIdCT[T: Format](matchId: UUID) = {
+  def getByMatchId[T: Format](matchId: UUID) = {
     get(matchId, matchRepository)
   }
 
-  def getByMatchIdSA[T: Format](matchId: UUID) = {
-    get(matchId, matchRepository)
-  }
+  //TODO - add save method (used to store known facts and upsert when adding a utr)
 
   private def get[T: Format](matchId: UUID,
                              cachingClient: ShortLivedCache): Future[Option[T]] = {
