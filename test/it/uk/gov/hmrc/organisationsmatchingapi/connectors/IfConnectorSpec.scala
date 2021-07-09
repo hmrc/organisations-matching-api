@@ -33,6 +33,7 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, NotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfCorpTaxCompanyDetails, IfSaTaxpayerDetails}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util.UnitSpec
 
@@ -95,6 +96,44 @@ class IfConnectorSpec
 
   "fetch Corporation Tax" should {
     val crn = "123456789"
+    val IFCorporationTaxResult = ""
+
+    "return data on successful call" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
+          .withHeader("Authorization", equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+          .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+              .withBody(
+                Json.toJson(
+                  IfCorpTaxCompanyDetails(
+                    None,
+                    Some(crn),
+                    None,
+                    None
+                  )).toString()
+              )
+          )
+      )
+
+      val result = await(
+        underTest
+          .fetchCorporationTax(crn, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec))
+
+      verify(underTest.auditHelper, times(1))
+        .auditIfApiResponse(any(), any(), any(), any(), any())(any())
+
+      result shouldBe IFCorporationTaxResult
+
+    }
 
     "Fail when IF returns an error" in new Setup {
 
@@ -160,47 +199,55 @@ class IfConnectorSpec
       }
       verify(underTest.auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
-    }
-
-    "for standard response" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
-      stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
-          .withHeader(
-            "Authorization",
-            equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
-          .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
-          .willReturn(aResponse()
-            .withStatus(200)
-            .withBody(Json.toJson("bar").toString())))
-
-      val result = await(
-        underTest.fetchCorporationTax(UUID.randomUUID().toString, "123456789")(
-          hc,
-          FakeRequest().withHeaders(sampleCorrelationIdHeader),
-          ec
-        )
-      )
-
-      result shouldBe "bar"
-
-      verify(underTest.auditHelper,
-        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
-
     }
   }
 
   "fetch Self Assessment" should {
     val utr = "123456789"
 
+    val SACorporationTaxResult = ""
+
+    "return data on successful call" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
+          .withHeader("Authorization", equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+          .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+          .willReturn(
+            aResponse()
+              .withStatus(200)
+                          .withBody(
+                            Json.toJson(IfSaTaxpayerDetails(
+                              Some(utr),
+                              Some("Individual"),
+                              None
+                            )).toString()
+                          )
+          )
+      )
+
+      val result = await(
+        underTest
+          .fetchSelfAssessment(utr, matchId)(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec))
+
+            verify(underTest.auditHelper, times(1))
+              .auditIfApiResponse(any(), any(), any(), any(), any())(any())
+
+      result shouldBe SACorporationTaxResult
+
+    }
+
     "Fail when IF returns an error" in new Setup {
 
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/self-assessment/$utr/CHANGEME"))
+        get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(500)))
 
       intercept[InternalServerException] {
@@ -223,7 +270,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$utr/company/details"))
+        get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
 
       intercept[InternalServerException] {
@@ -245,7 +292,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$utr/company/details"))
+        get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
 
       intercept[NotFoundException] {
@@ -266,7 +313,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$utr/company/details"))
+        get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .withHeader(
             "Authorization",
             equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))

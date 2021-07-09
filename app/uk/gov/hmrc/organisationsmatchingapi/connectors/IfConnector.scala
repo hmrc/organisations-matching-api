@@ -51,10 +51,10 @@ class IfConnector @Inject()(
     request: RequestHeader,
     ec: ExecutionContext) = {
 
-    val detailsUrl =
-      s"$baseUrl/organisations/corporation-tax/$utr/company/details"
+    val SAUrl =
+      s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    call(detailsUrl, matchId)
+    call(SAUrl, matchId)
 
   }
 
@@ -63,10 +63,10 @@ class IfConnector @Inject()(
     request: RequestHeader,
     ec: ExecutionContext) = {
 
-    val detailsUrl =
+    val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
-    call(detailsUrl, matchId)
+    call(CTUrl, matchId)
 
   }
 
