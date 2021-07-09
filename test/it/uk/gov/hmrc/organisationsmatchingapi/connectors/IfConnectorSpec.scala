@@ -93,7 +93,7 @@ class IfConnectorSpec
     wireMockServer.stop()
   }
 
-  "fetch foo" should {
+  "fetch Corporation Tax" should {
     val crn = "123456789"
 
     "Fail when IF returns an error" in new Setup {
@@ -106,7 +106,7 @@ class IfConnectorSpec
 
       intercept[InternalServerException] {
         await(
-          underTest.fetchFoo(UUID.randomUUID().toString, "123456789")(
+          underTest.fetchCorporationTax(UUID.randomUUID().toString, "123456789")(
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
@@ -129,7 +129,7 @@ class IfConnectorSpec
 
       intercept[InternalServerException] {
         await(
-          underTest.fetchFoo(UUID.randomUUID().toString, "123456789")(
+          underTest.fetchCorporationTax(UUID.randomUUID().toString, "123456789")(
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
@@ -151,7 +151,7 @@ class IfConnectorSpec
 
       intercept[NotFoundException] {
         await(
-          underTest.fetchFoo(UUID.randomUUID().toString, "123456789")(
+          underTest.fetchCorporationTax(UUID.randomUUID().toString, "123456789")(
             hc,
             FakeRequest().withHeaders(sampleCorrelationIdHeader),
             ec
@@ -177,7 +177,106 @@ class IfConnectorSpec
             .withBody(Json.toJson("bar").toString())))
 
       val result = await(
-        underTest.fetchFoo(UUID.randomUUID().toString, "123456789")(
+        underTest.fetchCorporationTax(UUID.randomUUID().toString, "123456789")(
+          hc,
+          FakeRequest().withHeaders(sampleCorrelationIdHeader),
+          ec
+        )
+      )
+
+      result shouldBe "bar"
+
+      verify(underTest.auditHelper,
+        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+
+    }
+  }
+
+  "fetch Self Assessment" should {
+    val utr = "123456789"
+
+    "Fail when IF returns an error" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(s"/organisations/self-assessment/$utr/CHANGEME"))
+          .willReturn(aResponse().withStatus(500)))
+
+      intercept[InternalServerException] {
+        await(
+          underTest.fetchSelfAssessment(UUID.randomUUID().toString, "123456789")(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+      }
+
+      verify(underTest.auditHelper,
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+
+    }
+
+    "Fail when IF returns a bad request" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(s"/organisations/corporation-tax/$utr/company/details"))
+          .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
+
+      intercept[InternalServerException] {
+        await(
+          underTest.fetchSelfAssessment(UUID.randomUUID().toString, "123456789")(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+      }
+
+      verify(underTest.auditHelper,
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+    }
+
+    "Fail when IF returns a NOT_FOUND" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(s"/organisations/corporation-tax/$utr/company/details"))
+          .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
+
+      intercept[NotFoundException] {
+        await(
+          underTest.fetchSelfAssessment(UUID.randomUUID().toString, "123456789")(
+            hc,
+            FakeRequest().withHeaders(sampleCorrelationIdHeader),
+            ec
+          )
+        )
+      }
+      verify(underTest.auditHelper,
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+    }
+
+    "for standard response" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(s"/organisations/corporation-tax/$utr/company/details"))
+          .withHeader(
+            "Authorization",
+            equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+          .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+          .willReturn(aResponse()
+            .withStatus(200)
+            .withBody(Json.toJson("bar").toString())))
+
+      val result = await(
+        underTest.fetchSelfAssessment(UUID.randomUUID().toString, "123456789")(
           hc,
           FakeRequest().withHeaders(sampleCorrelationIdHeader),
           ec
