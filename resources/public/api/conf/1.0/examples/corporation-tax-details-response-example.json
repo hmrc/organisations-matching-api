@@ -1,25 +1,21 @@
 {
-  "employerName": "Employer Name",
+  "employerName": "Example Company Ltd",
   "address": {
     "addressLine1": "123 Long Road",
-    "addressLine2": "Some City",
-    "addressLine3": "Some County",
-    "addressLine4": "",
     "postcode": "AB12 3CD"
   },
   "_links": {
     "self": {
-      "href": "organisations/matching/paye/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET",
-      "title": "Get the organisation's paye data."
+      "href": "organisations/matching/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "name": "GET"
     },
-    "getDetails": {
-      "href": "organisations/details/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+    "getCorporationTaxDetails": {
+      "href": "organisations/details/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "name": "GET",
-      "title": "Get the organisation's paye details data."
+      "title": "Get the organisation's Corporation Tax details data."
     },
     "getEmployeeCount": {
-      "href": "organisations/details/number-of-employees/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "href": "organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "name": "GET",
       "title": "Get the organisation's paye employee count data."
     }

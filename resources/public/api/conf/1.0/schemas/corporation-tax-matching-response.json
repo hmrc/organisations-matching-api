@@ -4,6 +4,7 @@
   "properties": {
     "matchId": {
       "type": "string",
+      "description": "A short-lived universally unique identifier (UUID), typically valid for 5 hours.",
       "example": "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
     }
   }

@@ -9,20 +9,20 @@
   "properties": {
     "companyRegistrationNumber": {
       "type": "string",
-      "description": "Company Registration Number",
-      "pattern": "^[A-Z0-9]{1,10}$"
+      "description": "Company registration number (CRN). ",
+      "pattern": "^[A-Z0-9]{1,10}$",
+      "example": "AA123456"
     },
     "employerName": {
       "type": "string",
-      "description": "Employer name",
+      "description": "The name of the employer.",
       "example": "Example Company Ltd"
     },
     "address": {
       "type": "object",
-      "description": "Address",
+      "description": "The employer's address details.",
       "required": [
         "addressLine1",
-        "addressLine2",
         "postcode"
       ],
       "properties": {
@@ -30,20 +30,6 @@
           "type": "string",
           "description": "Address line 1.",
           "example": "123 Long Road"
-        },
-        "addressLine2": {
-          "type": "string",
-          "description": "Address line 2.",
-          "example": "Some City"
-        },
-        "addressLine3": {
-          "type": "string",
-          "description": "Address line 3.",
-          "example": "Some County"
-        },
-        "addressLine4": {
-          "type": "string",
-          "description": "Address line 4."
         },
         "postcode": {
           "type": "string",
