@@ -25,7 +25,8 @@ import play.api.libs.json.Json
 case class CtMatch(
                     request: CtMatchRequest,
                     matchId: UUID = randomUUID(),
-                    createdAt: LocalDateTime = LocalDateTime.now()
+                    createdAt: LocalDateTime = LocalDateTime.now(),
+                    utr: Option[String] = None
                   )
 
 object CtMatch {

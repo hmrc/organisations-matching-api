@@ -17,9 +17,11 @@
 package uk.gov.hmrc.organisationsmatchingapi.services
 
 import play.api.libs.json.Format
+
 import java.util.UUID
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
+import uk.gov.hmrc.organisationsmatchingapi.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.repository.{MatchRepository, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -30,15 +32,21 @@ class CacheService @Inject()(
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def getByMatchId[T: Format](matchId: UUID) = {
-    get(matchId, matchRepository)
+  def cacheCtUtr(ctMatch: CtMatch, utr: String) = {
+    save(ctMatch.matchId.toString, conf.key, ctMatch.copy(utr = Some(utr)))
   }
 
-  //TODO - add save method (used to store known facts and upsert when adding a utr)
+  def cacheSaUtr(saMatch: SaMatch, utr: String) = {
+    save(saMatch.matchId.toString, conf.key, saMatch.copy(utr = Some(utr)))
+  }
 
-  private def get[T: Format](matchId: UUID,
-                             cachingClient: ShortLivedCache): Future[Option[T]] = {
-    cachingClient.fetchAndGetEntry(matchId.toString, conf.key) flatMap  {
+  def save[T](id: String, key: String, value: T)
+               (implicit formats: Format[T]): Future[Unit] = {
+    matchRepository.cache(id, key, value)
+  }
+
+  def fetch[T: Format](matchId: UUID): Future[Option[T]] = {
+    matchRepository.fetchAndGetEntry(matchId.toString, conf.key) flatMap  {
       result =>
         Future.successful(result)
     }
