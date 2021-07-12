@@ -18,7 +18,6 @@ package it.uk.gov.hmrc.organisationsmatchingapi.services
 
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito.{times, verify}
-
 import java.util.UUID
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -88,57 +87,37 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     }
   }
 
-  "save" should {
-    "save updated CT match data to the cache" in {
-      Mockito.reset(mockMatchRepo)
-
-      val updatedMatch = ctMatch.copy(utr = Some("TESTUTR"))
-
-      given(mockMatchRepo.cache(any(), any(), any())(any()))
-        .willReturn(Future.successful())
-
-      await { cacheService.save(matchId.toString, mockCacheConfig.key, updatedMatch) }
-      verify(mockMatchRepo, times(1)).cache(any(), any(), eqTo(updatedMatch))(any())
-    }
-
-    "save updated SA match data to the cache" in {
-      Mockito.reset(mockMatchRepo)
-
-      val updatedMatch = saMatch.copy(utr = Some("TESTSAUTR"))
-
-      given(mockMatchRepo.cache(any(), any(), any())(any()))
-        .willReturn(Future.successful())
-
-      await { cacheService.save(matchId.toString, mockCacheConfig.key, updatedMatch) }
-      verify(mockMatchRepo, times(1)).cache(any(), any(), eqTo(updatedMatch))(any())
-    }
-
+  "cacheCtUtr" should {
     "save a CTUTR to the cache" in {
       Mockito.reset(mockMatchRepo)
 
-      val ctUtr    = "SOMECTUTR"
+      val ctUtr = "SOMECTUTR"
       val expected = ctMatch.copy(utr = Some(ctUtr))
 
       given(mockMatchRepo.cache(any(), any(), any())(any()))
         .willReturn(Future.successful())
 
-      await { cacheService.cacheCtUtr(ctMatch, ctUtr) }
+      await {
+        cacheService.cacheCtUtr(ctMatch, ctUtr)
+      }
       verify(mockMatchRepo, times(1)).cache(any(), any(), eqTo(expected))(any())
-
     }
+  }
 
+  "cacheSaUtr" should {
     "save an SAUTR to the cache" in {
       Mockito.reset(mockMatchRepo)
 
-      val saUtr    = "SOMESAUTR"
+      val saUtr = "SOMESAUTR"
       val expected = saMatch.copy(utr = Some(saUtr))
 
       given(mockMatchRepo.cache(any(), any(), any())(any()))
         .willReturn(Future.successful())
 
-      await { cacheService.cacheSaUtr(saMatch, saUtr) }
+      await {
+        cacheService.cacheSaUtr(saMatch, saUtr)
+      }
       verify(mockMatchRepo, times(1)).cache(any(), any(), eqTo(expected))(any())
-
     }
   }
 }

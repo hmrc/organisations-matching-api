@@ -40,15 +40,15 @@ class CacheService @Inject()(
     save(saMatch.matchId.toString, conf.key, saMatch.copy(utr = Some(utr)))
   }
 
-  def save[T](id: String, key: String, value: T)
-               (implicit formats: Format[T]): Future[Unit] = {
-    matchRepository.cache(id, key, value)
-  }
-
   def fetch[T: Format](matchId: UUID): Future[Option[T]] = {
     matchRepository.fetchAndGetEntry(matchId.toString, conf.key) flatMap  {
       result =>
         Future.successful(result)
     }
+  }
+
+  private def save[T](id: String, key: String, value: T)
+                     (implicit formats: Format[T]): Future[Unit] = {
+    matchRepository.cache(id, key, value)
   }
 }
