@@ -1,23 +1,23 @@
 {
   "taxPayerType": "Partnership",
-  "taxPayerName": "Example Partnership",
+  "taxPayerName": "Partnership Name",
   "address": {
     "addressLine1": "123 Long Road",
     "postcode": "AB12 3CD"
   },
   "_links": {
     "self": {
-      "href": "organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "href": "organisations/matching/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "name": "GET",
       "title": "Get the organisation's sa data."
     },
     "getDetails": {
-      "href": "organisations/details/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "href": "organisations/details?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "name": "GET",
       "title": "Get the organisation's self-assessment details data."
     },
     "getEmployeeCount": {
-      "href": "organisations/details/number-of-employees/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "href": "organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "name": "GET",
       "title": "Get the organisation's self-assessment employee count data."
     }

@@ -1,7 +1,7 @@
 {
   "selfAssessmentUniqueTaxPayerRef": "1234567890",
   "taxPayerType": "Partnership",
-  "taxPayerName": "Example Partnership",
+  "taxPayerName": "Partnership Name",
   "address": {
     "addressLine1": "123 Long Road",
     "postcode": "AB12 3CD"
