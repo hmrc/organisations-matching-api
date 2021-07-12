@@ -56,7 +56,7 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
   val configuration = fakeApplication.injector.instanceOf[Configuration]
   val mongo = fakeApplication.injector.instanceOf[ReactiveMongoComponent]
 
-  val shortLivedCache = new ShortLivedCache[TestClass](cacheConfig, configuration, mongo, "test")
+  val shortLivedCache = new ShortLivedCache(cacheConfig, configuration, mongo)
 
   override def beforeEach() {
     super.beforeEach()

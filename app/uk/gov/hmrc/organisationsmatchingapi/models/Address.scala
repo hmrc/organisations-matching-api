@@ -18,7 +18,10 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-case class Address(addressLine1: String, addressLine2: Option[String], addressLine3: Option[String], addressLine4: Option[String])
+case class Address(
+                    addressLine1: String,
+                    postcode: String
+                  )
 
 object Address {
   implicit val formats = Json.format[Address]

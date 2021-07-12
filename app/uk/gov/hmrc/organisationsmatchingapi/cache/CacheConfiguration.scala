@@ -28,11 +28,8 @@ class CacheConfiguration @Inject()(configuration: Configuration) {
   lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds")
     .getOrElse(60 * 15)
 
-  lazy val saUtrColName = configuration.getOptional[String]("cache.sautr-colName")
-    .getOrElse("sautr-matching-cache")
-
-  lazy val crnColName = configuration.getOptional[String]("cache.crn-colName")
-    .getOrElse("crn-matching-cache")
+  lazy val colName = configuration.getOptional[String]("cache.colName")
+    .getOrElse("matching-cache")
 
   lazy val key = configuration.getOptional[String]("cache.key")
     .getOrElse("organisations-matching")
