@@ -17,9 +17,11 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
+import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfCorpTaxCompanyDetails, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
@@ -54,7 +56,9 @@ class IfConnector @Inject()(
     val SAUrl =
       s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    call(SAUrl, matchId)
+    call(SAUrl, matchId) map {
+      response => Json.fromJson[IfSaTaxpayerDetails](Json.parse(response))
+    }
 
   }
 
@@ -66,7 +70,9 @@ class IfConnector @Inject()(
     val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
-    call(CTUrl, matchId)
+    call(CTUrl, matchId) map {
+      response => Json.fromJson[IfCorpTaxCompanyDetails](Json.parse(response))
+    }
 
   }
 
