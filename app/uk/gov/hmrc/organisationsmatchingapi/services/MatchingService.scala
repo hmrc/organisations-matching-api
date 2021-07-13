@@ -16,6 +16,6 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
-class OrganisationsMatchingService {
-
+class MatchingService {
+  throw new NotImplementedError("IMPLEMENT ME")
 }

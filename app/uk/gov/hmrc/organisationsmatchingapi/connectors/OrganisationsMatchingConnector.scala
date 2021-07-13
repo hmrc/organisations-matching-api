@@ -68,9 +68,8 @@ class OrganisationsMatchingConnector @Inject()(
                       requestUrl: String)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = x.recoverWith {
     case notFound: NotFoundException => {
-      // TODO - do we want to return a specific type of not found exception from orgs matching? To differentiate between url 404 and a non match?
       auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(notFound.getMessage))
-      // No need to log non match in Kibana for security reasons. Splunk only.
+      // No Kibana for security reasons. Splunk only.
       throw new MatchingException
     }
     case validationError: JsValidationException => {

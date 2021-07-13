@@ -45,14 +45,14 @@ class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar
 
   "GET matchCrn TO BE IMPLEMENTED /" should {
     "return 200" in {
-      val result = controller.matchCrn()(fakeRequest)
+      val result = controller.matchOrganisationCt()(fakeRequest)
       status(result) shouldBe Status.OK
     }
   }
 
   "GET matchSaUtr TO BE IMPLEMENTED /" should {
     "return 200" in {
-      val result = controller.matchSaUtr()(fakeRequest)
+      val result = controller.matchOrganisationSa()(fakeRequest)
       status(result) shouldBe Status.OK
     }
   }
