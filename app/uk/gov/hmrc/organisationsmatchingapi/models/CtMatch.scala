@@ -22,9 +22,13 @@ import java.util.UUID.randomUUID
 
 import play.api.libs.json.Json
 
-// TODO: Leaving these in from original repository - they will need updated
-case class CrnMatch(request: CrnMatchingRequest, id: UUID = randomUUID(), createdAt: LocalDateTime = LocalDateTime.now())
+case class CtMatch(
+                    request: CtMatchRequest,
+                    matchId: UUID = randomUUID(),
+                    createdAt: LocalDateTime = LocalDateTime.now(),
+                    utr: Option[String] = None
+                  )
 
-object CrnMatch {
-  implicit val formats = Json.format[CrnMatch]
+object CtMatch {
+  implicit val formats = Json.format[CtMatch]
 }

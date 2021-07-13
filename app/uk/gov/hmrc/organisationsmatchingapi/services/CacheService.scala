@@ -17,42 +17,38 @@
 package uk.gov.hmrc.organisationsmatchingapi.services
 
 import play.api.libs.json.Format
-import java.util.UUID
 
+import java.util.UUID
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.{CrnMatch, SaUtrMatch}
-import uk.gov.hmrc.organisationsmatchingapi.repository.{CrnMatchRepository, SaUtrMatchRepository, ShortLivedCache}
+import uk.gov.hmrc.organisationsmatchingapi.models.{CtMatch, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.repository.{MatchRepository, ShortLivedCache}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class CacheService @Inject()(
-    crnMatchRepository: CrnMatchRepository,
-    saUtrMatchRepository: SaUtrMatchRepository,
-    conf: CacheConfiguration)(implicit ec: ExecutionContext) {
+                              matchRepository: MatchRepository,
+                              val conf: CacheConfiguration)(implicit ec: ExecutionContext) {
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def getCtUtr(cacheId: UUID, fallbackFunction: () => Future[CrnMatch]): Future[CrnMatch] =
-    get(cacheId, crnMatchRepository, fallbackFunction)
+  def cacheCtUtr(ctMatch: CtMatch, utr: String) = {
+    save(ctMatch.matchId.toString, conf.key, ctMatch.copy(utr = Some(utr)))
+  }
 
-  def getSaUtr(cacheId: UUID, fallbackFunction: () => Future[SaUtrMatch]): Future[SaUtrMatch] =
-    get(cacheId, saUtrMatchRepository, fallbackFunction)
+  def cacheSaUtr(saMatch: SaMatch, utr: String) = {
+    save(saMatch.matchId.toString, conf.key, saMatch.copy(utr = Some(utr)))
+  }
 
-  private def get[T: Format](cacheId: UUID,
-                     cachingClient: ShortLivedCache[T],
-                     fallbackFunction: () => Future[T]): Future[T] = {
-    if (cacheEnabled)
-      cachingClient.fetchAndGetEntry(cacheId.toString, conf.key) flatMap {
-        case Some(value) =>
-          Future.successful(value)
-        case None =>
-          fallbackFunction.apply() map { result =>
-            cachingClient.cache(cacheId.toString, conf.key, result)
-            result
-          }
-      } else {
-      fallbackFunction.apply()
+  def fetch[T: Format](matchId: UUID): Future[Option[T]] = {
+    matchRepository.fetchAndGetEntry(matchId.toString, conf.key) flatMap  {
+      result =>
+        Future.successful(result)
     }
+  }
+
+  private def save[T](id: String, key: String, value: T)
+                     (implicit formats: Format[T]): Future[Unit] = {
+    matchRepository.cache(id, key, value)
   }
 }
