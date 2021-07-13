@@ -28,7 +28,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsSuccess, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, NotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -97,7 +97,6 @@ class IfConnectorSpec
   "fetch Corporation Tax" should {
     val crn = "12345678"
     val utr = "1234567890"
-    val IFCorporationTaxResult = ""
 
     "return data on successful call" in new Setup {
 
@@ -160,7 +159,12 @@ class IfConnectorSpec
       verify(underTest.auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
-      result shouldBe IFCorporationTaxResult
+      result shouldBe JsSuccess(IfCorpTaxCompanyDetails(
+        Some(utr),
+        Some(crn),
+        Some(registeredDetails),
+        Some(communicationDetails)
+      ))
 
     }
 
@@ -284,10 +288,14 @@ class IfConnectorSpec
         )
       )
 
-      result shouldBe "bar"
-
       verify(underTest.auditHelper,
         times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+
+      result shouldBe JsSuccess(IfSaTaxpayerDetails(
+        Some(utr),
+        Some("Individual"),
+        Some(Seq(taxpayerJohnNameAddress, taxpayerJoanneNameAddress))
+      ))
 
     }
 

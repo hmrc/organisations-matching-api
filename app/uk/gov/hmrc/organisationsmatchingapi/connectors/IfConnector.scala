@@ -17,7 +17,7 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -56,8 +56,8 @@ class IfConnector @Inject()(
     val SAUrl =
       s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    call(SAUrl, matchId) map {
-      response => Json.fromJson[IfSaTaxpayerDetails](Json.parse(response))
+    callSa(SAUrl, matchId) map {
+      response => Json.fromJson[IfSaTaxpayerDetails](Json.toJson(response))
     }
 
   }
@@ -70,8 +70,8 @@ class IfConnector @Inject()(
     val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
-    call(CTUrl, matchId) map {
-      response => Json.fromJson[IfCorpTaxCompanyDetails](Json.parse(response))
+    callCt(CTUrl, matchId) map {
+      response => Json.fromJson[IfCorpTaxCompanyDetails](Json.toJson(response))
     }
 
   }
@@ -86,19 +86,26 @@ class IfConnector @Inject()(
       .withExtraHeaders(
         Seq("Environment" -> integrationFrameworkEnvironment) ++ extraHeaders: _*)
 
-  private def call(url: String, matchId: String)
-                  (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover(http.GET[String](url)(implicitly, header(), ec) map { response =>
-      auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, response)
+  private def callSa(url: String, matchId: String)
+                    (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
+    recover[IfSaTaxpayerDetails](http.GET[IfSaTaxpayerDetails](url)(implicitly, header(), ec) map { response =>
+      auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, Json.toJson(response).toString)
       response
     }, extractCorrelationId(request), matchId, request, url)
 
-  private def recover(x: Future[String],
+  private def callCt(url: String, matchId: String)
+                    (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
+    recover[IfCorpTaxCompanyDetails](http.GET[IfCorpTaxCompanyDetails](url)(implicitly, header(), ec) map { response =>
+      auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, Json.toJson(response).toString)
+      response
+    }, extractCorrelationId(request), matchId, request, url)
+
+  private def recover[T](x: Future[T],
                       correlationId: String,
                       matchId: String,
                       request: RequestHeader,
                       requestUrl: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = x.recoverWith {
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
 
     case validationError: JsValidationException => {
       logger.warn("Integration Framework JsValidationException encountered")
