@@ -17,14 +17,13 @@
     "taxPayerName": {
       "type": "string",
       "description": "The name of the organisation.",
-      "example": "Example Partnership"
+      "example": "Partnership Name"
     },
     "address": {
       "type": "object",
-      "description": "An address for the organisation",
+      "description": "The organisation's address.",
       "required": [
         "addressLine1",
-        "addressLine2",
         "postcode"
       ],
       "properties": {
@@ -32,20 +31,6 @@
           "type": "string",
           "description": "Address line 1.",
           "example": "123 Long Road"
-        },
-        "addressLine2": {
-          "type": "string",
-          "description": "Address line 2.",
-          "example": "Some City"
-        },
-        "addressLine3": {
-          "type": "string",
-          "description": "Address line 3.",
-          "example": "Some County"
-        },
-        "addressLine4": {
-          "type": "string",
-          "description": "Address line 4."
         },
         "postcode": {
           "type": "string",
@@ -73,22 +58,18 @@
             "href": {
               "type": "string",
               "description": "The URL of the endpoint.",
-              "example": "/organisations/matching/paye/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+              "example": "/organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
             },
             "name": {
               "type": "string",
               "description": "The HTTP Action to use on this endpoint.",
               "example": "GET"
-            },
-            "title": {
-              "type": "string",
-              "description": "Get the organisation's sa data."
             }
           }
         },
-        "getDetails": {
+        "getSelfAssessementDetails": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment details data.",
+          "description": "The URI for the endpoint to get Self Assessment details for the matched organisation.",
           "required": [
             "href"
           ],
@@ -96,7 +77,7 @@
             "href": {
               "type": "string",
               "description": "The URL of the endpoint.",
-              "example": "/organisations/details/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+              "example": "/organisations/details/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
             },
             "name": {
               "type": "string",
@@ -105,13 +86,13 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's self-assessment details data."
+              "description": "Get the organisation's Self Assessment details"
             }
           }
         },
         "getEmployeeCount": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment employee count data.",
+          "description": "The URI for the endpoint to get number of employees data.",
           "required": [
             "href"
           ],
@@ -128,7 +109,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's self-assessment employee count data."
+              "description": "Get the organisation's number of employees data"
             }
           }
         }
