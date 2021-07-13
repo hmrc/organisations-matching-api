@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.audit
 
+import play.api.libs.json.JsValue
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.audit.models._
@@ -97,7 +98,7 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
                                          matchId: String,
                                          request: RequestHeader,
                                          requestUrl: String,
-                                         organisationsMatchingResponse: String)
+                                         organisationsMatchingResponse: JsValue)
                                         (implicit hc: HeaderCarrier) =
     auditConnector.sendExplicitAudit(
       "OrganisationsMatchingResponseEvent",

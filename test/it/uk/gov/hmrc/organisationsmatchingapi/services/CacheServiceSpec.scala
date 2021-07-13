@@ -18,6 +18,7 @@ package it.uk.gov.hmrc.organisationsmatchingapi.services
 
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito.{times, verify}
+
 import java.util.UUID
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -26,7 +27,8 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.models.{Address, CtMatch, CtMatchRequest, SaMatch, SaMatchRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 import util.UnitSpec
@@ -40,9 +42,9 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     val mockMatchRepo = mock[MatchRepository]
     val matchId: UUID = UUID.fromString("69f0da0d-4e50-4161-badc-fa39f769bed3")
     val cacheService = new CacheService(mockMatchRepo, mockCacheConfig)
-    val ctRequest = CtMatchRequest("crn", "name", Address("line1", "postcode"))
+    val ctRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
     val ctMatch = CtMatch(ctRequest, matchId)
-    val saRequest = SaMatchRequest("utr", "Individual", "name", Address("line1", "postcode"))
+    val saRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
     val saMatch = SaMatch(saRequest, matchId)
 
   "getByMatchId" should {

@@ -33,8 +33,12 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.OrganisationsMatchingConnector
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, CtOrganisationsMatchingRequest, SaKnownFacts, SaOrganisationsMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util.UnitSpec
+
 import scala.concurrent.ExecutionContext
 
 class OrganisationsMatchingConnectorSpec
@@ -64,13 +68,25 @@ class OrganisationsMatchingConnectorSpec
     fakeApplication.injector.instanceOf[ExecutionContext]
 
   trait Setup {
-    val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
-    val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+    val matchId       = "80a6bb14-d888-436e-a541-4000674c60aa"
+    val correlationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+    val ctKnownFacts  = CtKnownFacts("test", "test", "test", "test")
+    val name          = IfNameDetails(Some("test"), Some("test"))
+    val address       = IfAddress(Some("test"), None, None, None, Some("test"))
+    val details       = IfNameAndAddressDetails(Some(name), Some(address))
+    val ctIfData      = IfCorpTaxCompanyDetails(Some("test"), Some("test"), Some(details), Some(details))
+    val ctPostData    = CtOrganisationsMatchingRequest(ctKnownFacts, ctIfData)
+
+    val saKnownFacts    = SaKnownFacts("test", "Individual", "test", "test", "test")
+    val saDetails       = IfSaTaxPayerNameAddress(Some("test"), None, Some(address))
+    val taxpayerDetails = Some(Seq(saDetails))
+    val saIfData        = IfSaTaxpayerDetails(Some("test"), Some("Individual"), taxpayerDetails)
+    val saPostData      = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-    val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]
+    val config: ServicesConfig   = fakeApplication.injector.instanceOf[ServicesConfig]
+    val httpClient: HttpClient   = fakeApplication.injector.instanceOf[HttpClient]
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new OrganisationsMatchingConnector(config, httpClient, auditHelper)
@@ -87,17 +103,53 @@ class OrganisationsMatchingConnectorSpec
 
   "matchCycleCotax" should {
 
-    "Fail when organisations matching returns an error" in new Setup {
+    "Fail when organisations matching returns an error CT" in new Setup {
 
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        post(urlPathMatching(s"/organisations-matching/perform-match/cotax?matchId=${matchId}&correlationId=${sampleCorrelationId}"))
+        post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=${matchId}&correlationId=${correlationId}"))
+          .withRequestBody(equalToJson(
+            """
+              |{
+              |    "knownFacts": {
+              |        "crn": "test",
+              |        "name": "test",
+              |        "line1": "test",
+              |        "postcode": "test"
+              |    },
+              |    "ifData": {
+              |        "utr": "test",
+              |        "crn": "test",
+              |        "registeredDetails": {
+              |          "name": {
+              |            "name1": "test",
+              |            "name2": "test"
+              |          },
+              |          "address": {
+              |            "line1": "test",
+              |            "postcode": "test"
+              |          }
+              |        },
+              |        "communicationDetails": {
+              |          "name": {
+              |            "name1": "test",
+              |            "name2": "test"
+              |          },
+              |          "address": {
+              |            "line1": "test",
+              |            "postcode": "test"
+              |          }
+              |        }
+              |     }
+              |}
+            """.stripMargin
+          ))
           .willReturn(aResponse().withStatus(500)))
 
       intercept[InternalServerException] {
         await(
-          underTest.matchCycleCotax()(
+          underTest.matchCycleCotax(matchId, correlationId, ctPostData)(
             hc,
             FakeRequest(),
             ec
@@ -106,7 +158,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(underTest.auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
 
     }
 
@@ -115,12 +167,48 @@ class OrganisationsMatchingConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        post(urlPathMatching(s"/organisations-matching/perform-match/cotax?matchId=${matchId}"))
+        post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=${matchId}"))
+          .withRequestBody(equalToJson(
+            """
+              |{
+              |    "knownFacts": {
+              |        "crn": "test",
+              |        "name": "test",
+              |        "line1": "test",
+              |        "postcode": "test"
+              |    },
+              |    "ifData": {
+              |        "utr": "test",
+              |        "crn": "test",
+              |        "registeredDetails": {
+              |          "name": {
+              |            "name1": "test",
+              |            "name2": "test"
+              |          },
+              |          "address": {
+              |            "line1": "test",
+              |            "postcode": "test"
+              |          }
+              |        },
+              |        "communicationDetails": {
+              |          "name": {
+              |            "name1": "test",
+              |            "name2": "test"
+              |          },
+              |          "address": {
+              |            "line1": "test",
+              |            "postcode": "test"
+              |          }
+              |        }
+              |     }
+              |}
+            """.stripMargin
+          ))
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
 
       intercept[InternalServerException] {
         await(
-          underTest.matchCycleCotax()(
+          underTest.matchCycleCotax(matchId, correlationId, ctPostData)(
             hc,
             FakeRequest(),
             ec
@@ -129,15 +217,15 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(underTest.auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
     }
 
-    "return a match for a matched request" in new Setup {
+    "return a match for a matched request CT" in new Setup {
 
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations-matching/perform-match/cotax?matchId=${matchId}"))
+        post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=${matchId}&correlationId=${correlationId}"))
           .withRequestBody(equalToJson(
             """
               |{
@@ -179,32 +267,32 @@ class OrganisationsMatchingConnectorSpec
             .withBody(Json.toJson("match").toString())))
 
       val result = await(
-        underTest.matchCycleCotax()(
+        underTest.matchCycleCotax(matchId, correlationId, ctPostData)(
           hc,
           FakeRequest(),
           ec
         )
       )
 
-      result shouldBe "match"
+      result shouldBe Json.toJson("match")
 
       verify(underTest.auditHelper,
-        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
 
     }
 
-    "return NOT_FOUND for a non matched request" in new Setup {
+    "return NOT_FOUND for a non matched request CT" in new Setup {
 
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations-matching/perform-match/cotax?matchId=${matchId}"))
+        post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=${matchId}&correlationId=${correlationId}"))
           .withRequestBody(equalToJson(
             """
               |{
               |    "knownFacts": {
-              |        "crn": "nomatch",
-              |        "name": "nomatch",
+              |        "crn": "test",
+              |        "name": "test",
               |        "line1": "test",
               |        "postcode": "test"
               |    },
@@ -238,75 +326,30 @@ class OrganisationsMatchingConnectorSpec
           .willReturn(aResponse()
             .withStatus(404).withBody("NOT_FOUND")))
 
-      val result = await(
-        underTest.matchCycleCotax()(
-          hc,
-          FakeRequest(),
-          ec
+      intercept[MatchingException] {
+        await(
+          underTest.matchCycleCotax(matchId, correlationId, ctPostData)(
+            hc,
+            FakeRequest(),
+            ec
+          )
         )
-      )
-
-      result shouldBe "match"
+      }
 
       verify(underTest.auditHelper,
-        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
 
     }
   }
 
   "matchCycleSelfAssessment" should {
 
-    "Fail when organisations matching returns an error" in new Setup {
+    "Fail when organisations matching returns an error SA" in new Setup {
 
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        post(urlPathMatching(s"/organisations-matching/perform-match/self-assessment?matchId=${matchId}&correlationId=${sampleCorrelationId}"))
-          .willReturn(aResponse().withStatus(500)))
-
-      intercept[InternalServerException] {
-        await(
-          underTest.matchCycleSelfAssessment()(
-            hc,
-            FakeRequest(),
-            ec
-          )
-        )
-      }
-
-      verify(underTest.auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
-
-    }
-
-    "Fail when organisations matching returns a bad request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
-      stubFor(
-        post(urlPathMatching(s"/organisations-matching/perform-match/self-assessment?matchId=${matchId}"))
-          .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
-
-      intercept[InternalServerException] {
-        await(
-          underTest.matchCycleSelfAssessment()(
-            hc,
-            FakeRequest(),
-            ec
-          )
-        )
-      }
-
-      verify(underTest.auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
-    }
-
-    "return a match for a matched request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
-      stubFor(
-        get(urlPathMatching(s"/organisations-matching/perform-match/self-assessment?matchId=${matchId}"))
+        post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=${matchId}&correlationId=${correlationId}"))
           .withRequestBody(equalToJson(
             """
               |{
@@ -322,7 +365,99 @@ class OrganisationsMatchingConnectorSpec
               |        "taxpayerType": "Individual",
               |        "taxpayerDetails": [{
               |          "name": "test",
-              |          "addressType": "test",
+              |          "address": {
+              |            "line1": "test",
+              |            "postcode": "test"
+              |          }
+              |        }]
+              |     }
+              |}
+            """.stripMargin
+          ))
+          .willReturn(aResponse().withStatus(500)))
+
+      intercept[InternalServerException] {
+        await(
+          underTest.matchCycleSelfAssessment(matchId, correlationId, saPostData)(
+            hc,
+            FakeRequest(),
+            ec
+          )
+        )
+      }
+
+      verify(underTest.auditHelper,
+        times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+
+    }
+
+    "Fail when organisations matching returns a bad request" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=${matchId}"))
+          .withRequestBody(equalToJson(
+            """
+              |{
+              |    "knownFacts": {
+              |        "utr": "test",
+              |        "taxpayerType": "Individual",
+              |        "name": "test",
+              |        "line1": "test",
+              |        "postcode": "test"
+              |    },
+              |    "ifData": {
+              |        "utr": "test",
+              |        "taxpayerType": "Individual",
+              |        "taxpayerDetails": [{
+              |          "name": "test",
+              |          "address": {
+              |            "line1": "test",
+              |            "postcode": "test"
+              |          }
+              |        }]
+              |     }
+              |}
+            """.stripMargin
+          ))
+          .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
+
+      intercept[InternalServerException] {
+        await(
+          underTest.matchCycleSelfAssessment(matchId, correlationId, saPostData)(
+            hc,
+            FakeRequest(),
+            ec
+          )
+        )
+      }
+
+      verify(underTest.auditHelper,
+        times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+    }
+
+    "return a match for a matched request" in new Setup {
+
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=${matchId}&correlationId=${correlationId}"))
+          .withRequestBody(equalToJson(
+            """
+              |{
+              |    "knownFacts": {
+              |        "utr": "test",
+              |        "taxpayerType": "Individual",
+              |        "name": "test",
+              |        "line1": "test",
+              |        "postcode": "test"
+              |    },
+              |    "ifData": {
+              |        "utr": "test",
+              |        "taxpayerType": "Individual",
+              |        "taxpayerDetails": [{
+              |          "name": "test",
               |          "address": {
               |            "line1": "test",
               |            "postcode": "test"
@@ -337,17 +472,17 @@ class OrganisationsMatchingConnectorSpec
             .withBody(Json.toJson("match").toString())))
 
       val result = await(
-        underTest.matchCycleSelfAssessment()(
+        underTest.matchCycleSelfAssessment(matchId, correlationId, saPostData)(
           hc,
           FakeRequest(),
           ec
         )
       )
 
-      result shouldBe "match"
+      result shouldBe Json.toJson("match")
 
       verify(underTest.auditHelper,
-        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
 
     }
 
@@ -356,14 +491,14 @@ class OrganisationsMatchingConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations-matching/perform-match/self-assessment?matchId=${matchId}"))
+        post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=${matchId}&correlationId=${correlationId}"))
           .withRequestBody(equalToJson(
             """
               |{
               |    "knownFacts": {
               |        "utr": "test",
               |        "taxpayerType": "Individual",
-              |        "name": "non match",
+              |        "name": "test",
               |        "line1": "test",
               |        "postcode": "test"
               |    },
@@ -372,7 +507,6 @@ class OrganisationsMatchingConnectorSpec
               |        "taxpayerType": "Individual",
               |        "taxpayerDetails": [{
               |          "name": "test",
-              |          "addressType": "test",
               |          "address": {
               |            "line1": "test",
               |            "postcode": "test"
@@ -385,18 +519,18 @@ class OrganisationsMatchingConnectorSpec
           .willReturn(aResponse()
             .withStatus(404).withBody("NOT_FOUND")))
 
-      val result = await(
-        underTest.matchCycleSelfAssessment()(
-          hc,
-          FakeRequest(),
-          ec
+      intercept[MatchingException] {
+        await(
+          underTest.matchCycleCotax(matchId, correlationId, ctPostData)(
+            hc,
+            FakeRequest(),
+            ec
+          )
         )
-      )
-
-      result shouldBe "match"
+      }
 
       verify(underTest.auditHelper,
-        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
 
     }
   }

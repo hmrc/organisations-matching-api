@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.audit.models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 case class OrganisationsMatchingResponseEventModel(deviceId: String,
                                                    input: String,
@@ -27,7 +27,7 @@ case class OrganisationsMatchingResponseEventModel(deviceId: String,
                                                    correlationId: String,
                                                    applicationId: String,
                                                    requestUrl: String,
-                                                   matchingResponse: String)
+                                                   matchingResponse: JsValue)
 
 
 object OrganisationsMatchingResponseEventModel {

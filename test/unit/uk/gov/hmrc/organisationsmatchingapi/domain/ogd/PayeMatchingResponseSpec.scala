@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfAddress
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{PayeMatchingRequest, PayeMatchingResponse}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, PayeMatchingResponse}
 import util.IfHelpers
 
 class PayeMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {

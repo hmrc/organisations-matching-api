@@ -17,10 +17,14 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
+import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, JsValidationException, NotFoundException, TooManyRequestException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, JsValidationException, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtOrganisationsMatchingRequest, SaOrganisationsMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -32,43 +36,47 @@ class OrganisationsMatchingConnector @Inject()(
 
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
 
-  def matchCycleCotax(matchId: String, correlationId: String)
+  def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)
                      (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
 
-    // TODO - implement with body
+    val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
+    recover(http.POST[CtOrganisationsMatchingRequest, JsValue](url, postData) map {
+      response =>
+        auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
+        response
+    }, correlationId, matchId, request, url)
   }
 
-  def matchCycleSelfAssessment(matchId: String, correlationId: String)
+  def matchCycleSelfAssessment(matchId: String, correlationId: String, postData: SaOrganisationsMatchingRequest)
                               (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
 
-    // TODO - implement with body
+    val url = s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
+
+    recover(http.POST[SaOrganisationsMatchingRequest, JsValue](url, postData) map {
+      response =>
+        auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
+        response
+    }, correlationId, matchId, request, url)
 
   }
 
-  private def call(url: String, matchId: String, correlationId: String)
-                  (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover(http.GET[String](url)(implicitly, hc, ec) map { response =>
-      auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
-      response
-    }, correlationId, matchId, request, url)
-
-  private def recover(x: Future[String],
+  private def recover(x: Future[JsValue],
                       correlationId: String,
                       matchId: String,
                       request: RequestHeader,
                       requestUrl: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[String] = x.recoverWith {
-
+                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = x.recoverWith {
+    case notFound: NotFoundException => {
+      // TODO - do we want to return a specific type of not found exception from orgs matching? To differentiate between url 404 and a non match?
+      auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(notFound.getMessage))
+      // No need to log non match in Kibana for security reasons. Splunk only.
+      throw new MatchingException
+    }
     case validationError: JsValidationException => {
       Logger.warn("Organisations Matching JsValidationException encountered")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Error parsing organisations matching response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
-    }
-    case notFound: NotFoundException => {
-      auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, notFound.getMessage)
-      Logger.info("Organisations Matching NotFoundException encountered")
-      Future.successful("MATCH_NOT_FOUND")
     }
     case Upstream5xxResponse(msg, code, _, _) => {
       Logger.warn(s"Organisations Matching Upstream5xxResponse encountered: $code")

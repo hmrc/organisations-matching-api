@@ -18,14 +18,13 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, Json}
 
-case class SaMatchingRequest(selfAssessmentUniqueTaxPayerRef: String,
-                             taxPayerType: String,
-                             taxPayerName: String,
+case class CtMatchingRequest(companyRegistrationNumber: String,
+                             employerName: String,
                              addressLine1: String,
-                             postcode: String)
+                             postcode: String )
 
-object SaMatchingRequest {
+object CtMatchingRequest {
 
-  implicit val saMatchingFormat:Format[SaMatchingRequest] = Json.format[SaMatchingRequest]
+  implicit val ctMatchingformat: Format[CtMatchingRequest] = Json.format[CtMatchingRequest]
 
 }

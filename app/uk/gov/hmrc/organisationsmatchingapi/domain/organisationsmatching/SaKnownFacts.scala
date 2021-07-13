@@ -14,23 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
-
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.UUID.randomUUID
+package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import play.api.libs.json.Json
 
-case class SaMatch(
-                    request: SaMatchRequest,
-                    matchId: UUID = randomUUID(),
-                    createdAt: LocalDateTime = LocalDateTime.now(),
-                    utr: Option[String] = None
-                  )
+case class SaKnownFacts(utr: String,
+                        taxpayerType: String,
+                        name: String,
+                        line1: String,
+                        postcode : String)
 
-object SaMatch {
-  implicit val formats = Json.format[SaMatch]
+object SaKnownFacts {
+  implicit val formats = Json.format[SaKnownFacts]
 }
 
-
+case class MatchRequestSA(knownFacts: SaKnownFacts, ifData: Seq[SaKnownFacts])

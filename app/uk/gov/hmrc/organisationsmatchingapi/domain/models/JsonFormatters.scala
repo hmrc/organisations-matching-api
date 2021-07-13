@@ -14,20 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
+package uk.gov.hmrc.organisationsmatchingapi.domain.models
 
-import play.api.libs.json.{Format, Json}
+import java.util.UUID
 
-case class PayeMatchingRequest(companyRegistrationNumber: String,
-                               employerName: String,
-                               addressLine1: String,
-                               addressLine2: String,
-                               addressLine3: String,
-                               addressLine4: String,
-                               postcode: String )
+import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json}
 
-object PayeMatchingRequest {
+object JsonFormatters {
 
-  implicit val payeMatchingformat: Format[PayeMatchingRequest] = Json.format[PayeMatchingRequest]
+  implicit val uuidJsonFormat = new Format[UUID] {
+    override def writes(uuid: UUID) = JsString(uuid.toString)
+
+    override def reads(json: JsValue) =
+      JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
+  }
 
 }

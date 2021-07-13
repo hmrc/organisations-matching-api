@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import play.api.libs.json.Json
 
-case class Address(
-                    addressLine1: String,
-                    postcode: String
-                  )
+case class CtKnownFacts(crn: String,
+                        name: String,
+                        line1: String,
+                        postcode: String)
 
-object Address {
-  implicit val formats = Json.format[Address]
+object CtKnownFacts {
+  implicit val formats = Json.format[CtKnownFacts]
 }
+
+case class MatchRequestCT(knownFacts: CtKnownFacts, ifData: Seq[CtKnownFacts])
