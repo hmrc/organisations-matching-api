@@ -24,24 +24,34 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
 
   val scopesService = new ScopesService(mockConfig)
 
-  "Gets correct endpoints from configuration for first scope" in {
-    val endpoints = scopesService.getEndpoints(Seq(mockScopeOne))
-
+  "Gets correct external endpoints from configuration for first scope" in {
+    val endpoints = scopesService.getExternalEndpoints(Seq(mockScopeOne))
     endpoints.size shouldBe 2
     endpoints.map(_.key) shouldBe Seq(endpointKeyOne, endpointKeyTwo)
-    endpoints.map(_.link) shouldBe Seq("/test/1", "/test/2")
+    endpoints.map(_.link) shouldBe Seq("/external/1", "/external/2")
     endpoints.map(_.title) shouldBe Seq("Get the first endpoint", "Get the second endpoint")
 
   }
 
-  "Gets correct endpoints from configuration for second scope" in {
-    val endpoints = scopesService.getEndpoints(Seq(mockScopeTwo))
-
+  "Gets correct external endpoints from configuration for second scope" in {
+    val endpoints = scopesService.getExternalEndpoints(Seq(mockScopeTwo))
     endpoints.size shouldBe 2
     endpoints.map(_.key) shouldBe Seq(endpointKeyTwo, endpointKeyThree)
-    endpoints.map(_.link) shouldBe Seq("/test/2", "/test/3")
+    endpoints.map(_.link) shouldBe Seq("/external/2", "/external/3")
     endpoints.map(_.title) shouldBe Seq("Get the second endpoint", "Get the third endpoint")
+  }
 
+  "Gets correct internal endpoints from configuration for first scope" in {
+    val endpoints = scopesService.getInternalEndpoints(Seq(mockScopeOne))
+    endpoints.size shouldBe 2
+    endpoints.map(_.link) shouldBe Seq("/internal/1", "/internal/2")
+    endpoints.map(_.title) shouldBe Seq("Get the first endpoint", "Get the second endpoint")
+  }
+
+  "Gets correct internal endpoints from configuration for second scope" in {
+    val endpoints = scopesService.getInternalEndpoints(Seq(mockScopeTwo))
+    endpoints.map(_.link) shouldBe Seq("/internal/2", "/internal/3")
+    endpoints.map(_.title) shouldBe Seq("Get the second endpoint", "Get the third endpoint")
   }
 
   "Gets all scopes correctly" in {

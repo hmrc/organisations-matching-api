@@ -1,5 +1,5 @@
+import sbt.Tests.{Group, SubProcess}
 import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
-
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "organisations-matching-api"
@@ -23,9 +23,16 @@ lazy val scoverageSettings = {
   )
 }
 
+lazy val ComponentTest = config("component") extend Test
+
 def intTestFilter(name: String): Boolean = name startsWith "it"
 def unitFilter(name: String): Boolean = name startsWith "unit"
 def componentFilter(name: String): Boolean = name startsWith "component"
+
+def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
+  tests.map { test =>
+    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
+  }
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
@@ -51,6 +58,15 @@ lazy val microservice = Project(appName, file("."))
     unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(
       base => Seq(base / "test")).value,
     testOptions in IntegrationTest := Seq(Tests.Filter(intTestFilter))
+  )
+
+  .configs(ComponentTest)
+  .settings(inConfig(ComponentTest)(Defaults.testSettings): _*)
+  .settings(
+    testOptions in ComponentTest := Seq(Tests.Filter(componentFilter)),
+    unmanagedSourceDirectories in ComponentTest := (baseDirectory in ComponentTest)(base => Seq(base / "test")).value,
+    testGrouping in ComponentTest := oneForkedJvmPerTest((definedTests in ComponentTest).value),
+    parallelExecution in ComponentTest := false
   )
 
   .settings(publishingSettings: _*)

@@ -17,6 +17,7 @@
 package util
 
 import java.nio.charset.Charset
+
 import akka.stream.Materializer
 import akka.util.ByteString
 import org.scalatest.wordspec.AnyWordSpec
