@@ -18,9 +18,13 @@ package uk.gov.hmrc.organisationsmatchingapi.models
 
 import play.api.libs.json.Json
 
-//TODO: Leaving these in from original repository - they will need updated
-case class CrnMatchingRequest(crn: String, name: String, address: Address, postcode: String)
+case class SaMatchRequest(
+                           selfAssessmentUniqueTaxPayerRef : String,
+                           taxpayerType : String,
+                           taxpayerName : String,
+                           address: Address
+                         )
 
-object CrnMatchingRequest {
-  implicit val formats = Json.format[CrnMatchingRequest]
+object SaMatchRequest {
+  implicit val formats = Json.format[SaMatchRequest]
 }
