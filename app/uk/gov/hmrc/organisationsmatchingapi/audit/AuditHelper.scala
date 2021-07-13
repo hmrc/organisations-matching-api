@@ -93,6 +93,28 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
       )
     )
 
+  def auditOrganisationsMatchingResponse(correlationId: String,
+                                         matchId: String,
+                                         request: RequestHeader,
+                                         requestUrl: String,
+                                         organisationsMatchingResponse: String)
+                                        (implicit hc: HeaderCarrier) =
+    auditConnector.sendExplicitAudit(
+      "OrganisationsMatchingResponseEvent",
+      OrganisationsMatchingResponseEventModel(
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "1.0",
+        matchId = matchId,
+        correlationId = correlationId,
+        request.headers.get("X-Application-ID").getOrElse("-"),
+        requestUrl = requestUrl,
+        matchingResponse = organisationsMatchingResponse
+      )
+    )
+
   def auditIfApiFailure(correlationId: String,
                         matchId: String,
                         request: RequestHeader,
@@ -102,6 +124,28 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
     auditConnector.sendExplicitAudit(
       "IntegrationFrameworkApiFailureEvent",
       ApiFailureResponseEventModel(
+        deviceId = hc.deviceID.getOrElse("-"),
+        input = s"Request to ${request.path}",
+        method = request.method.toUpperCase,
+        userAgent = request.headers.get("User-Agent").getOrElse("-"),
+        apiVersion = "1.0",
+        matchId = matchId,
+        correlationId = Some(correlationId),
+        request.headers.get("X-Application-ID").getOrElse("-"),
+        requestUrl,
+        msg
+      )
+    )
+
+  def auditOrganisationsMatchingFailure(correlationId: String,
+                        matchId: String,
+                        request: RequestHeader,
+                        requestUrl: String,
+                        msg: String)
+                       (implicit hc: HeaderCarrier) =
+    auditConnector.sendExplicitAudit(
+      "OrganisationsMatchingFailureEvent",
+      OrganisationsMatchingFailureResponseEventModel(
         deviceId = hc.deviceID.getOrElse("-"),
         input = s"Request to ${request.path}",
         method = request.method.toUpperCase,
