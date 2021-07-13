@@ -42,22 +42,30 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     */
   def getQueryStringFor(scopes: Iterable[String], endpoints: List[String]): String =
     PathTree(scopesService.getValidItemsFor(scopes, endpoints)).toString
-//
-//  /**
-//    * @param endpoint The endpoint that the user has called
-//    * @param scopes The list of scopes associated with the user
-//    * @param data The data to be returned from the endpoint
-//    * @return A HalResource containing data, and a list of valid links determined by the provided scopes
-//    */
-//  def getHalResponse(endpoint: String, scopes: List[String], data: Option[JsValue]): HalResource = {
-//    val hateoasLinks = scopesService
-//      .getEndpoints(scopes)
-//      .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
-//      .toList ++
-//      Seq(HalLink("self", scopesService.getEndpointLink(endpoint).get))
-//
-//    state(data) ++ linksSeq(hateoasLinks)
-//  }
+
+  /**
+    * @param endpoint The endpoint that the user has called
+    * @param scopes The list of scopes associated with the user
+    * @param data The data to be returned from the endpoint
+    * @return A HalResource containing data, and a list of valid links determined by the provided scopes
+    */
+  def getHalResponse(endpoint: String, scopes: List[String], data: Option[JsValue]): HalResource = {
+
+    val internalEndpoints = scopesService
+      .getInternalEndpoints(scopes)
+      .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
+      .toList
+
+    val externalEndpoints = scopesService
+      .getExternalEndpoints(scopes)
+      .map(link => HalLink(rel = link.name, href = link.link, name = Some(link.title)))
+      .toList
+
+    val hateoasLinks = internalEndpoints ++ externalEndpoints ++
+      Seq(HalLink("self", scopesService.getEndpointLink(endpoint).get))
+
+    state(data) ++ linksSeq(hateoasLinks)
+  }
 
   def getHalLinks(matchId: UUID,
                   excludeList: Option[List[String]],
