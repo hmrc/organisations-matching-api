@@ -45,8 +45,9 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
   val scopes = "test"
   val ifUrl = s"host/organisations/corporation-tax/$crn/company/details"
   val matchingUrlCt = s"/organisations-matching/perform-match/cotax?matchId=${matchId}&correlationId=${correlationId}"
-  val matchingResponseCt = Json.toJson("match")
-  val matchingNonMatchResponseCt = "Not Found"
+  val matchingUrlSa = s"/organisations-matching/perform-match/self-assessment?matchId=${matchId}&correlationId=${correlationId}"
+  val matchingResponse = Json.toJson("match")
+  val matchingNonMatchResponse = "Not Found"
 
   "auditAuthScopes" in {
 
@@ -137,7 +138,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingResponseEventModel])
 
-    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlCt, matchingResponseCt)
+    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlCt, matchingResponse)
 
     verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingResponseEvent"),
       captor.capture())(any(), any(), any())
@@ -146,7 +147,27 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
     capturedEvent.matchId shouldEqual matchId
     capturedEvent.correlationId shouldEqual correlationId
     capturedEvent.requestUrl shouldBe matchingUrlCt
-    capturedEvent.matchingResponse shouldBe matchingResponseCt
+    capturedEvent.matchingResponse shouldBe matchingResponse
+    capturedEvent.applicationId shouldBe applicationId
+
+  }
+
+  "auditOrganisationsMatchingResponse match SA" in {
+
+    Mockito.reset(auditConnector)
+
+    val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingResponseEventModel])
+
+    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlCt, matchingResponse)
+
+    verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingResponseEvent"),
+      captor.capture())(any(), any(), any())
+
+    val capturedEvent = captor.getValue.asInstanceOf[OrganisationsMatchingResponseEventModel]
+    capturedEvent.matchId shouldEqual matchId
+    capturedEvent.correlationId shouldEqual correlationId
+    capturedEvent.requestUrl shouldBe matchingUrlCt
+    capturedEvent.matchingResponse shouldBe matchingResponse
     capturedEvent.applicationId shouldBe applicationId
 
   }
@@ -157,7 +178,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingResponseEventModel])
 
-    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlCt, Json.toJson(matchingNonMatchResponseCt))
+    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlCt, Json.toJson(matchingNonMatchResponse))
 
     verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingResponseEvent"),
       captor.capture())(any(), any(), any())
@@ -166,7 +187,27 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
     capturedEvent.matchId shouldEqual matchId
     capturedEvent.correlationId shouldEqual correlationId
     capturedEvent.requestUrl shouldBe matchingUrlCt
-    capturedEvent.matchingResponse shouldBe Json.toJson(matchingNonMatchResponseCt)
+    capturedEvent.matchingResponse shouldBe Json.toJson(matchingNonMatchResponse)
+    capturedEvent.applicationId shouldBe applicationId
+
+  }
+
+  "auditOrganisationsMatchingResponse non match SA" in {
+
+    Mockito.reset(auditConnector)
+
+    val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingResponseEventModel])
+
+    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlSa, Json.toJson(matchingNonMatchResponse))
+
+    verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingResponseEvent"),
+      captor.capture())(any(), any(), any())
+
+    val capturedEvent = captor.getValue.asInstanceOf[OrganisationsMatchingResponseEventModel]
+    capturedEvent.matchId shouldEqual matchId
+    capturedEvent.correlationId shouldEqual correlationId
+    capturedEvent.requestUrl shouldBe matchingUrlSa
+    capturedEvent.matchingResponse shouldBe Json.toJson(matchingNonMatchResponse)
     capturedEvent.applicationId shouldBe applicationId
 
   }
@@ -179,7 +220,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingFailureResponseEventModel])
 
-    auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, matchingUrlCt, msg)
+    auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, matchingUrlSa, msg)
 
     verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingFailureEvent"),
       captor.capture())(any(), any(), any())
@@ -187,7 +228,29 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
     val capturedEvent = captor.getValue.asInstanceOf[OrganisationsMatchingFailureResponseEventModel]
     capturedEvent.matchId shouldEqual matchId
     capturedEvent.correlationId shouldEqual Some(correlationId)
-    capturedEvent.requestUrl shouldEqual matchingUrlCt
+    capturedEvent.requestUrl shouldEqual matchingUrlSa
+    capturedEvent.response shouldEqual msg
+    capturedEvent.applicationId shouldBe applicationId
+
+  }
+
+  "auditOrganisationsMatchingFailure SA" in {
+
+    Mockito.reset(auditConnector)
+
+    val msg = "Something went wrong"
+
+    val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingFailureResponseEventModel])
+
+    auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, matchingUrlSa, msg)
+
+    verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingFailureEvent"),
+      captor.capture())(any(), any(), any())
+
+    val capturedEvent = captor.getValue.asInstanceOf[OrganisationsMatchingFailureResponseEventModel]
+    capturedEvent.matchId shouldEqual matchId
+    capturedEvent.correlationId shouldEqual Some(correlationId)
+    capturedEvent.requestUrl shouldEqual matchingUrlSa
     capturedEvent.response shouldEqual msg
     capturedEvent.applicationId shouldBe applicationId
 
