@@ -1,9 +1,9 @@
 {
   "type": "object",
   "required": [
-    "taxPayerType",
+    "taxpayerType",
     "selfAssessmentUniqueTaxPayerRef",
-    "taxPayerName",
+    "taxpayerName",
     "address"
   ],
   "properties": {
@@ -13,7 +13,7 @@
       "pattern": "^[0-9]{10}$",
       "example": "1234567890"
     },
-    "taxPayerType": {
+    "taxpayerType": {
       "type": "string",
       "description": "The type of taxpayer the organisation is.",
       "enum": [
@@ -21,7 +21,7 @@
         "Partnership"
       ]
     },
-    "taxPayerName": {
+    "taxpayerName": {
       "type": "string",
       "description": "The name of the organisation.",
       "example": "Partnership Name"
