@@ -14,17 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
+package util
 
-import play.api.libs.json.{Format, Json}
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 
-case class CtMatchingRequest(companyRegistrationNumber: String,
-                             employerName: String,
-                             addressLine1: String,
-                             postcode: String)
+trait ComponentSpec extends UnitSpec with GuiceOneServerPerSuite {
 
-object CtMatchingRequest {
-
-  implicit val ctMatchingformat: Format[CtMatchingRequest] = Json.format[CtMatchingRequest]
+  implicit override lazy val app: Application = GuiceApplicationBuilder()
+    .configure(
+      "auditing.enabled"                                       -> false,
+      "auditing.traceRequests"                                 -> false,
+      "run.mode"                                               -> "It"
+    )
+    .build()
 
 }

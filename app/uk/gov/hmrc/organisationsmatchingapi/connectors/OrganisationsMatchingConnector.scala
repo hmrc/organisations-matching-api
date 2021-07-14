@@ -28,11 +28,10 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationsMatchingConnector @Inject()(
-                                                servicesConfig: ServicesConfig,
-                                                http: HttpClient,
-                                                val auditHelper: AuditHelper
-                                              )(implicit ec: ExecutionContext) {
+class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
+                                               http: HttpClient,
+                                               val auditHelper: AuditHelper)
+                                              (implicit ec: ExecutionContext) {
 
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
 

@@ -1,36 +1,36 @@
 {
   "type": "object",
   "required": [
-    "taxPayerType",
+    "taxpayerType",
     "selfAssessmentUniqueTaxPayerRef",
-    "taxPayerName",
+    "taxpayerName",
     "address"
   ],
   "properties": {
     "selfAssessmentUniqueTaxPayerRef": {
       "type": "string",
+      "description": "The organisation's Unique Taxpayer Reference for Self Assessment.",
       "pattern": "^[0-9]{10}$",
       "example": "1234567890"
     },
-    "taxPayerType": {
+    "taxpayerType": {
       "type": "string",
-      "description": "Individual, Partnership",
+      "description": "The type of taxpayer the organisation is.",
       "enum": [
         "Individual",
         "Partnership"
       ]
     },
-    "taxPayerName": {
+    "taxpayerName": {
       "type": "string",
       "description": "The name of the organisation.",
-      "example": "Example Partnership"
+      "example": "Partnership Name"
     },
     "address": {
       "type": "object",
       "description": "The organisation's address.",
       "required": [
         "addressLine1",
-        "addressLine2",
         "postcode"
       ],
       "properties": {
@@ -38,20 +38,6 @@
           "type": "string",
           "description": "Address line 1.",
           "example": "123 Long Road"
-        },
-        "addressLine2": {
-          "type": "string",
-          "description": "Address line 2.",
-          "example": "Some City"
-        },
-        "addressLine3": {
-          "type": "string",
-          "description": "Address line 3.",
-          "example": "Some County"
-        },
-        "addressLine4": {
-          "type": "string",
-          "description": "Address line 4."
         },
         "postcode": {
           "type": "string",

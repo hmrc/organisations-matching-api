@@ -158,7 +158,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingResponseEventModel])
 
-    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlCt, matchingResponse)
+    auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, matchingUrlSa, matchingResponse)
 
     verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingResponseEvent"),
       captor.capture())(any(), any(), any())
@@ -166,7 +166,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
     val capturedEvent = captor.getValue.asInstanceOf[OrganisationsMatchingResponseEventModel]
     capturedEvent.matchId shouldEqual matchId
     capturedEvent.correlationId shouldEqual correlationId
-    capturedEvent.requestUrl shouldBe matchingUrlCt
+    capturedEvent.requestUrl shouldBe matchingUrlSa
     capturedEvent.matchingResponse shouldBe matchingResponse
     capturedEvent.applicationId shouldBe applicationId
 
@@ -220,7 +220,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
 
     val captor = ArgumentCaptor.forClass(classOf[OrganisationsMatchingFailureResponseEventModel])
 
-    auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, matchingUrlSa, msg)
+    auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, matchingUrlCt, msg)
 
     verify(auditConnector, times(1)).sendExplicitAudit(eqTo("OrganisationsMatchingFailureEvent"),
       captor.capture())(any(), any(), any())
@@ -228,7 +228,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
     val capturedEvent = captor.getValue.asInstanceOf[OrganisationsMatchingFailureResponseEventModel]
     capturedEvent.matchId shouldEqual matchId
     capturedEvent.correlationId shouldEqual Some(correlationId)
-    capturedEvent.requestUrl shouldEqual matchingUrlSa
+    capturedEvent.requestUrl shouldEqual matchingUrlCt
     capturedEvent.response shouldEqual msg
     capturedEvent.applicationId shouldBe applicationId
 
