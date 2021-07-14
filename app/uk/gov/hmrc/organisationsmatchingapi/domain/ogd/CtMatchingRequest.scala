@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
-import java.time.LocalDateTime
-import java.util.UUID
-import java.util.UUID.randomUUID
+import play.api.libs.json.{Format, Json}
 
-import play.api.libs.json.Json
+case class CtMatchingRequest(companyRegistrationNumber: String,
+                             employerName: String,
+                             addressLine1: String,
+                             postcode: String)
 
-case class SaMatch(
-                    request: SaMatchRequest,
-                    matchId: UUID = randomUUID(),
-                    createdAt: LocalDateTime = LocalDateTime.now(),
-                    utr: Option[String] = None
-                  )
+object CtMatchingRequest {
 
-object SaMatch {
-  implicit val formats = Json.format[SaMatch]
+  implicit val ctMatchingformat: Format[CtMatchingRequest] = Json.format[CtMatchingRequest]
+
 }
-
-

@@ -14,21 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.domain.models
 
-import java.time.LocalDateTime
 import java.util.UUID
-import java.util.UUID.randomUUID
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json}
 
-case class CtMatch(
-                    request: CtMatchRequest,
-                    matchId: UUID = randomUUID(),
-                    createdAt: LocalDateTime = LocalDateTime.now(),
-                    utr: Option[String] = None
-                  )
+object JsonFormatters {
 
-object CtMatch {
-  implicit val formats = Json.format[CtMatch]
+  implicit val uuidJsonFormat = new Format[UUID] {
+    override def writes(uuid: UUID) = JsString(uuid.toString)
+
+    override def reads(json: JsValue) =
+      JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
+  }
+
 }

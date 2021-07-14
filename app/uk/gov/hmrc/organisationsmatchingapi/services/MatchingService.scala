@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.services
 
-import play.api.libs.json.Json
-
-case class CtMatchRequest(
-                           companyRegistrationNumber : String,
-                           employerName : String,
-                           address: Address
-                         )
-
-object CtMatchRequest {
-  implicit val formats = Json.format[CtMatchRequest]
+class MatchingService {
+  throw new NotImplementedError("IMPLEMENT ME")
 }

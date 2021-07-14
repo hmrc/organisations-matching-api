@@ -46,6 +46,7 @@ object ErrorResponse {
     extends ErrorResponse(500,
       "INTERNAL_SERVER_ERROR",
       "Internal server error")
+  class MatchingException extends RuntimeException
 
   implicit val writes: Writes[ErrorResponse] = new Writes[ErrorResponse] {
     override def writes(o: ErrorResponse): JsValue =

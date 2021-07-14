@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
+package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Json
 
-case class PayeMatchingRequest(companyRegistrationNumber: String,
-                               employerName: String,
-                               addressLine1: String,
-                               addressLine2: String,
-                               addressLine3: String,
-                               addressLine4: String,
-                               postcode: String )
+case class SaKnownFacts(utr: String,
+                        taxpayerType: String,
+                        name: String,
+                        line1: String,
+                        postcode : String)
 
-object PayeMatchingRequest {
-
-  implicit val payeMatchingformat: Format[PayeMatchingRequest] = Json.format[PayeMatchingRequest]
-
+object SaKnownFacts {
+  implicit val formats = Json.format[SaKnownFacts]
 }
+
+case class MatchRequestSA(knownFacts: SaKnownFacts, ifData: Seq[SaKnownFacts])

@@ -14,17 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import play.api.libs.json.Json
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfSaTaxpayerDetails
 
-case class SaMatchRequest(
-                           selfAssessmentUniqueTaxPayerRef : String,
-                           taxpayerType : String,
-                           taxpayerName : String,
-                           address: Address
-                         )
+case class SaOrganisationsMatchingRequest(knownFacts: SaKnownFacts,
+                                          ifData    : IfSaTaxpayerDetails)
 
-object SaMatchRequest {
-  implicit val formats = Json.format[SaMatchRequest]
+object SaOrganisationsMatchingRequest {
+  implicit val formatSaOrganisationsMatchingRequest = Json.format[SaOrganisationsMatchingRequest]
 }
+
+
+
+

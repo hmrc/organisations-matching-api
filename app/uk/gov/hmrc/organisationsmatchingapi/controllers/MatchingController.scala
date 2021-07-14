@@ -22,6 +22,7 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 
+import java.util.UUID
 import scala.concurrent.Future
 
 @Singleton
@@ -29,11 +30,19 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
                                    cacheService: CacheService) extends BaseApiController(cc) with ErrorHandling {
 
-  def matchCrn() : Action[AnyContent] = Action.async { implicit request =>
+  def matchOrganisationCt() : Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok("IMPLEMENT ME!"))
-    }
+  }
 
-  def matchSaUtr() : Action[AnyContent] = Action.async { implicit request =>
+  def matchOrganisationSa() : Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok("IMPLEMENT ME!"))
+  }
+
+  def matchedOrganisationCt(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok("IMPLEMENT ME!"))
+  }
+
+  def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok("IMPLEMENT ME!"))
   }
 
