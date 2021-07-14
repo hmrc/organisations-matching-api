@@ -27,20 +27,53 @@ trait ScopesConfig {
   val endpointKeyTwo : String = "B"
   val endpointKeyThree : String = "C"
 
+  val endpointOne : String = "sampleEndpointOne"
+  val endpointTwo : String = "sampleEndpointTwo"
+  val endpointThree : String = "sampleEndpointThree"
+
   val mockConfig : Configuration = Configuration(
     (s"api-config.scopes.$mockScopeOne.endpoints", Seq(endpointKeyOne, endpointKeyTwo)),
+    (s"api-config.scopes.$mockScopeOne.fields", Seq("A", "B", "C", "D")),
     (s"api-config.scopes.$mockScopeTwo.endpoints", Seq(endpointKeyTwo, endpointKeyThree)),
+    (s"api-config.scopes.$mockScopeTwo.fields", Seq("E", "F", "G", "H", "I")),
 
-    (s"api-config.endpoints.sampleEndpointOne.key", endpointKeyOne),
-    (s"api-config.endpoints.sampleEndpointOne.endpoint", "/test/1"),
-    (s"api-config.endpoints.sampleEndpointOne.title", "Get the first endpoint"),
+    (s"api-config.endpoints.internal.$endpointOne.key", endpointKeyOne),
+    (s"api-config.endpoints.internal.$endpointOne.endpoint", "/internal/1"),
+    (s"api-config.endpoints.internal.$endpointOne.title", "Get the first endpoint"),
+    (s"api-config.endpoints.internal.$endpointOne.fields", Seq("A", "B", "C")),
 
-    (s"api-config.endpoints.sampleEndpointTwo.key", endpointKeyTwo),
-    (s"api-config.endpoints.sampleEndpointTwo.endpoint", "/test/2"),
-    (s"api-config.endpoints.sampleEndpointTwo.title", "Get the second endpoint"),
+    (s"api-config.endpoints.internal.$endpointTwo.key", endpointKeyTwo),
+    (s"api-config.endpoints.internal.$endpointTwo.endpoint", "/internal/2"),
+    (s"api-config.endpoints.internal.$endpointTwo.title", "Get the second endpoint"),
+    (s"api-config.endpoints.internal.$endpointTwo.fields", Seq("D", "E", "F")),
 
-    (s"api-config.endpoints.sampleEndpointThree.key", endpointKeyThree),
-    (s"api-config.endpoints.sampleEndpointThree.endpoint", "/test/3"),
-    (s"api-config.endpoints.sampleEndpointThree.title", "Get the third endpoint"),
+    (s"api-config.endpoints.internal.$endpointThree.key", endpointKeyThree),
+    (s"api-config.endpoints.internal.$endpointThree.endpoint", "/internal/3"),
+    (s"api-config.endpoints.internal.$endpointThree.title", "Get the third endpoint"),
+    (s"api-config.endpoints.internal.$endpointThree.fields", Seq("G", "H", "I")),
+
+    (s"api-config.endpoints.external.$endpointOne.key", endpointKeyOne),
+    (s"api-config.endpoints.external.$endpointOne.endpoint", "/external/1"),
+    (s"api-config.endpoints.external.$endpointOne.title", "Get the first endpoint"),
+
+    (s"api-config.endpoints.external.$endpointTwo.key", endpointKeyTwo),
+    (s"api-config.endpoints.external.$endpointTwo.endpoint", "/external/2"),
+    (s"api-config.endpoints.external.$endpointTwo.title", "Get the second endpoint"),
+
+    (s"api-config.endpoints.external.$endpointThree.key", endpointKeyThree),
+    (s"api-config.endpoints.external.$endpointThree.endpoint", "/external/3"),
+    (s"api-config.endpoints.external.$endpointThree.title", "Get the third endpoint"),
+
+    (s"api-config.fields.A", "path/to/a"),
+    (s"api-config.fields.B", "path/to/b"),
+    (s"api-config.fields.C", "path/to/c"),
+
+    (s"api-config.fields.D", "path/to/d"),
+    (s"api-config.fields.E", "path/to/e"),
+    (s"api-config.fields.F", "path/to/f"),
+
+    (s"api-config.fields.G", "path/to/g"),
+    (s"api-config.fields.H", "path/to/h"),
+    (s"api-config.fields.I", "path/to/i"),
   )
 }

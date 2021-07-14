@@ -14,13 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package util
 
-import play.api.libs.json.Json
+import org.scalatestplus.play.guice.GuiceOneServerPerSuite
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 
-//TODO: Leaving these in from original repository - they will need updated
-case class SaUtrMatchingRequest(organisationType: String, utr: String, name: String, address: Address, postcode: String)
+trait ComponentSpec extends UnitSpec with GuiceOneServerPerSuite {
 
-object SaUtrMatchingRequest {
-  implicit val formats = Json.format[SaUtrMatchingRequest]
+  implicit override lazy val app: Application = GuiceApplicationBuilder()
+    .configure(
+      "auditing.enabled"                                       -> false,
+      "auditing.traceRequests"                                 -> false,
+      "run.mode"                                               -> "It"
+    )
+    .build()
+
 }

@@ -14,24 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.cache
+package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
+import play.api.libs.json.Json
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfSaTaxpayerDetails
 
-@Singleton
-class CacheConfiguration @Inject()(configuration: Configuration) {
+case class SaOrganisationsMatchingRequest(knownFacts: SaKnownFacts,
+                                          ifData    : IfSaTaxpayerDetails)
 
-  lazy val cacheEnabled = configuration.getOptional[Boolean]("cache.enabled")
-    .getOrElse(true)
-
-  lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds")
-    .getOrElse(60 * 15)
-
-  lazy val colName = configuration.getOptional[String]("cache.colName")
-    .getOrElse("matching-cache")
-
-  lazy val key = configuration.getOptional[String]("cache.key")
-    .getOrElse("organisations-matching")
-
+object SaOrganisationsMatchingRequest {
+  implicit val formatSaOrganisationsMatchingRequest = Json.format[SaOrganisationsMatchingRequest]
 }
+
+
+
+

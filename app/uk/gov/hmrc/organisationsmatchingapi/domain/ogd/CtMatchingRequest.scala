@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.models
+package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 
-case class Address(addressLine1: String, addressLine2: Option[String], addressLine3: Option[String], addressLine4: Option[String])
+case class CtMatchingRequest(companyRegistrationNumber: String,
+                             employerName: String,
+                             addressLine1: String,
+                             postcode: String)
 
-object Address {
-  implicit val formats = Json.format[Address]
+object CtMatchingRequest {
+
+  implicit val ctMatchingformat: Format[CtMatchingRequest] = Json.format[CtMatchingRequest]
+
 }

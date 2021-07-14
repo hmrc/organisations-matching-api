@@ -1,5 +1,5 @@
-POST        /matching/crn                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchCrn
-GET         /details/crn/:matchId        uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.crnDetails(matchId: java.util.UUID, fromYear: Int, toYear: Option[Int])
+POST        /corporation-tax                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationCt
+GET         /corporation-tax/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedOrganisationCt(matchId: java.util.UUID)
 
-POST        /matching/sautr              uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchSaUtr
-GET         /details/sautr/:matchId      uk.gov.hmrc.organisationsmatchingapi.controllers.DetailsController.saUtrDetails(matchId: java.util.UUID, fromYear: Int, toYear: Option[Int])
+POST        /self-assessment                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationSa
+GET         /self-assessment/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedOrganisationSa(matchId: java.util.UUID)

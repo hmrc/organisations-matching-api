@@ -18,55 +18,93 @@ package uk.gov.hmrc.organisationsmatchingapi.config
 
 import com.typesafe.config.Config
 import play.api.ConfigLoader
+import uk.gov.hmrc.organisationsmatchingapi.services.PathTree
+
 import scala.collection.JavaConverters._
 
-case class ApiConfig(scopes: List[ScopeConfig], endpoints: List[EndpointConfig]) {
+case class ApiConfig(scopes: List[ScopeConfig], internalEndpoints: List[InternalEndpointConfig], externalEndpoints: List[ExternalEndpointConfig]) {
 
   def getScope(scope: String): Option[ScopeConfig] =
     scopes.find(c => c.name == scope)
 
-  def getEndpoint(endpoint: String): Option[EndpointConfig] =
-    endpoints.find(e => e.name == endpoint)
+  def getInternalEndpoint(endpoint: String): Option[InternalEndpointConfig] =
+    internalEndpoints.find(e => e.name == endpoint)
 
+  def getExternalEndpoint(endpoint: String): Option[ExternalEndpointConfig] =
+    externalEndpoints.find(e => e.name == endpoint)
 }
 
-case class ScopeConfig(name: String, endpoints: List[String]) {}
+case class ScopeConfig(name: String, fields: List[String], endpoints: List[String])
 
-case class EndpointConfig(key: String, name: String, link: String, title: String)
+trait EndpointConfig {
+  val name: String
+  val link: String
+  val title: String
+}
+
+case class InternalEndpointConfig( override val name: String,
+                                   override val link: String,
+                                   override val title: String,
+                                   fields: Map[String, String]) extends EndpointConfig
+
+case class ExternalEndpointConfig( override val name: String,
+                                    override val link: String,
+                                    override val title: String,
+                                    key: String ) extends EndpointConfig
 
 object ApiConfig {
 
-  implicit val configLoader: ConfigLoader[ApiConfig] =
-    (rootConfig: Config, path: String) => {
-      val config = rootConfig.getConfig(path)
+  implicit val configLoader: ConfigLoader[ApiConfig] = (rootConfig: Config, path: String) => {
 
-      def getKeys(path2: String): Iterable[String] =
-        config
-          .getConfig(path2)
-          .entrySet()
-          .asScala
-          .map(x => x.getKey.replaceAllLiterally("\"", ""))
-          .map(x => x.split("\\.").head)
+    val config = rootConfig.getConfig(path)
 
-      val endpointConfig: List[EndpointConfig] = getKeys("endpoints")
-        .map(
-          key =>
-            EndpointConfig(
-              key = config.getString(s"endpoints.$key.key"),
-              name = key,
-              link = config.getString(s"endpoints.$key.endpoint"),
-              title = config.getString(s"endpoints.$key.title")
-            ))
+    def parseConfig(path: String): PathTree = {
+      val keys: List[String] = config
+        .getConfig(path)
+        .entrySet()
+        .asScala
+        .map(x => x.getKey.replaceAllLiterally("\"", ""))
         .toList
 
-      val scopesConfig: List[ScopeConfig] = getKeys("scopes")
-        .map(key =>
-          ScopeConfig(name = key, endpoints = config.getStringList(s"""scopes."$key".endpoints""").asScala.toList))
-        .toList
-
-      ApiConfig(
-        scopes = scopesConfig,
-        endpoints = endpointConfig
-      )
+      PathTree(keys, "\\.")
     }
+
+    val internalEndpointTree = parseConfig("endpoints.internal")
+
+    val internalEndpointConfig: List[InternalEndpointConfig] =
+      internalEndpointTree.listChildren.map(endpointName =>
+        InternalEndpointConfig(
+          name = endpointName,
+          link = config.getString(s"endpoints.internal.$endpointName.endpoint"),
+          title = config.getString(s"endpoints.internal.$endpointName.title"),
+          fields = config.getStringList(s"endpoints.internal.$endpointName.fields").asScala
+            .map(field => (field, config.getString(s"fields.$field")))
+            .toMap
+        )).toList
+
+    val externalEndpointTree = parseConfig("endpoints.external")
+
+    val externalEndpointConfig: List[ExternalEndpointConfig] =
+      externalEndpointTree.listChildren.map(key =>
+        ExternalEndpointConfig(
+          name = key,
+          key = config.getString(s"endpoints.external.$key.key"),
+          link = config.getString(s"endpoints.external.$key.endpoint"),
+          title = config.getString(s"endpoints.external.$key.title")
+        )).toList
+
+    val scopeTree = parseConfig("scopes")
+    val scopeConfig = scopeTree.listChildren
+      .map(key => ScopeConfig(
+        name = key,
+        fields = config.getStringList(s"""scopes."$key".fields""").asScala.toList,
+        endpoints = config.getStringList(s"""scopes."$key".endpoints""").asScala.toList))
+      .toList
+
+    ApiConfig(
+      scopes = scopeConfig,
+      internalEndpoints = internalEndpointConfig,
+      externalEndpoints = externalEndpointConfig
+    )
+  }
 }

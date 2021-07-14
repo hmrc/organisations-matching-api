@@ -19,21 +19,18 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.PayeMatchingRequest
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.CtMatchingRequest
 import util.IfHelpers
 
-class PayeMatchingRequestSpec extends AnyWordSpec with Matchers with IfHelpers {
+class CtMatchingRequestSpec extends AnyWordSpec with Matchers with IfHelpers {
 
   "PayeMatchingRequest" should {
     "Read and write" in {
 
-      val payeMatchingRequest = PayeMatchingRequest(
+      val payeMatchingRequest = CtMatchingRequest(
         companyRegistrationNumber = "1234567890",
         employerName = "name",
         addressLine1 = "line1",
-        addressLine2 = "line2",
-        addressLine3 = "line3",
-        addressLine4 = "line4",
         postcode = "postcode")
 
       val asJson = Json.toJson(payeMatchingRequest)
@@ -42,9 +39,6 @@ class PayeMatchingRequestSpec extends AnyWordSpec with Matchers with IfHelpers {
                                    |  "companyRegistrationNumber" : "1234567890",
                                    |  "employerName" : "name",
                                    |  "addressLine1" : "line1",
-                                   |  "addressLine2" : "line2",
-                                   |  "addressLine3" : "line3",
-                                   |  "addressLine4" : "line4",
                                    |  "postcode" : "postcode"
                                    |}""".stripMargin)
     }
