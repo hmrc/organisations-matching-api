@@ -19,12 +19,21 @@ package uk.gov.hmrc.organisationsmatchingapi.controllers
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OFormat, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
+import uk.gov.hmrc.auth.core.authorise.Predicate
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment}
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.ErrorNotFound
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future.successful
+import scala.util.{Success, Try}
 
 abstract class BaseApiController (cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
 
@@ -51,6 +60,27 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
           "message" -> "The request body does not conform to the schema.",
           "errors" -> Json.toJson(errors.toList))))
 
+}
+
+trait PrivilegedAuthentication extends AuthorisedFunctions {
+
+  def authPredicate(scopes: Iterable[String]): Predicate =
+    scopes.map(Enrolment(_): Predicate).reduce(_ or _)
+
+  def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(
+    implicit hc: HeaderCarrier,
+    request: RequestHeader,
+    auditHelper: AuditHelper): Future[Result] = {
+
+    if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
+
+      authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) {
+        case scopes => {
+          auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
+          f(scopes.enrolments.map(e => e.key))
+        }
+    }
+  }
 }
 
 case class SchemaValidationError(keyword: String,

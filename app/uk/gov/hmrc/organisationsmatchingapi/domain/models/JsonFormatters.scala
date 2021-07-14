@@ -17,10 +17,13 @@
 package uk.gov.hmrc.organisationsmatchingapi.domain.models
 
 import java.util.UUID
-
-import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json}
+import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json, Writes}
 
 object JsonFormatters {
+
+  implicit val errorResponseWrites = new Writes[ErrorResponse] {
+    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
+  }
 
   implicit val uuidJsonFormat = new Format[UUID] {
     override def writes(uuid: UUID) = JsString(uuid.toString)

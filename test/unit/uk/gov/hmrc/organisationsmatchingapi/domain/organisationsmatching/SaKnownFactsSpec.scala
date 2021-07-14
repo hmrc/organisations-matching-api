@@ -14,17 +14,16 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
+package unit.uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfAddress
+import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
+import util.IfHelpers
 
-case class SaMatchingResponse(taxPayerType: String,
-                              taxPayerName: String,
-                              address: Address)
+class SaKnownFactsSpec extends AnyWordSpec with Matchers with IfHelpers {
 
-object SaMatchingResponse {
-
-  implicit val saMatchingFormat:Format[SaMatchingResponse] = Json.format[SaMatchingResponse]
-
+  "CtKnownFacts" should {
+    "Read and write" in {
+    }
+  }
 }

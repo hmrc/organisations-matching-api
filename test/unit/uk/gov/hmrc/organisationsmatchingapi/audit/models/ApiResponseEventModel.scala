@@ -33,7 +33,8 @@ class ApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       Some("test"),
       "test",
       "test",
-      "test"
+      "test",
+      Some(Json.toJson("test"))
     )
 
     val result = Json.toJson(apiResponseEventModel)
@@ -48,7 +49,8 @@ class ApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "correlationId" -> "test",
       "applicationId" -> "test",
       "scopes" -> "test",
-      "returnLinks" -> "test"
+      "returnLinks" -> "test",
+      "response" -> "test"
     )
   }
 
@@ -63,7 +65,8 @@ class ApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       "correlationId" -> "test",
       "applicationId" -> "test",
       "scopes" -> "test",
-      "returnLinks" -> "test"
+      "returnLinks" -> "test",
+      "response" -> "test"
     )
 
     val result = Json.fromJson[ApiResponseEventModel](json)
@@ -78,7 +81,8 @@ class ApiResponseEventModelSpec extends AnyWordSpec with Matchers {
       Some("test"),
       "test",
       "test",
-      "test"
+      "test",
+      Some(Json.toJson("test"))
     )
   }
 }

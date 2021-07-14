@@ -1,6 +1,6 @@
 POST        /corporation-tax                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationCt
-GET         /corporation-tax/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedOrganisationCt(matchId: java.util.UUID)
+GET         /corporation-tax/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController.matchedOrganisationCt(matchId: java.util.UUID)
 
 POST        /self-assessment                uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationSa
-GET         /self-assessment/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchedOrganisationSa(matchId: java.util.UUID)
+GET         /self-assessment/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController.matchedOrganisationSa(matchId: java.util.UUID)
 
