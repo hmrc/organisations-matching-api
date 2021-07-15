@@ -29,4 +29,7 @@ object JsonFormatters {
       JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
   }
 
+  implicit val matchedOrganisationRecordJsonFormat =
+    Json.format[MatchedOrganisationRecord]
+
 }

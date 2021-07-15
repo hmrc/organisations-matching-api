@@ -1,6 +1,6 @@
 # Add all the application routes to the app.routes file
 ->         /                                app.Routes
-->         /1.0                             app_version_v1_0.Routes
+->         /1.0                             api_version_v1_0.Routes
 ->         /                                definition.Routes
 ->         /                                health.Routes
 

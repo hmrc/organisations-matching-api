@@ -24,7 +24,11 @@ import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
 import uk.gov.hmrc.auth.core.AuthorisedFunctions
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+
+import java.util.UUID
+import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Success, Try}
 
 abstract class BaseApiController (cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
 
@@ -41,6 +45,12 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
       case JsSuccess(t, _) => f(t)
       case JsError(errors) =>
         Future.failed(new BadRequestException(errors.toString()))
+    }
+
+  protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] =
+    Try(UUID.fromString(uuidString)) match {
+      case Success(uuid) => f(uuid)
+      case _             => successful(NotFound.toResult)
     }
 
   def errorResult(errors: IndexedSeq[NestedError]): Future[Result] =
