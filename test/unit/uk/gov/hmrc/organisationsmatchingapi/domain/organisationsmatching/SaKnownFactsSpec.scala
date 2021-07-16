@@ -18,12 +18,26 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
+import play.api.libs.json.Json
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, SaKnownFacts}
 import util.IfHelpers
 
 class SaKnownFactsSpec extends AnyWordSpec with Matchers with IfHelpers {
 
-  "CtKnownFacts" should {
+  "SaKnownFacts" should {
     "Read and write" in {
+      val knownFacts = SaKnownFacts("utr", "individual", "name", "line1", "postcode")
+      val asJson     = Json.toJson(knownFacts)
+
+      asJson shouldBe Json.parse("""
+        |{
+        |  "utr" : "utr",
+        |  "name" : "name",
+        |  "taxpayerType" : "individual",
+        |  "line1" : "line1",
+        |  "postcode" : "postcode"
+        |}
+        |""".stripMargin)
     }
   }
 }

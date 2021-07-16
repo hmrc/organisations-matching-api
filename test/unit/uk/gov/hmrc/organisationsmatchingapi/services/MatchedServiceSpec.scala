@@ -19,32 +19,72 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.services
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.test.{FakeRequest, Helpers}
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController
-import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchedService, ScopesHelper, ScopesService}
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.BDDMockito.`given`
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchedService}
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future.successful
 
 class MatchedServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
+
   private val cacheService   = mock[CacheService]
   private val matchedService = new MatchedService(cacheService)
+  private val matchId        = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
+  private val matchRequestCt = new CtMatchingRequest(
+    "crn",
+    "test",
+    "test",
+    "test"
+  )
+
+  private val matchRequestSa = new SaMatchingRequest(
+    "utr",
+    "individual",
+    "test",
+    "test",
+    "test"
+  )
+
+  private val ctMatch = new CtMatch(matchRequestCt, utr = Some("test"))
+  private val saMatch = new SaMatch(matchRequestSa, utr = Some("test"))
 
   "fetchCt" should {
     "return cache entry" in {
+      given(cacheService.fetch[CtMatch](eqTo(matchId))(any())).willReturn(successful(Some(ctMatch)))
+
+      val res = await(matchedService.fetchCt(matchId))
+      res shouldBe ctMatch
     }
 
     "return not found" in {
+      given(cacheService.fetch[CtMatch](eqTo(matchId))(any())).willReturn(successful(None))
+
+      intercept[MatchNotFoundException] {
+        await(matchedService.fetchCt(matchId))
+      }
     }
   }
 
   "fetchSa" should {
     "return cache entry" in {
+      given(cacheService.fetch[SaMatch](eqTo(matchId))(any())).willReturn(successful(Some(saMatch)))
+
+      val res = await(matchedService.fetchSa(matchId))
+      res shouldBe saMatch
     }
 
     "return not found" in {
+      given(cacheService.fetch[SaMatch](eqTo(matchId))(any())).willReturn(successful(None))
+
+      intercept[MatchNotFoundException] {
+        await(matchedService.fetchSa(matchId))
+      }
     }
   }
 }

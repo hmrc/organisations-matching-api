@@ -23,9 +23,9 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CotaxMatchingResponse, SaMatchingResponse}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse, SaMatchingResponse}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
+import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
 
 import java.util.UUID
@@ -46,42 +46,42 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
   def matchedOrganisationCt(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       val correlationId = validateCorrelationId(request)
-      matchedService.fetchCt(matchId) flatMap { cacheData =>
+      matchedService.fetchCt(matchId) map { cacheData =>
 
         val selfLink = HalLink("self", s"/organisations/matching/corporation-tax?matchId=$matchId")
-        val links    = scopesHelper.getHalLinks(matchId, Some(List()), authScopes, Some(List())) ++ selfLink
+        val links    = scopesHelper.getHalLinks(matchId, None, authScopes, None, true) ++ selfLink
         val response = Json.toJson(state(ctResponse(cacheData)) ++ links)
 
         auditHelper.auditApiResponse(
           correlationId.toString, matchId.toString, authScopes.mkString(","), request, selfLink.toString, Some(response)
         )
 
-        Future.successful(Ok(response))
+        Ok(response)
       }
-    }
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, s"/organisations/matching/corporation-tax?matchId=$matchId")
   }
 
   def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       val correlationId = validateCorrelationId(request)
-      matchedService.fetchSa(matchId) flatMap { cacheData =>
+      matchedService.fetchSa(matchId) map { cacheData =>
 
         val selfLink = HalLink("self", s"/organisations/matching/self-assessment/?matchId=$matchId")
-        val links    = scopesHelper.getHalLinks(matchId, Some(List()), authScopes, Some(List())) ++ selfLink
+        val links    = scopesHelper.getHalLinks(matchId, None, authScopes, None, true) ++ selfLink
         val response = Json.toJson(state(saResponse(cacheData)) ++ links)
 
         auditHelper.auditApiResponse(
           correlationId.toString, matchId.toString, authScopes.mkString(","), request, selfLink.toString, Some(response)
         )
 
-        Future.successful(Ok(response))
+        Ok(response)
       }
-    }
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, s"/organisations/matching/self-assessment?matchId=$matchId")
   }
 
   private def ctResponse(cacheData: CtMatch) = {
     Json.toJson(
-      CotaxMatchingResponse(
+      CtMatchingResponse(
         cacheData.request.employerName,
         Address(
           Some(cacheData.request.addressLine1),

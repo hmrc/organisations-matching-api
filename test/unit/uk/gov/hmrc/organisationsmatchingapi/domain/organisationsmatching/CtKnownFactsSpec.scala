@@ -19,13 +19,25 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CotaxMatchingResponse}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse}
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.CtKnownFacts
 import util.IfHelpers
 
 class CtKnownFactsSpec extends AnyWordSpec with Matchers with IfHelpers {
 
   "CtKnownFacts" should {
     "Read and write" in {
+      val knownFacts = CtKnownFacts("crn", "name", "line1", "postcode")
+      val asJson     = Json.toJson(knownFacts)
+
+      asJson shouldBe Json.parse("""
+        |{
+        |  "crn" : "crn",
+        |  "name" : "name",
+        |  "line1" : "line1",
+        |  "postcode" : "postcode"
+        |}
+        |""".stripMargin)
     }
   }
 }

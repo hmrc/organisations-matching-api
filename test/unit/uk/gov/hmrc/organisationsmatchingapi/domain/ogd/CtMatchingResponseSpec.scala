@@ -20,15 +20,15 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfAddress
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CotaxMatchingResponse, CtMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse, CtMatchingRequest}
 import util.IfHelpers
 
-class CotaxMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
+class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
 
   "PayeMatchingResponse" should {
     "Read and write" in {
 
-      val payeMatchingResponse = CotaxMatchingResponse(
+      val payeMatchingResponse = CtMatchingResponse(
         employerName = "1234567890",
         address = Address(
           line1 = Some("line1"),

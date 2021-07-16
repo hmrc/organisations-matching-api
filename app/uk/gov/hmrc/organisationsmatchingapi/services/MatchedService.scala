@@ -17,7 +17,6 @@
 package uk.gov.hmrc.organisationsmatchingapi.services
 
 import com.google.inject.Inject
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch}
 
 import java.util.UUID
@@ -26,14 +25,14 @@ import scala.concurrent.Future.failed
 
 class MatchedService @Inject()(cacheService: CacheService) {
 
-  def fetchCt(matchId: UUID)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+  def fetchCt(matchId: UUID)(implicit ec: ExecutionContext) =
     cacheService.fetch[CtMatch](matchId) flatMap {
       case Some(entry) =>
         Future.successful(entry)
       case _ => failed(new MatchNotFoundException)
     }
 
-  def fetchSa(matchId: UUID)(implicit hc: HeaderCarrier, ec: ExecutionContext) =
+  def fetchSa(matchId: UUID)(implicit ec: ExecutionContext) =
     cacheService.fetch[SaMatch](matchId) flatMap {
       case Some(entry) =>
         Future.successful(entry)

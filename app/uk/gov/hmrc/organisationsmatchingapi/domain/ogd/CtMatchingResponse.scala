@@ -18,9 +18,9 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, Json}
 
-case class CotaxMatchingResponse(employerName: String,
-                                 address: Address )
+case class CtMatchingResponse(employerName: String,
+                              address: Address )
 
-object CotaxMatchingResponse {
-  implicit val cotaxMatchingformat: Format[CotaxMatchingResponse] = Json.format[CotaxMatchingResponse]
+object CtMatchingResponse {
+  implicit val cotaxMatchingformat: Format[CtMatchingResponse] = Json.format[CtMatchingResponse]
 }
