@@ -111,7 +111,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
              |  },
              |  "_links": {
              |    "self": {
-             |      "href": "/organisations/matching/corporation-tax?matchId=$matchId"
+             |      "href": "/organisations/matching/corporation-tax/$matchId"
              |    },
              |    "sampleEndpointThree": {
              |      "href": "/external/3",
@@ -215,7 +215,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
              |  },
              |  "_links": {
              |    "self": {
-             |      "href": "/organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+             |      "href": "/organisations/matching/self-assessment/$matchId"
              |    },
              |    "sampleEndpointThree": {
              |      "href": "/external/3",

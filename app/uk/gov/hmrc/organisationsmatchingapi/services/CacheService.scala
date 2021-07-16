@@ -47,7 +47,7 @@ class CacheService @Inject()(
     }
   }
 
-  private def save[T](id: String, key: String, value: T)
+  def save[T](id: String, key: String, value: T)
                      (implicit formats: Format[T]): Future[Unit] = {
     matchRepository.cache(id, key, value)
   }

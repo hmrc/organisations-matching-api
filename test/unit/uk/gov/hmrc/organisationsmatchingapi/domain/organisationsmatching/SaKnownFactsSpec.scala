@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, SaKnownFacts}
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.SaKnownFacts
 import util.IfHelpers
 
 class SaKnownFactsSpec extends AnyWordSpec with Matchers with IfHelpers {
