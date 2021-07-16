@@ -14,22 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.domain.models
+package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import java.util.UUID
-import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json}
-import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.MatchedOrganisationRecord
 
-object JsonFormatters {
+case class MatchedOrganisationRecord(utr: String, matchId: UUID)
 
-  implicit val uuidJsonFormat = new Format[UUID] {
-    override def writes(uuid: UUID) = JsString(uuid.toString)
-
-    override def reads(json: JsValue) =
-      JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
-  }
-
-  implicit val matchedOrganisationRecordJsonFormat =
-    Json.format[MatchedOrganisationRecord]
-
-}

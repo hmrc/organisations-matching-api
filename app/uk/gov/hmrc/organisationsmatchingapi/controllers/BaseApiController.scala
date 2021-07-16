@@ -20,8 +20,9 @@ import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OFormat, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.{ErrorResponse, NestedError}
 import uk.gov.hmrc.auth.core.AuthorisedFunctions
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.{MatchingFailed, BadRequest}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -50,8 +51,17 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
   protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] =
     Try(UUID.fromString(uuidString)) match {
       case Success(uuid) => f(uuid)
-      case _             => successful(NotFound.toResult)
+      case _             => successful(ErrorResponse.NotFound.toResult)
     }
+
+  private[controllers] def recovery: PartialFunction[Throwable, Result] = {
+        // Need to do proper error handling here when error responses have been updated.
+//    case _: OrganisationNotFoundException | _: InvalidUtrException | _: MatchingException =>
+//      MatchingFailed.toHttpResponse
+//    case _: MatchNotFoundException => ErrorNotFound.toHttpResponse
+    case e: IllegalArgumentException =>
+      ErrorResponse.BadRequest.toResult
+  }
 
   def errorResult(errors: IndexedSeq[NestedError]): Future[Result] =
     Future.successful(

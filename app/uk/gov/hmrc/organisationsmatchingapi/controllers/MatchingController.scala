@@ -16,19 +16,25 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
+import play.api.libs.json.Json.toJson
+
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters.matchedOrganisationRecordJsonFormat
+import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 
 import java.util.UUID
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
-                                   cacheService: CacheService) extends BaseApiController(cc) with ErrorHandling {
+                                   cacheService: CacheService,
+                                   matchingService: MatchingService)
+                                  (implicit ec: ExecutionContext) extends BaseApiController(cc) with ErrorHandling {
 
   def matchOrganisationCt() : Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok("IMPLEMENT ME!"))
@@ -38,12 +44,20 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
     Future.successful(Ok("IMPLEMENT ME!"))
   }
 
+  def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
+    Future.successful(Ok("IMPLEMENT ME!"))
+  }
+
   def matchedOrganisationCt(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
     Future.successful(Ok("IMPLEMENT ME!"))
   }
 
-  def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
+  def matchedOrganisation(matchId: String) = Action.async { implicit request =>
+    withUuid(matchId) { matchUuid =>
+      matchingService.fetchMatchedOrganisationRecord(matchUuid) map { matchedOrganisation =>
+        Ok(toJson(matchedOrganisation))
+      }
+    } recover recovery
   }
 
 }

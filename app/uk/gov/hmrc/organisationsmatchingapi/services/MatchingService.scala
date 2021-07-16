@@ -16,6 +16,12 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
-class MatchingService {
-  throw new NotImplementedError("IMPLEMENT ME")
+import java.util.UUID
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.MatchedOrganisationRecord
+
+import scala.concurrent.Future
+
+trait MatchingService {
+  def fetchMatchedOrganisationRecord(matchId: UUID)(implicit hc: HeaderCarrier): Future[MatchedOrganisationRecord]
 }
