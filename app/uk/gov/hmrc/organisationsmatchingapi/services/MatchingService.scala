@@ -16,12 +16,31 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
+import play.api.libs.json.Format.GenericFormat
+
+import javax.inject.{Inject, Singleton}
 import java.util.UUID
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.organisationsmatchingapi.connectors.OrganisationsMatchingConnector
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.UtrMatch
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.MatchedOrganisationRecord
+import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future.{failed, successful}
 
-trait MatchingService {
-  def fetchMatchedOrganisationRecord(matchId: UUID)(implicit hc: HeaderCarrier): Future[MatchedOrganisationRecord]
+@Singleton
+class MatchingService @Inject()(
+                               cacheService: CacheService)
+                               (implicit ec: ExecutionContext) {
+
+  def fetchMatchedOrganisationRecord(matchId: UUID)
+                                    (implicit hc: HeaderCarrier) =
+    cacheService.fetch[UtrMatch](matchId) flatMap {
+      case Some(utrMatch) =>
+        successful(MatchedOrganisationRecord(utrMatch.utr, utrMatch.id))
+      case _ => failed(new Exception)
+          // following merge with HODS-154:
+//      case _ => failed(new MatchNotFoundException)
+    }
 }

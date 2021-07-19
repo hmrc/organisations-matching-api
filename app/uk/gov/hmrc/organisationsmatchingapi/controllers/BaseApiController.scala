@@ -55,7 +55,8 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
     }
 
   private[controllers] def recovery: PartialFunction[Throwable, Result] = {
-        // Need to do proper error handling here when error responses have been updated.
+        // Need to do proper error handling here when error responses have been updated -
+    // will this become recoveryWithAudit?
 //    case _: OrganisationNotFoundException | _: InvalidUtrException | _: MatchingException =>
 //      MatchingFailed.toHttpResponse
 //    case _: MatchNotFoundException => ErrorNotFound.toHttpResponse
