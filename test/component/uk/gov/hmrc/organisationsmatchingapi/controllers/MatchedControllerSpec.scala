@@ -41,7 +41,7 @@ class MatchedControllerSpec extends BaseSpec  {
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
-      And("A valid nino match exist")
+      And("A valid match exist")
       result(mongoRepository.cache(matchId.toString, "organisations-matching", ctMatch), timeout)
 
       When("the API is invoked")
@@ -180,7 +180,7 @@ class MatchedControllerSpec extends BaseSpec  {
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
-      And("A valid nino match exist")
+      And("A valid match exist")
       result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
 
       When("the API is invoked")

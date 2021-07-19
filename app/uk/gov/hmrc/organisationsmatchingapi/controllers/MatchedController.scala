@@ -22,6 +22,7 @@ import play.api.libs.json.Json
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.CtMatch.convert
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse, SaMatchingResponse}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
@@ -51,7 +52,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
         val exclude  = Some(List("details-self-assessment"))
         val selfLink = HalLink("self", s"/organisations/matching/corporation-tax/$matchId")
         val links    = scopesHelper.getHalLinks(matchId, exclude, authScopes, None, true) ++ selfLink
-        val response = Json.toJson(state(ctResponse(cacheData)) ++ links)
+        val response = Json.toJson(state(CtMatch.convert(cacheData)) ++ links)
 
         auditHelper.auditApiResponse(
           correlationId.toString, matchId.toString, authScopes.mkString(","), request, selfLink.toString, Some(response)
@@ -70,7 +71,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
         val exclude  = Some(List("details-corporation-tax"))
         val selfLink = HalLink("self", s"/organisations/matching/self-assessment/$matchId")
         val links    = scopesHelper.getHalLinks(matchId, exclude, authScopes, None, true) ++ selfLink
-        val response = Json.toJson(state(saResponse(cacheData)) ++ links)
+        val response = Json.toJson(state(SaMatch.convert(cacheData)) ++ links)
 
         auditHelper.auditApiResponse(
           correlationId.toString, matchId.toString, authScopes.mkString(","), request, selfLink.toString, Some(response)
@@ -79,30 +80,5 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
         Ok(response)
       }
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, s"/organisations/matching/self-assessment?matchId=$matchId")
-  }
-
-  private def ctResponse(cacheData: CtMatch) = {
-    Json.toJson(
-      CtMatchingResponse(
-        cacheData.request.employerName,
-        Address(
-          Some(cacheData.request.addressLine1),
-          Some(cacheData.request.postcode)
-        )
-      )
-    )
-  }
-
-  private def saResponse(cacheData: SaMatch) = {
-    Json.toJson(
-      SaMatchingResponse(
-        cacheData.request.taxPayerType,
-        cacheData.request.taxPayerName,
-        Address(
-          Some(cacheData.request.addressLine1),
-          Some(cacheData.request.postcode)
-        )
-      )
-    )
   }
 }

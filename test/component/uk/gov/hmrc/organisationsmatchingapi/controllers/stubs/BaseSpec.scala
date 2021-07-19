@@ -27,7 +27,6 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers.await
 import play.mvc.Http.MimeTypes.JSON
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
@@ -42,12 +41,12 @@ trait BaseSpec
 
   implicit override lazy val app: Application = GuiceApplicationBuilder()
     .configure(
-      "cache.enabled"                                   -> true,
-      "auditing.enabled"                                       -> false,
-      "auditing.traceRequests"                                 -> false,
-      "mongodb.uri"                                            -> "mongodb://localhost:27017/organisations-matching-api",
-      "microservice.services.auth.port"                        -> AuthStub.port,
-      "run.mode"                                               -> "It"
+      "cache.enabled"            -> true,
+      "auditing.enabled"                -> false,
+      "auditing.traceRequests"          -> false,
+      "mongodb.uri"                     -> "mongodb://localhost:27017/organisations-matching-api",
+      "microservice.services.auth.port" -> AuthStub.port,
+      "run.mode"                        -> "It"
     )
     .build()
 

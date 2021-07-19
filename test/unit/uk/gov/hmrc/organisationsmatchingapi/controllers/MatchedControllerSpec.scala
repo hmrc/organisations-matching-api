@@ -48,17 +48,20 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
   implicit lazy val materializer: Materializer = fakeApplication.materializer
 
   trait Setup extends ScopesConfig {
-    val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+    val sampleCorrelationId       = "188e9400-b636-4a3b-80ba-230a8c72b92a"
     val sampleCorrelationIdHeader = "CorrelationId" -> sampleCorrelationId
-    val badCorrelationIdHeader = "CorrelationId" -> "foo"
-    val fakeRequest = FakeRequest("GET", "/").withHeaders(sampleCorrelationIdHeader)
-    val fakeRequestMalformed = FakeRequest("GET", "/").withHeaders(badCorrelationIdHeader)
-    val mockAuthConnector = mock[AuthConnector]
+    val badCorrelationIdHeader    = "CorrelationId" -> "foo"
+    val fakeRequest               = FakeRequest("GET", "/").withHeaders(sampleCorrelationIdHeader)
+    val fakeRequestMalformed      = FakeRequest("GET", "/").withHeaders(badCorrelationIdHeader)
+    val mockAuthConnector         = mock[AuthConnector]
+
     lazy val scopeService: ScopesService = new ScopesService(mockConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
-    val auditHelper = mock[AuditHelper]
+
+    val auditHelper    = mock[AuditHelper]
     val matchedService = mock[MatchedService]
-    val matchId = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+    val matchId        = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val matchRequestCt = new CtMatchingRequest(
