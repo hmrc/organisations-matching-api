@@ -19,13 +19,16 @@ package uk.gov.hmrc.organisationsmatchingapi.controllers
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OFormat, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.{ErrorResponse, NestedError}
-import uk.gov.hmrc.auth.core.AuthorisedFunctions
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.{MatchingFailed, BadRequest}
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, InsufficientEnrolments}
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.{BadRequest, MatchingFailed}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import java.util.UUID
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,14 +57,49 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
       case _             => successful(ErrorResponse.NotFound.toResult)
     }
 
-  private[controllers] def recovery: PartialFunction[Throwable, Result] = {
-        // Need to do proper error handling here when error responses have been updated -
-    // will this become recoveryWithAudit?
-//    case _: OrganisationNotFoundException | _: InvalidUtrException | _: MatchingException =>
-//      MatchingFailed.toHttpResponse
-//    case _: MatchNotFoundException => ErrorNotFound.toHttpResponse
-    case e: IllegalArgumentException =>
-      ErrorResponse.BadRequest.toResult
+  private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(
+    implicit request: RequestHeader,
+    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
+    case _: MatchNotFoundException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
+      ErrorNotFound.toHttpResponse
+    }
+    case e: InvalidBodyException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
+    case _: MatchingException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
+      ErrorMatchingFailed.toHttpResponse
+    }
+    case e: InsufficientEnrolments => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorUnauthorized("Insufficient Enrolments").toHttpResponse
+    }
+    case e: AuthorisationException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorUnauthorized(e.getMessage).toHttpResponse
+    }
+    case tmr: TooManyRequestException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, tmr.getMessage)
+      ErrorTooManyRequests.toHttpResponse
+    }
+    case br: BadRequestException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, br.getMessage)
+      ErrorInvalidRequest(br.getMessage).toHttpResponse
+    }
+    case e: IllegalArgumentException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
+    case e: InternalServerException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInternalServer("Something went wrong").toHttpResponse
+    }
+    case e => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInternalServer("Something went wrong").toHttpResponse
+    }
   }
 
   def errorResult(errors: IndexedSeq[NestedError]): Future[Result] =

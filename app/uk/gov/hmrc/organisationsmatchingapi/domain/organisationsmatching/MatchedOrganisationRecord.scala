@@ -18,5 +18,5 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import java.util.UUID
 
-case class MatchedOrganisationRecord(utr: String, matchId: UUID)
+case class MatchedOrganisationRecord(matchId: UUID, utr: String)
 

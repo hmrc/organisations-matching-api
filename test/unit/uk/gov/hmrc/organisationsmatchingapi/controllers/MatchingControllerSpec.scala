@@ -16,44 +16,89 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
+import akka.stream.Materializer
+import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.http.Status
-import play.api.test.Helpers._
-import play.api.test.{FakeRequest, Helpers}
-import play.api.{Configuration, Environment}
+import play.api.test.FakeRequest
 import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
-import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
+import util.SpecBase
+import play.api.test.Helpers
+import uk.gov.hmrc.http.HeaderCarrier
+import play.api.http.Status._
+import play.api.libs.json.Json
+import uk.gov.hmrc.api.controllers.ErrorNotFound
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.UtrMatch
+import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
 
-class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
-  private val fakeRequest = FakeRequest("GET", "/")
+import java.util.UUID
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-  private val env           = Environment.simple()
-  private val configuration = Configuration.load(env)
+class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar with SpecBase {
 
-  private val mockAuthConnector = mock[AuthConnector]
-  private val mockCacheService = mock[CacheService]
+  implicit lazy val materializer: Materializer = fakeApplication.materializer
 
-  private val serviceConfig = new ServicesConfig(configuration)
+  trait Setup extends ScopesConfig {
+    val sampleCorrelationId       = "188e9400-b636-4a3b-80ba-230a8c72b92a"
+    val sampleCorrelationIdHeader = "CorrelationId" -> sampleCorrelationId
+    val badCorrelationIdHeader    = "CorrelationId" -> "foo"
+    val fakeRequest               = FakeRequest("GET", "/").withHeaders(sampleCorrelationIdHeader)
+    val fakeRequestMalformed      = FakeRequest("GET", "/").withHeaders(badCorrelationIdHeader)
+    val mockAuthConnector         = mock[AuthConnector]
 
-  private val controller = new MatchingController(mockAuthConnector, Helpers.stubControllerComponents(), mockCacheService)
+    lazy val scopeService: ScopesService = new ScopesService(mockConfig)
+    lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
 
+    val auditHelper     = mock[AuditHelper]
+    val cacheService    = mock[CacheService]
+    val matchingService = mock[MatchingService]
+    val matchId         = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
-  "GET matchCrn TO BE IMPLEMENTED /" should {
-    "return 200" in {
-      val result = controller.matchOrganisationCt()(fakeRequest)
-      status(result) shouldBe Status.OK
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+
+    val utrMatch = new UtrMatch(utr = "test", id = matchId)
+
+    val controller = new MatchingController(
+      mockAuthConnector,
+      Helpers.stubControllerComponents(),
+      cacheService,
+      matchingService
+    )
+
+  }
+
+  "verify matched organisation from cache data" when {
+    "given a valid matchId" should {
+      "return 200" in new Setup {
+        given(matchingService.fetchMatchedOrganisationRecord(matchId)).willReturn(Future.successful(utrMatch))
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe OK
+
+        jsonBodyOf(result) shouldBe Json.parse(
+          s"""{
+             |  "id": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+             |  "utr": "test"
+             |}""".stripMargin
+        )
+      }
+    }
+
+    "match is expired or not present in cache" should {
+      "return NOT_FOUND 404" in new Setup {
+        given(matchingService.fetchMatchedOrganisationRecord(matchId)).willThrow(new Exception)
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe NOT_FOUND
+
+        jsonBodyOf(result) shouldBe Json.toJson(ErrorNotFound)
+      }
     }
   }
 
-  "GET matchSaUtr TO BE IMPLEMENTED /" should {
-    "return 200" in {
-      val result = controller.matchOrganisationSa()(fakeRequest)
-      status(result) shouldBe Status.OK
-    }
-  }
 }

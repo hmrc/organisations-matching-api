@@ -17,13 +17,14 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.libs.json.Json.toJson
-
 import javax.inject.{Inject, Singleton}
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters.matchedOrganisationRecordJsonFormat
+import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.maybeCorrelationId
 import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 
 import java.util.UUID
@@ -33,6 +34,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
                                    cacheService: CacheService,
+                                   implicit val auditHelper: AuditHelper,
                                    matchingService: MatchingService)
                                   (implicit ec: ExecutionContext) extends BaseApiController(cc) with ErrorHandling {
 
@@ -53,12 +55,12 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
     Future.successful(Ok("IMPLEMENT ME!"))
   }
 
-  def matchedOrganisation(matchId: String) = Action.async { implicit request =>
-    withUuid(matchId) { matchUuid =>
+  def matchedOrganisation(matchId: UUID) = Action.async { implicit request =>
+    withUuid(matchId.toString) { matchUuid =>
       matchingService.fetchMatchedOrganisationRecord(matchUuid) map { matchedOrganisation =>
         Ok(toJson(matchedOrganisation))
       }
-    } recover recovery
+    } recover recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/$matchId")
   }
 
 }

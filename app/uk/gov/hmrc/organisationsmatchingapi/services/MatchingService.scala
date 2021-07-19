@@ -22,7 +22,7 @@ import javax.inject.{Inject, Singleton}
 import java.util.UUID
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.connectors.OrganisationsMatchingConnector
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.UtrMatch
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{MatchNotFoundException, UtrMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.MatchedOrganisationRecord
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
@@ -38,9 +38,7 @@ class MatchingService @Inject()(
                                     (implicit hc: HeaderCarrier) =
     cacheService.fetch[UtrMatch](matchId) flatMap {
       case Some(utrMatch) =>
-        successful(MatchedOrganisationRecord(utrMatch.utr, utrMatch.id))
-      case _ => failed(new Exception)
-          // following merge with HODS-154:
-//      case _ => failed(new MatchNotFoundException)
+        successful(MatchedOrganisationRecord(utrMatch.id, utrMatch.utr))
+      case _ => failed(new MatchNotFoundException)
     }
 }
