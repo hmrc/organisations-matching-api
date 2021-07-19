@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, JsPath}
+import play.api.libs.functional.syntax._
 
 case class SaMatchingRequest(selfAssessmentUniqueTaxPayerRef: String,
                              taxPayerType: String,
@@ -26,6 +27,21 @@ case class SaMatchingRequest(selfAssessmentUniqueTaxPayerRef: String,
 
 object SaMatchingRequest {
 
-  implicit val saMatchingFormat:Format[SaMatchingRequest] = Json.format[SaMatchingRequest]
+  implicit val saMatchingformat: Format[SaMatchingRequest] = Format(
+    (
+      (JsPath \ "selfAssessmentUniqueTaxPayerRef").read[String] and
+        (JsPath \ "taxPayerType").read[String] and
+        (JsPath \ "taxPayerName").read[String] and
+        (JsPath \ "address" \ "addressLine1").read[String] and
+        (JsPath \ "address" \ "postcode").read[String]
+      ) (SaMatchingRequest.apply _),
+    (
+      (JsPath \ "selfAssessmentUniqueTaxPayerRef").write[String] and
+      (JsPath \ "taxPayerType").write[String] and
+      (JsPath \ "taxPayerName").write[String] and
+      (JsPath \ "address" \ "addressLine1").write[String] and
+      (JsPath \ "address" \ "postcode").write[String]
+    )(unlift(SaMatchingRequest.unapply))
+  )
 
 }

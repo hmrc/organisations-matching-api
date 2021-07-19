@@ -159,12 +159,12 @@ class IfConnectorSpec
       verify(underTest.auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
-      result shouldBe JsSuccess(IfCorpTaxCompanyDetails(
+      result shouldBe IfCorpTaxCompanyDetails(
         Some(utr),
         Some(crn),
         Some(registeredDetails),
         Some(communicationDetails)
-      ))
+      )
 
     }
 
@@ -291,11 +291,11 @@ class IfConnectorSpec
       verify(underTest.auditHelper,
         times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
-      result shouldBe JsSuccess(IfSaTaxpayerDetails(
+      result shouldBe IfSaTaxpayerDetails(
         Some(utr),
         Some("Individual"),
         Some(Seq(taxpayerJohnNameAddress, taxpayerJoanneNameAddress))
-      ))
+      )
 
     }
 

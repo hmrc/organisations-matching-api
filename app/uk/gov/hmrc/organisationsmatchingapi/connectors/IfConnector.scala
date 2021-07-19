@@ -56,9 +56,7 @@ class IfConnector @Inject()(
     val SAUrl =
       s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    callSa(SAUrl, matchId) map {
-      response => Json.fromJson[IfSaTaxpayerDetails](Json.toJson(response))
-    }
+    callSa(SAUrl, matchId)
 
   }
 
@@ -70,10 +68,7 @@ class IfConnector @Inject()(
     val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
-    callCt(CTUrl, matchId) map {
-      response => Json.fromJson[IfCorpTaxCompanyDetails](Json.toJson(response))
-    }
-
+    callCt(CTUrl, matchId)
   }
 
   private def extractCorrelationId(requestHeader: RequestHeader) = validateCorrelationId(requestHeader).toString

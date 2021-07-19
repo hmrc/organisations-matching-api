@@ -93,9 +93,9 @@ class ScopesService @Inject()(configuration: Configuration) {
   }
 
   def getAccessibleExternalEndpoints(scopes: Iterable[String]): Iterable[String] = {
-    val scopeKeys = scopes.flatMap(s => getScopeFieldKeys(s)).toSeq
-    apiConfig.internalEndpoints
-      .filter(endpoint => endpoint.fields.keySet.exists(scopeKeys.contains))
+    val scopeKeys = scopes.flatMap(s => getScopeEndpointKeys(s)).toSeq
+    apiConfig.externalEndpoints
+      .filter(endpoint => scopeKeys.contains(endpoint.key))
       .map(endpoint => endpoint.name)
   }
 

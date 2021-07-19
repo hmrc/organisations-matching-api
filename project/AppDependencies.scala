@@ -28,7 +28,8 @@ object AppDependencies {
     "org.pegdown"             %  "pegdown"                  % "1.6.0"                 % scope,
     "com.github.tomakehurst"  %  "wiremock-jre8"            % "2.27.2"                % scope,
     "org.mockito"             %  "mockito-core"             % "3.8.0"                 % scope,
-    hmrc                      %% "service-integration-test" % "1.1.0-play-27"         % scope
+    hmrc                      %% "service-integration-test" % "1.1.0-play-27"         % scope,
+    "org.scalaj"              %% "scalaj-http"              % "2.4.2"                 % scope
   )
 
 }
