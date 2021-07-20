@@ -26,8 +26,8 @@ uses:
   annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
-/organisations:
-  /matching/corporation-tax:
+/organisations/matching/:
+  /corporation-tax:
       post:
         displayName: "Match Corporation Tax details for an organisation "
         description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include: company registration number (CRN), employer name, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
@@ -75,8 +75,7 @@ uses:
                     description: "The organisation's details provided did not match with HMRC's records"
                     value:
                       code: MATCHING_FAILED
-
-  /matching/self-assessment:
+  /self-assessment:
       post:
         displayName: Match Self Assessment details for an organisation
         description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
@@ -124,7 +123,7 @@ uses:
                     description: "The organisation's details provided did not match with HMRC's records"
                     value:
                       code: MATCHING_FAILED
-  /matching/corporation-tax/{matchId}:
+  /corporation-tax/{matchId}:
       uriParameters:
         matchId:
           description: "A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API."
@@ -164,7 +163,7 @@ uses:
                     description: "Not Found"
                     value:
                       code: NOT_FOUND
-  /matching/self-assessment/{matchId}:
+  /self-assessment/{matchId}:
       uriParameters:
         matchId:
           description: "A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API."

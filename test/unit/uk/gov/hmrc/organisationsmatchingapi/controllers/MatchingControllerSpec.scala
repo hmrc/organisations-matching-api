@@ -32,8 +32,7 @@ import play.api.test.Helpers
 import uk.gov.hmrc.http.HeaderCarrier
 import play.api.http.Status._
 import play.api.libs.json.Json
-import uk.gov.hmrc.api.controllers.ErrorNotFound
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{MatchNotFoundException, UtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorNotFound, MatchNotFoundException, UtrMatch}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 
@@ -94,12 +93,15 @@ class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar
 
     "match is expired or not present in cache" should {
       "return NOT_FOUND 404" in new Setup {
-        given(matchingService.fetchMatchedOrganisationRecord(eqTo(matchId))(any())).willThrow(new MatchNotFoundException)
+        given(matchingService.fetchMatchedOrganisationRecord(eqTo(matchId))(any()))
+          .willReturn(Future.failed(new MatchNotFoundException))
 
         val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        //jsonBodyOf(result) shouldBe Json.toJson(ErrorNotFound)
+        jsonBodyOf(result) shouldBe Json.parse(
+          s"""{"code":"NOT_FOUND","message":"The resource can not be found"}"""
+        )
       }
     }
   }

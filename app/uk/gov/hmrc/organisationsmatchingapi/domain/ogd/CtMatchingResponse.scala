@@ -17,11 +17,10 @@
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails}
 
-case class PayeMatchingResponse(  employerName: String,
-                                  address: IfAddress )
+case class CtMatchingResponse(employerName: String,
+                              address: Address )
 
-object PayeMatchingResponse {
-  implicit val payeMatchingformat: Format[PayeMatchingResponse] = Json.format[PayeMatchingResponse]
+object CtMatchingResponse {
+  implicit val cotaxMatchingformat: Format[CtMatchingResponse] = Json.format[CtMatchingResponse]
 }

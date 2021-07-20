@@ -17,10 +17,12 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.libs.json.Json.toJson
+
 import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, Result}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, MatchNotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.maybeCorrelationId
@@ -61,5 +63,4 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
       }
     } recover recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/$matchId")
   }
-
 }
