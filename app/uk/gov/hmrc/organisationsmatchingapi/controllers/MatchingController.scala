@@ -55,16 +55,17 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
 
             val selfLink = HalLink("self", s"/organisations/matching/corporation-tax")
             val data = toJson(MatchIdResponse(matchId))
-            val response = state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getCorporationTaxMatch"))) ++ selfLink
+            val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getCorporationTaxMatch"))) ++ selfLink)
 
             auditHelper.auditApiResponse(
               correlationId.toString,
               matchId.toString,
               authScopes.mkString(","),
               request,
-              selfLink.toString)
+              selfLink.toString,
+              Some(response))
 
-            Ok(Json.toJson(response))
+            Ok(response)
           }
         ))
       }}
@@ -80,16 +81,17 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
           matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map(_ => {
             val selfLink = HalLink("self", s"/organisations/matching/self-assessment")
             val data = toJson(MatchIdResponse(matchId))
-            val response = state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink
+            val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink)
 
             auditHelper.auditApiResponse(
               correlationId.toString,
               matchId.toString,
               authScopes.mkString(","),
               request,
-              selfLink.toString)
+              selfLink.toString,
+              Some(response))
 
-            Ok(Json.toJson(response))
+            Ok(response)
           }
         ))
       }}

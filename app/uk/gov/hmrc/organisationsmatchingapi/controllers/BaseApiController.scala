@@ -20,11 +20,12 @@ import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OFormat, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
 import uk.gov.hmrc.auth.core.authorise.Predicate
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
-import uk.gov.hmrc.auth.core.{AuthorisedFunctions, Enrolment}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CitizenNotFoundException, ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 
@@ -55,14 +56,51 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
           "message" -> "The request body does not conform to the schema.",
           "errors" -> Json.toJson(errors.toList))))
 
-}
+  private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(
+    implicit request: RequestHeader,
+    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
+    case _: MatchNotFoundException => {
+      auditHelper.auditApiResponse(correlationId.getOrElse("-"), matchId, "", request, url, Some(Json.toJson("Not Found")))
+      ErrorNotFound.toHttpResponse
+    }
+    case e: InvalidBodyException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
+    case _: MatchingException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
+      ErrorMatchingFailed.toHttpResponse
+    }
+    case e: InsufficientEnrolments => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorUnauthorized("Insufficient Enrolments").toHttpResponse
+    }
+    case e: AuthorisationException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorUnauthorized(e.getMessage).toHttpResponse
+    }
+    case tmr: TooManyRequestException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, tmr.getMessage)
+      ErrorTooManyRequests.toHttpResponse
+    }
+    case br: BadRequestException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, br.getMessage)
+      ErrorInvalidRequest(br.getMessage).toHttpResponse
+    }
+    case e: IllegalArgumentException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInvalidRequest(e.getMessage).toHttpResponse
+    }
+    case e: InternalServerException => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInternalServer("Something went wrong").toHttpResponse
+    }
+    case e => {
+      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
+      ErrorInternalServer("Something went wrong").toHttpResponse
+    }
+  }
 
-case class SchemaValidationError(keyword: String,
-                                 msgs: Seq[String],
-                                 instancePath: String)
-
-object SchemaValidationError {
-  implicit val format: OFormat[SchemaValidationError] = Json.format
 }
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {

@@ -39,10 +39,10 @@ class MatchingControllerSpec extends BaseSpec  {
   Scenario("Valid POST request to corporation-tax endpoint") {
 
     Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes, scopes)
+    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
     Given("A successful match")
-    MatchingStub.willReturnCtMatch( testCorrelationHeader._2)
+    MatchingStub.willReturnCtMatch( correlationIdHeader._2)
 
     val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
 
@@ -83,10 +83,10 @@ class MatchingControllerSpec extends BaseSpec  {
   Scenario("Valid POST request to corporation-tax endpoint not found") {
 
     Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes, scopes)
+    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
     Given("A successful match")
-    MatchingStub.willReturnCtMatchNotFound(testCorrelationHeader._2)
+    MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
 
     val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
 
@@ -107,10 +107,10 @@ class MatchingControllerSpec extends BaseSpec  {
   Scenario("Valid POST request to self-assessment endpoint") {
 
     Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes, scopes)
+    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
     Given("A successful match")
-    MatchingStub.willReturnSaMatch( testCorrelationHeader._2)
+    MatchingStub.willReturnSaMatch( correlationIdHeader._2)
 
     val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
 
@@ -146,10 +146,10 @@ class MatchingControllerSpec extends BaseSpec  {
   Scenario("Valid POST request to self-assessment endpoint not found") {
 
     Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes, scopes)
+    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
     Given("A successful match")
-    MatchingStub.willReturnSaMatchNotFound(testCorrelationHeader._2)
+    MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
 
     val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
 

@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfAddress
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{SaMatchingRequest, SaMatchingResponse}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, SaMatchingRequest, SaMatchingResponse}
 import util.IfHelpers
 
 class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
@@ -31,11 +31,8 @@ class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
       val saMatchingResponse = SaMatchingResponse(
         taxPayerType = "A",
         taxPayerName = "name",
-        address = IfAddress(
+        address = Address(
           line1 = Some("line1"),
-          line2 = Some("line2"),
-          line3 = Some("line3"),
-          line4 = Some("line4"),
           postcode = Some("postcode")))
 
       val asJson = Json.toJson(saMatchingResponse)
@@ -45,9 +42,6 @@ class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
                                    |  "taxPayerName" : "name",
                                    |  "address" : {
                                    |    "line1" : "line1",
-                                   |    "line2" : "line2",
-                                   |    "line3" : "line3",
-                                   |    "line4" : "line4",
                                    |    "postcode" : "postcode"
                                    |  }
                                    |}""".stripMargin)

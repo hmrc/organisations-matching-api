@@ -20,7 +20,7 @@ import java.time.LocalDateTime
 import java.util.UUID
 import java.util.UUID.randomUUID
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.SaMatchingRequest
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, SaMatchingRequest, SaMatchingResponse}
 
 case class SaMatch(
                     request: SaMatchingRequest,
@@ -31,6 +31,19 @@ case class SaMatch(
 
 object SaMatch {
   implicit val formats = Json.format[SaMatch]
+
+  def convert(cacheData: SaMatch) = {
+    Json.toJson(
+      SaMatchingResponse(
+        cacheData.request.taxPayerType,
+        cacheData.request.taxPayerName,
+        Address(
+          Some(cacheData.request.addressLine1),
+          Some(cacheData.request.postcode)
+        )
+      )
+    )
+  }
 }
 
 

@@ -14,18 +14,11 @@
  * limitations under the License.
  */
 
-package stubs
+package component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.matching.StringValuePattern
 import com.github.tomakehurst.wiremock.stubbing.StubMapping
-import play.api.http.HeaderNames.AUTHORIZATION
-import play.api.http.{HeaderNames, Status}
-import play.api.libs.json.Json.{arr, obj, toJson}
-import play.api.libs.json.{JsArray, Json}
-import uk.gov.hmrc.auth.core.Enrolment
-import uk.gov.hmrc.auth.core.authorise.Predicate
-
+import play.api.http.Status
 
 object MatchingStub extends MockHost(9658) {
 

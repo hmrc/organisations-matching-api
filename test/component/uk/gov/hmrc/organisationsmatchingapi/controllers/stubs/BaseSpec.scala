@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package stubs
+package component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs
 
 import java.util.concurrent.TimeUnit
-
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration
@@ -33,6 +32,7 @@ import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
 import scala.concurrent.Await.result
 import scala.concurrent.duration.Duration
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait BaseSpec
@@ -54,19 +54,23 @@ trait BaseSpec
   val timeout = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"
   val mocks = Seq(AuthStub, MatchingStub)
-  val mongoRepository = app.injector.instanceOf[MatchRepository]
   val authToken = "Bearer AUTH_TOKEN"
+  val clientId = "CLIENT_ID"
+  val acceptHeaderP1 = ACCEPT -> "application/vnd.hmrc.1.0+json"
+  val correlationIdHeader = "CorrelationId" -> "188e9400-b636-4a3b-80ba-230a8c72b92a"
+  val correlationIdHeaderMalformed = "CorrelationId" -> "foo"
+  val mongoRepository = app.injector.instanceOf[MatchRepository]
 
-  val acceptHeaderP1 = ACCEPT                        -> "application/vnd.hmrc.1.0+json"
-  val testCorrelationHeader = "CorrelationId"        -> "188e9400-b636-4a3b-80ba-230a8c72b92a"
-  val invalidTestCorrelationHeader = "CorrelationId" -> "test"
+  protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderP1) =
+    Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationIdHeader)
 
-  protected def requestHeaders(
-    acceptHeader: (String, String) = acceptHeaderP1,
-    correlationHeader: (String, String) = testCorrelationHeader) =
-    Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationHeader)
+  protected def requestHeadersInvalid(acceptHeader: (String, String) = acceptHeaderP1) =
+    Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader)
 
-  protected def errorResponse(message: String) =
+  protected def requestHeadersMalformed(acceptHeader: (String, String) = acceptHeaderP1) =
+    Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationIdHeaderMalformed)
+
+  protected def invalidRequest(message: String) =
     s"""{"code":"INVALID_REQUEST","message":"$message"}"""
 
   override protected def beforeEach(): Unit = {
@@ -87,5 +91,5 @@ trait BaseSpec
 case class MockHost(port: Int) {
   val server = new WireMockServer(WireMockConfiguration.wireMockConfig().port(port))
   val mock = new WireMock("localhost", port)
-  val url = s"http://localhost:$port"
+  val url = s"http://localhost:9000"
 }

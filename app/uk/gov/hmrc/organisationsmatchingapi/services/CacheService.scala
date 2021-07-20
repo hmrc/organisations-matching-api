@@ -22,7 +22,7 @@ import java.util.UUID
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
-import uk.gov.hmrc.organisationsmatchingapi.repository.{MatchRepository, ShortLivedCache}
+import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
