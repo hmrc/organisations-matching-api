@@ -16,7 +16,8 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format, JsPath}
+import play.api.libs.functional.syntax._
 
 case class CtMatchingRequest(companyRegistrationNumber: String,
                              employerName: String,
@@ -25,6 +26,18 @@ case class CtMatchingRequest(companyRegistrationNumber: String,
 
 object CtMatchingRequest {
 
-  implicit val ctMatchingformat: Format[CtMatchingRequest] = Json.format[CtMatchingRequest]
-
+  implicit val ctMatchingformat: Format[CtMatchingRequest] = Format(
+    (
+      (JsPath \ "companyRegistrationNumber").read[String] and
+      (JsPath \ "employerName").read[String] and
+      (JsPath \ "address" \ "addressLine1").read[String] and
+      (JsPath \ "address" \ "postcode").read[String]
+    )(CtMatchingRequest.apply _),
+    (
+      (JsPath \ "companyRegistrationNumber").write[String] and
+      (JsPath \ "employerName").write[String] and
+      (JsPath \ "address" \ "addressLine1").write[String] and
+      (JsPath \ "address" \ "postcode").write[String]
+    )(unlift(CtMatchingRequest.unapply))
+  )
 }

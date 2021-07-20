@@ -28,8 +28,8 @@ import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CitizenNotFoundException, ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 abstract class BaseApiController (cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
 
@@ -111,22 +111,21 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
-    auditHelper: AuditHelper): Future[Result] = {
+    auditHelper: AuditHelper,
+    ec: ExecutionContext): Future[Result] = {
 
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
+
       authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) {
         case scopes => {
+
           auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
+
           f(scopes.enrolments.map(e => e.key))
         }
-    }
+      }
   }
-}
 
-case class SchemaValidationError(keyword: String,
-                                 msgs: Seq[String],
-                                 instancePath: String)
-
-object SchemaValidationError {
-  implicit val format: OFormat[SchemaValidationError] = Json.format
+  def requiresPrivilegedAuthentication(body: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
+    authorised(Enrolment("read:individuals-matching"))(body)
 }

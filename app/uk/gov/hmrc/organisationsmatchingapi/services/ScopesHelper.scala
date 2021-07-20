@@ -19,7 +19,6 @@ package uk.gov.hmrc.organisationsmatchingapi.services
 import java.util.UUID
 
 import javax.inject.Inject
-import javax.xml.ws.Endpoint
 import play.api.hal.Hal.{linksSeq, state}
 import play.api.hal.{HalLink, HalResource}
 import play.api.libs.json.JsValue

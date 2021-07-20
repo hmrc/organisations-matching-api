@@ -16,34 +16,89 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import javax.inject.{Inject, Singleton}
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
-
 import java.util.UUID
-import scala.concurrent.Future
+
+import javax.inject.{Inject, Singleton}
+import play.api.hal.Hal.state
+import play.api.hal.HalLink
+import play.api.libs.json.Json.toJson
+import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.{Action, ControllerComponents, PlayBodyParsers}
+import uk.gov.hmrc.auth.core.AuthConnector
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, MatchIdResponse, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
+import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils._
+import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
-                                   cacheService: CacheService) extends BaseApiController(cc) with ErrorHandling {
+                                   scopeService: ScopesService,
+                                   scopesHelper: ScopesHelper,
+                                   bodyParsers: PlayBodyParsers,
+                                   cacheService: CacheService,
+                                   matchingService: MatchingService
+                                  )(implicit val ec: ExecutionContext, auditHelper: AuditHelper) extends BaseApiController(cc)
+                                                                  with ErrorHandling
+                                                                  with PrivilegedAuthentication {
 
-  def matchOrganisationCt() : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
+  def matchOrganisationCt() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
+    val matchId = UUID.randomUUID()
+    authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
+      withJsonBody[CtMatchingRequest] { matchRequest => {
+        val correlationId = validateCorrelationId(request)
+        handleErrors(
+          matchingService.matchCoTax(matchId, correlationId.toString, matchRequest).map( _ => {
+
+            val selfLink = HalLink("self", s"/organisations/matching/corporation-tax")
+            val data = toJson(MatchIdResponse(matchId))
+            val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getCorporationTaxMatch"))) ++ selfLink)
+
+            auditHelper.auditApiResponse(
+              correlationId.toString,
+              matchId.toString,
+              authScopes.mkString(","),
+              request,
+              selfLink.toString,
+              Some(response))
+
+            Ok(response)
+          }
+        ))
+      }}
+    }
   }
 
-  def matchOrganisationSa() : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
+  def matchOrganisationSa() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
+    val matchId = UUID.randomUUID()
+    authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
+      withJsonBody[SaMatchingRequest] { matchRequest => {
+        val correlationId = validateCorrelationId(request)
+        handleErrors(
+          matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map(_ => {
+            val selfLink = HalLink("self", s"/organisations/matching/self-assessment")
+            val data = toJson(MatchIdResponse(matchId))
+            val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink)
+
+            auditHelper.auditApiResponse(
+              correlationId.toString,
+              matchId.toString,
+              authScopes.mkString(","),
+              request,
+              selfLink.toString,
+              Some(response))
+
+            Ok(response)
+          }
+        ))
+      }}
+    }
   }
 
-  def matchedOrganisationCt(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
-  }
+  def matchedOrganisationSa(matchId: UUID) =  Action.async { implicit request => Future.successful(Ok)}
 
-  def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
-  }
-
+  def matchedOrganisationCt(matchId: UUID)=  Action.async { implicit request => Future.successful(Ok)}
 }

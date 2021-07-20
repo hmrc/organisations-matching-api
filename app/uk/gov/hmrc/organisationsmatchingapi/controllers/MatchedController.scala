@@ -50,7 +50,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
       val correlationId = validateCorrelationId(request)
       matchedService.fetchCt(matchId) map { cacheData =>
 
-        val exclude  = Some(List("details-self-assessment"))
+        val exclude  = Some(List("getSelfAssessmentDetails"))
         val selfLink = HalLink("self", self)
         val links    = scopesHelper.getHalLinks(matchId, exclude, authScopes, None, true) ++ selfLink
         val response = Json.toJson(state(CtMatch.convert(cacheData)) ++ links)
@@ -70,7 +70,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
       val correlationId = validateCorrelationId(request)
       matchedService.fetchSa(matchId) map { cacheData =>
 
-        val exclude  = Some(List("details-corporation-tax"))
+        val exclude  = Some(List("getCorporationTaxDetails"))
         val selfLink = HalLink("self", self)
         val links    = scopesHelper.getHalLinks(matchId, exclude, authScopes, None, true) ++ selfLink
         val response = Json.toJson(state(SaMatch.convert(cacheData)) ++ links)

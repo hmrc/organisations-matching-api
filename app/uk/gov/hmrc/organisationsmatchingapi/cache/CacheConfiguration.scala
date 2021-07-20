@@ -26,7 +26,7 @@ class CacheConfiguration @Inject()(configuration: Configuration) {
     .getOrElse(true)
 
   lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds")
-    .getOrElse(60 * 15)
+    .getOrElse(60 * 60 * 5)
 
   lazy val colName = configuration.getOptional[String]("cache.colName")
     .getOrElse("matching-cache")

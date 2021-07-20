@@ -58,14 +58,14 @@ class MatchedControllerSpec extends BaseSpec  {
            |    "postcode": "postcode"
            |  },
            |  "_links": {
-           |    "details-number-of-employees": {
+           |    "getEmployeeCount": {
            |      "href": "/organisations/details/number-of-employees?matchId=$matchId",
            |      "title": "Get the organisation's paye employee count data."
            |    },
            |    "self": {
            |      "href": "/organisations/matching/corporation-tax/$matchId"
            |    },
-           |    "details-corporation-tax": {
+           |    "getCorporationTaxDetails": {
            |      "href": "/organisations/details/corporation-tax?matchId=$matchId",
            |      "title": "Get the organisation's Corporation Tax details data."
            |    }
@@ -197,12 +197,12 @@ class MatchedControllerSpec extends BaseSpec  {
            |    "postcode": "postcode"
            |  },
            |  "_links": {
-           |    "details-number-of-employees": {
+           |    "getEmployeeCount": {
            |      "href": "/organisations/details/number-of-employees?matchId=$matchId",
            |      "title": "Get the organisation's paye employee count data."
            |    },
-           |    "details-self-assessment": {
-           |      "href": "/organisations/details/self-assessment/?matchId=$matchId",
+           |    "getSelfAssessmentDetails": {
+           |      "href": "/organisations/details/self-assessment?matchId=$matchId",
            |      "title": "Get the organisation's self-assessment details data."
            |    },
            |    "self": {

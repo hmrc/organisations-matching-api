@@ -16,41 +16,97 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
+import java.util.UUID
+
+import org.mockito.ArgumentMatchers.{any, refEq}
+import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
-import play.api.test.Helpers._
+import play.api.libs.json.Json
+import play.api.mvc.PlayBodyParsers
 import play.api.test.{FakeRequest, Helpers}
-import play.api.{Configuration, Environment}
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.config.AppConfig
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
-import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
-import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
+import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
+import util.SpecBase
 
-class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar {
-  private val fakeRequest = FakeRequest("GET", "/")
+import scala.concurrent.Future
 
-  private val env           = Environment.simple()
-  private val configuration = Configuration.load(env)
+class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers with MockitoSugar {
+
+  private implicit val ec  = scala.concurrent.ExecutionContext.Implicits.global
 
   private val mockAuthConnector = mock[AuthConnector]
   private val mockCacheService = mock[CacheService]
+  private val mockAuditHelper = mock[AuditHelper]
+  private val mockScopesService = mock[ScopesService]
+  private val scopesHelper = new ScopesHelper(mockScopesService)
+  private val mockMatchingService = mock[MatchingService]
+  private val mockBodyParser = mock[PlayBodyParsers]
 
-  private val serviceConfig = new ServicesConfig(configuration)
+  private val controller = new MatchingController(
+    mockAuthConnector,
+    Helpers.stubControllerComponents(),
+    mockScopesService,
+    scopesHelper,
+    mockBodyParser,
+    mockCacheService,
+    mockMatchingService
+  )(ec, mockAuditHelper)
 
-  private val controller = new MatchingController(mockAuthConnector, Helpers.stubControllerComponents(), mockCacheService)
+  given(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
+    .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope"), Enrolment("test-scope-1")))))
+
+  given(mockScopesService.getAllScopes).willReturn(List("test-scope", "test-scope-1"))
+
+  given(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+  given(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+
+  given(mockScopesService.getInternalEndpoints(any())).willReturn(Seq())
+  given(mockScopesService.getExternalEndpoints(any())).willReturn(Seq())
 
 
-  "GET matchCrn TO BE IMPLEMENTED /" should {
+  "POST matchOrganisationCt" should {
+
+    val fakeRequest = FakeRequest("POST", "/")
+      .withHeaders(("CorrelationId", UUID.randomUUID().toString))
+      .withBody(Json.parse(
+      """
+        |{
+        |   "companyRegistrationNumber":"1234567890",
+        |   "employerName":"name",
+        |   "address": {
+        |     "postcode":"postcode",
+        |     "addressLine1":"line1"
+        |   }
+        |}""".stripMargin))
+
     "return 200" in {
       val result = controller.matchOrganisationCt()(fakeRequest)
       status(result) shouldBe Status.OK
     }
   }
 
-  "GET matchSaUtr TO BE IMPLEMENTED /" should {
+  "POST matchOrganisationSa" should {
+
+    val fakeRequest = FakeRequest("POST", "/")
+      .withHeaders(("CorrelationId", UUID.randomUUID().toString))
+      .withBody(Json.parse(
+      """
+        |{
+        |   "selfAssessmentUniqueTaxPayerRef":"1234567890",
+        |   "taxPayerType":"A",
+        |   "taxPayerName":"name",
+        |   "address":{
+        |     "postcode":"postcode",
+        |     "addressLine1":"line1"
+        |   }
+        | }""".stripMargin))
+
     "return 200" in {
       val result = controller.matchOrganisationSa()(fakeRequest)
       status(result) shouldBe Status.OK
