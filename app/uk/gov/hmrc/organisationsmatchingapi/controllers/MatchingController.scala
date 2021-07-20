@@ -23,7 +23,6 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters.matchedOrganisationRecordJsonFormat
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.maybeCorrelationId
 import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 

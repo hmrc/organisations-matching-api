@@ -18,7 +18,6 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.models
 
 import java.util.UUID
 import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json, Writes}
-import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.MatchedOrganisationRecord
 
 object JsonFormatters {
 
@@ -32,8 +31,5 @@ object JsonFormatters {
   implicit val errorResponseWrites = new Writes[ErrorResponse] {
     def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
   }
-
-  implicit val matchedOrganisationRecordJsonFormat =
-    Json.format[MatchedOrganisationRecord]
 
 }
