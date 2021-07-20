@@ -102,10 +102,12 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
     case e: InternalServerException => {
+      println("ERR: " + e.getMessage)
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong").toHttpResponse
     }
     case e => {
+      println("ERR: " + e.getMessage)
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong").toHttpResponse
     }

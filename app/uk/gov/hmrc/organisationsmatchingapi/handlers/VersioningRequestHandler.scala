@@ -40,6 +40,7 @@ class VersioningRequestHandler @Inject()(config: Configuration,
   }.getOrElse(Seq.empty[String])
 
   override def routeRequest(request: RequestHeader): Option[Handler] = {
+    println("ACHI: " + request)
     val requestContext = extractUriContext(request)
     if (unversionedContexts.contains(requestContext)) {
       super.routeRequest(request)

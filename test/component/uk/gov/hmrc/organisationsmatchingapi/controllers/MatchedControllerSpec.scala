@@ -32,9 +32,9 @@ class MatchedControllerSpec extends BaseSpec  {
   val matchId   = UUID.randomUUID()
   val scopes    = List("read:organisations-matching-ho-ssp")
   val ctRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
-  val ctMatch   = CtMatch(ctRequest, matchId)
+  val ctMatch   = CtMatch(ctRequest, matchId, utr = Some("testutr"))
   val saRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
-  val saMatch   = SaMatch(saRequest, matchId)
+  val saMatch   = SaMatch(saRequest, matchId, utr = Some("testutr"))
 
   Feature("cotax") {
     Scenario("a valid request is made for an existing match") {
@@ -311,6 +311,60 @@ class MatchedControllerSpec extends BaseSpec  {
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
         "message" -> "Malformed CorrelationId"
+      )
+    }
+  }
+
+  Feature("matched organisation") {
+    Scenario("a valid request is made for an existing match id") {
+      Given("A valid privileged Auth bearer token")
+
+      And("A valid match exist")
+      result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/$matchId").asString
+
+      response.code shouldBe OK
+
+      Json.parse(response.body) shouldBe Json.parse(
+        s"""{
+           |  "matchId": "$matchId",
+           |  "utr": "testutr"
+           |}""".stripMargin
+      )
+    }
+
+    Scenario("a valid request is made for an match id that does not exist") {
+      Given("A valid privileged Auth bearer token")
+
+      And("A valid match does not exist")
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/$matchId").asString
+
+      response.code shouldBe NOT_FOUND
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
+    }
+
+    Scenario("a valid request is made for an invalid match id") {
+      Given("A valid privileged Auth bearer token")
+
+      And("A valid match exist")
+      result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/foo").asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "statusCode"    -> 400,
+        "message" -> "bad request"
       )
     }
   }

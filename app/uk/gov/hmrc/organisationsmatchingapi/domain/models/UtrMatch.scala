@@ -20,7 +20,7 @@ import play.api.libs.json.Json
 
 import java.util.UUID
 
-case class UtrMatch(id: UUID,
+case class UtrMatch(matchId: UUID,
                     utr: String
                    )
 

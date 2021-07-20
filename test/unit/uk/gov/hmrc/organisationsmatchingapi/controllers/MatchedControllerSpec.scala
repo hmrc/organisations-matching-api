@@ -34,7 +34,7 @@ import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorInternalServer, ErrorNotFound, MatchNotFoundException, SaMatch, UtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorNotFound, MatchNotFoundException, SaMatch, UtrMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
@@ -316,7 +316,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
         jsonBodyOf(result) shouldBe Json.parse(
           s"""{
-             |  "id": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+             |  "matchId": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
              |  "utr": "test"
              |}""".stripMargin
         )

@@ -43,7 +43,7 @@ class MatchedService @Inject()(cacheService: CacheService) {
                                     (implicit ec: ExecutionContext) =
     cacheService.fetch[UtrMatch](matchId) flatMap {
       case Some(utrMatch) =>
-        successful(UtrMatch(utrMatch.id, utrMatch.utr))
+        successful(UtrMatch(utrMatch.matchId, utrMatch.utr))
       case _ => failed(new MatchNotFoundException)
     }
 }

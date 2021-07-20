@@ -46,7 +46,8 @@ trait BaseSpec
       "auditing.traceRequests"          -> false,
       "mongodb.uri"                     -> "mongodb://localhost:27017/organisations-matching-api",
       "microservice.services.auth.port" -> AuthStub.port,
-      "run.mode"                        -> "It"
+      "run.mode"                        -> "It",
+      "versioning.unversionedContexts"  -> List("/match-record")
     )
     .build()
 
