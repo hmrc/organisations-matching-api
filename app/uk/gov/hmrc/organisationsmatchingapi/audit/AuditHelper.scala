@@ -32,7 +32,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
                        matchId: String,
                        scopes: String,
                        request: RequestHeader,
-                       selfLink: String)
+                       selfLink: String,
+                       response: Option[JsValue])
                       (implicit hc: HeaderCarrier) =
     auditConnector.sendExplicitAudit(
       "ApiResponseEvent",
@@ -46,7 +47,8 @@ class AuditHelper @Inject()(auditConnector: AuditConnector)
         correlationId = Some(correlationId),
         request.headers.get("X-Application-ID").getOrElse("-"),
         scopes = scopes,
-        returnLinks = selfLink
+        returnLinks = selfLink,
+        response
       )
     )
 
