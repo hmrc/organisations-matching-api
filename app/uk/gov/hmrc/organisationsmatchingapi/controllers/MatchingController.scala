@@ -24,9 +24,8 @@ import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, MatchNotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
-import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
+import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchedService}
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.maybeCorrelationId
-import uk.gov.hmrc.organisationsmatchingapi.services.MatchingService
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,7 +35,7 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
                                    cacheService: CacheService,
                                    implicit val auditHelper: AuditHelper,
-                                   matchingService: MatchingService)
+                                   matchedService: MatchedService)
                                   (implicit ec: ExecutionContext) extends BaseApiController(cc) with ErrorHandling {
 
   def matchOrganisationCt() : Action[AnyContent] = Action.async { implicit request =>
@@ -47,20 +46,4 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
     Future.successful(Ok("IMPLEMENT ME!"))
   }
 
-  // two methods below need to be deleted once merged with HODS-154
-  def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
-  }
-
-  def matchedOrganisationCt(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
-    Future.successful(Ok("IMPLEMENT ME!"))
-  }
-
-  def matchedOrganisation(matchId: UUID) = Action.async { implicit request =>
-    withUuid(matchId.toString) { matchUuid =>
-      matchingService.fetchMatchedOrganisationRecord(matchUuid) map { matchedOrganisation =>
-        Ok(toJson(matchedOrganisation))
-      }
-    } recover recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/$matchId")
-  }
 }

@@ -19,6 +19,7 @@ package uk.gov.hmrc.organisationsmatchingapi.controllers
 import play.api.hal.Hal.state
 import play.api.hal.HalLink
 import play.api.libs.json.Json
+import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -82,5 +83,13 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
         Ok(response)
       }
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
+  }
+
+  def matchedOrganisation(matchId: UUID) = Action.async { implicit request =>
+    withUuid(matchId.toString) { matchUuid =>
+      matchedService.fetchMatchedOrganisationRecord(matchUuid) map { matchedOrganisation =>
+        Ok(toJson(matchedOrganisation))
+      }
+    } recover recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/$matchId")
   }
 }
