@@ -17,7 +17,7 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -45,8 +45,6 @@ class IfConnector @Inject()(
   private val integrationFrameworkEnvironment = servicesConfig.getString(
     "microservice.services.integration-framework.environment"
   )
-
-  private val emptyResponse = ""
 
   def fetchSelfAssessment(matchId: String, utr: String)(
     implicit hc: HeaderCarrier,

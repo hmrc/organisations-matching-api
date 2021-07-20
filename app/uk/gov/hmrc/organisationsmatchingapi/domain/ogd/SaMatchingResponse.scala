@@ -17,7 +17,6 @@
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfAddress
 
 case class SaMatchingResponse(taxPayerType: String,
                               taxPayerName: String,

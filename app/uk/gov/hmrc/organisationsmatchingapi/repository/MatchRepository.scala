@@ -20,10 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.UtrMatch
-
-import java.util.UUID
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext}
 
 @Singleton
 class MatchRepository @Inject()(cacheConfig: CacheConfiguration,

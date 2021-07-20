@@ -17,7 +17,7 @@
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import akka.stream.Materializer
-import org.mockito.ArgumentMatchers.{any, refEq, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -29,12 +29,12 @@ import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
 import util.SpecBase
 import play.api.test.Helpers
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.http.HeaderCarrier
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorNotFound, MatchNotFoundException, SaMatch, UtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorNotFound, MatchNotFoundException, MatchingException, SaMatch, UtrMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
@@ -323,7 +323,21 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
       }
     }
 
-    "match is expired or not present in cache" should {
+    "runtime exception is encountered through no match for information provided" should {
+      "return MATCHING_FAILED 403" in new Setup {
+        given(matchedService.fetchMatchedOrganisationRecord(matchId))
+          .willReturn(Future.failed(new MatchingException))
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe 403
+
+        jsonBodyOf(result) shouldBe Json.parse(
+          s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}"""
+        )
+      }
+    }
+
+    "match is not present in cache" should {
       "return NOT_FOUND 404" in new Setup {
         given(matchedService.fetchMatchedOrganisationRecord(matchId))
           .willReturn(Future.failed(new MatchNotFoundException))
