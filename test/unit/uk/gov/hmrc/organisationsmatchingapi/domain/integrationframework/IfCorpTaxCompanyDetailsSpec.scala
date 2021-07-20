@@ -16,12 +16,9 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework
 
-import java.util.UUID
-
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsString, JsSuccess, Json}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
+import play.api.libs.json.Json
 import util.IfHelpers
 
 class IfCorpTaxCompanyDetailsSpec extends AnyWordSpec with Matchers with IfHelpers {

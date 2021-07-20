@@ -16,95 +16,100 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import akka.stream.Materializer
-import org.mockito.ArgumentMatchers.any
+import java.util.UUID
+
+import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.AuthConnector
-import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.controllers.{MatchedController, MatchingController}
-import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchedService, MatchingService, ScopesHelper, ScopesService}
-import util.SpecBase
-import play.api.test.Helpers
-import uk.gov.hmrc.http.HeaderCarrier
-import play.api.http.Status._
+import play.api.http.Status
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorNotFound, MatchNotFoundException, UtrMatch}
-import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import play.api.mvc.PlayBodyParsers
+import play.api.test.{FakeRequest, Helpers}
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
+import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
+import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
+import util.SpecBase
 
-import java.util.UUID
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar with SpecBase {
+class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers with MockitoSugar {
 
-  implicit lazy val materializer: Materializer = fakeApplication.materializer
+  private implicit val ec  = scala.concurrent.ExecutionContext.Implicits.global
 
-  trait Setup extends ScopesConfig {
-    val sampleCorrelationId       = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-    val sampleCorrelationIdHeader = "CorrelationId" -> sampleCorrelationId
-    val badCorrelationIdHeader    = "CorrelationId" -> "foo"
-    val fakeRequest               = FakeRequest("GET", "/").withHeaders(sampleCorrelationIdHeader)
-    val fakeRequestMalformed      = FakeRequest("GET", "/").withHeaders(badCorrelationIdHeader)
-    val mockAuthConnector         = mock[AuthConnector]
+  private val mockAuthConnector = mock[AuthConnector]
+  private val mockCacheService = mock[CacheService]
+  private val mockAuditHelper = mock[AuditHelper]
+  private val mockScopesService = mock[ScopesService]
+  private val scopesHelper = new ScopesHelper(mockScopesService)
+  private val mockMatchingService = mock[MatchingService]
+  private val mockBodyParser = mock[PlayBodyParsers]
 
-    lazy val scopeService: ScopesService = new ScopesService(mockConfig)
-    lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
+  private val controller = new MatchingController(
+    mockAuthConnector,
+    Helpers.stubControllerComponents(),
+    mockScopesService,
+    scopesHelper,
+    mockBodyParser,
+    mockCacheService,
+    mockMatchingService
+  )(ec, mockAuditHelper)
 
-    val auditHelper     = mock[AuditHelper]
-    val cacheService    = mock[CacheService]
-    val matchedService = mock[MatchedService]
-    val matchId         = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+  given(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
+    .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope"), Enrolment("test-scope-1")))))
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+  given(mockScopesService.getAllScopes).willReturn(List("test-scope", "test-scope-1"))
 
-    val controller = new MatchedController(
-      mockAuthConnector,
-      Helpers.stubControllerComponents(),
-      scopeService,
-      scopesHelper,
-      auditHelper,
-      matchedService
-    )
+  given(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+  given(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
 
-    val utrMatch = new UtrMatch(matchId, "test")
+  given(mockScopesService.getInternalEndpoints(any())).willReturn(Seq())
+  given(mockScopesService.getExternalEndpoints(any())).willReturn(Seq())
 
-  }
 
-  "verify matched organisation from cache data" when {
-    "given a valid matchId" should {
-      "return 200" in new Setup {
-        given(matchedService.fetchMatchedOrganisationRecord(eqTo(matchId))(any())).willReturn(Future.successful(utrMatch))
+  "POST matchOrganisationCt" should {
 
-        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
-        status(result) shouldBe OK
+    val fakeRequest = FakeRequest("POST", "/")
+      .withHeaders(("CorrelationId", UUID.randomUUID().toString))
+      .withBody(Json.parse(
+        """
+          |{
+          |   "companyRegistrationNumber":"1234567890",
+          |   "employerName":"name",
+          |   "address": {
+          |     "postcode":"postcode",
+          |     "addressLine1":"line1"
+          |   }
+          |}""".stripMargin))
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          s"""{
-             |  "id": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-             |  "utr": "test"
-             |}""".stripMargin
-        )
-      }
-    }
-
-    "match is expired or not present in cache" should {
-      "return NOT_FOUND 404" in new Setup {
-        given(matchedService.fetchMatchedOrganisationRecord(eqTo(matchId))(any()))
-          .willReturn(Future.failed(new MatchNotFoundException))
-
-        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
-        status(result) shouldBe NOT_FOUND
-
-        jsonBodyOf(result) shouldBe Json.parse(
-          s"""{"code":"NOT_FOUND","message":"The resource can not be found"}"""
-        )
-      }
+    "return 200" in {
+      val result = controller.matchOrganisationCt()(fakeRequest)
+      status(result) shouldBe Status.OK
     }
   }
 
-} 
+  "POST matchOrganisationSa" should {
+
+    val fakeRequest = FakeRequest("POST", "/")
+      .withHeaders(("CorrelationId", UUID.randomUUID().toString))
+      .withBody(Json.parse(
+        """
+          |{
+          |   "selfAssessmentUniqueTaxPayerRef":"1234567890",
+          |   "taxPayerType":"A",
+          |   "taxPayerName":"name",
+          |   "address":{
+          |     "postcode":"postcode",
+          |     "addressLine1":"line1"
+          |   }
+          | }""".stripMargin))
+
+    "return 200" in {
+      val result = controller.matchOrganisationSa()(fakeRequest)
+      status(result) shouldBe Status.OK
+    }
+  }
+}

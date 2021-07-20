@@ -29,11 +29,10 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
     new GuiceApplicationBuilder()
       .configure(
         Configuration(
-          ConfigFactory.parseString(
-            """
-              | metrics.jvm = false
-              | metrics.enabled = true
-          """.stripMargin)
+          ConfigFactory.parseString("""
+                                      | metrics.jvm = false
+                                      | metrics.enabled = true
+                                      | """.stripMargin)
         ) ++ extraConfig)
       .build()
 

@@ -16,26 +16,54 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
-import play.api.libs.json.Format.GenericFormat
-
-import javax.inject.{Inject, Singleton}
+import java.time.LocalDateTime
 import java.util.UUID
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{MatchNotFoundException, UtrMatch}
 
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.Future.{failed, successful}
+import javax.inject.Inject
+import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.{HeaderCarrier}
+import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, CtOrganisationsMatchingRequest, SaKnownFacts, SaOrganisationsMatchingRequest}
 
-@Singleton
-class MatchingService @Inject()(
+import scala.concurrent.ExecutionContext
+
+class MatchingService @Inject()( ifConnector: IfConnector,
+                                 matchingConnector: OrganisationsMatchingConnector,
                                  cacheService: CacheService)
-                               (implicit ec: ExecutionContext) {
+                               ( implicit val ec: ExecutionContext  ) {
 
-  def fetchMatchedOrganisationRecord(matchId: UUID)
-                                    (implicit hc: HeaderCarrier) =
-    cacheService.fetch[UtrMatch](matchId) flatMap {
-      case Some(utrMatch) =>
-        successful(UtrMatch(utrMatch.matchId, utrMatch.utr))
-      case _ => failed(new MatchNotFoundException)
-    }
+  def matchCoTax(matchId: UUID, correlationId: String, ctMatchingRequest: CtMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader) = {
+    for {
+      ifData <- ifConnector.fetchCorporationTax(matchId.toString, ctMatchingRequest.companyRegistrationNumber)
+      matched   <-  matchingConnector.matchCycleCotax(matchId.toString,  correlationId, CtOrganisationsMatchingRequest(
+        CtKnownFacts(
+          ctMatchingRequest.companyRegistrationNumber,
+          ctMatchingRequest.employerName,
+          ctMatchingRequest.addressLine1,
+          ctMatchingRequest.postcode
+        ), ifData
+      ))
+      _ <- cacheService.cacheCtUtr(CtMatch(ctMatchingRequest, matchId, LocalDateTime.now(), ifData.utr), ifData.utr.getOrElse(""))
+    } yield matched
+  }
+
+  def matchSaTax(matchId: UUID, correlationId: String, saMatchingRequest: SaMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader) = {
+    for {
+      ifData <- ifConnector.fetchSelfAssessment(matchId.toString, saMatchingRequest.selfAssessmentUniqueTaxPayerRef)
+      matched   <-  matchingConnector.matchCycleSelfAssessment(matchId.toString,  correlationId, SaOrganisationsMatchingRequest(
+        SaKnownFacts(
+          saMatchingRequest.selfAssessmentUniqueTaxPayerRef,
+          saMatchingRequest.taxPayerType,
+          saMatchingRequest.taxPayerName,
+          saMatchingRequest.addressLine1,
+          saMatchingRequest.postcode
+        ), ifData
+      ))
+      _ <- cacheService.cacheSaUtr(SaMatch(saMatchingRequest, matchId, LocalDateTime.now(), ifData.utr), ifData.utr.getOrElse(""))
+    } yield matched
+  }
+
+
 }
