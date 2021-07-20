@@ -38,7 +38,7 @@ class MatchingService @Inject()(
                                     (implicit hc: HeaderCarrier) =
     cacheService.fetch[UtrMatch](matchId) flatMap {
       case Some(utrMatch) =>
-        successful(MatchedOrganisationRecord(utrMatch.id, utrMatch.utr))
+        successful(UtrMatch(utrMatch.id, utrMatch.utr))
       case _ => failed(new MatchNotFoundException)
     }
 }

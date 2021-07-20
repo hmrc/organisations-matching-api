@@ -61,14 +61,15 @@ class MatchingControllerSpec extends AnyWordSpec with Matchers with MockitoSugar
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
-    val utrMatch = new UtrMatch(utr = "test", id = matchId)
-
     val controller = new MatchingController(
       mockAuthConnector,
       Helpers.stubControllerComponents(),
       cacheService,
+      auditHelper,
       matchingService
     )
+
+    val utrMatch = new UtrMatch(matchId, "test")
 
   }
 

@@ -20,10 +20,9 @@ import play.api.libs.json.Json
 
 import java.util.UUID
 
-case class UtrMatch(utr: String,
-                    id: UUID
+case class UtrMatch(id: UUID,
+                    utr: String
                    )
-// dateTime not mentioned - do we need it here?
 
 object UtrMatch {
   implicit val formats = Json.format[UtrMatch]
