@@ -39,8 +39,6 @@ case object ErrorTooManyRequests extends ErrorResponse(TOO_MANY_REQUESTS, "TOO_M
 
 class ValidationException(message: String) extends RuntimeException(message)
 class MatchingException extends RuntimeException
-class CitizenNotFoundException extends RuntimeException
-class InvalidNinoException extends RuntimeException
 class MatchNotFoundException extends RuntimeException
 class NotFoundException extends RuntimeException
 class NotImplementedException extends RuntimeException
