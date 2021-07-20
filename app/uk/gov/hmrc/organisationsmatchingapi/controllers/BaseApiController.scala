@@ -61,42 +61,52 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
     implicit request: RequestHeader,
     auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException => {
+      println("ACHI MatchNotFoundException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
       ErrorNotFound.toHttpResponse
     }
     case e: InvalidBodyException => {
+      println("ACHI InvalidBodyException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
     case _: MatchingException => {
+      println("ACHI MatchingException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
       ErrorMatchingFailed.toHttpResponse
     }
     case e: InsufficientEnrolments => {
+      println("ACHI InsufficientEnrolments")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorUnauthorized("Insufficient Enrolments").toHttpResponse
     }
     case e: AuthorisationException => {
+      println("ACHI AuthorisationException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorUnauthorized(e.getMessage).toHttpResponse
     }
     case tmr: TooManyRequestException => {
+      println("ACHI TooManyRequestException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, tmr.getMessage)
       ErrorTooManyRequests.toHttpResponse
     }
     case br: BadRequestException => {
+      println("ACHI BadRequestException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, br.getMessage)
       ErrorInvalidRequest(br.getMessage).toHttpResponse
     }
     case e: IllegalArgumentException => {
+      println("ACHI IllegalArgumentException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInvalidRequest(e.getMessage).toHttpResponse
     }
     case e: InternalServerException => {
+      println("ACHI InternalServerException")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong").toHttpResponse
     }
     case e => {
+      println("ACHI e")
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong").toHttpResponse
     }
