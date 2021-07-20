@@ -45,12 +45,13 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
   with PrivilegedAuthentication {
 
   def matchedOrganisationCt(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
+    val self = s"/organisations/matching/corporation-tax/$matchId"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       val correlationId = validateCorrelationId(request)
       matchedService.fetchCt(matchId) map { cacheData =>
 
         val exclude  = Some(List("details-self-assessment"))
-        val selfLink = HalLink("self", s"/organisations/matching/corporation-tax/$matchId")
+        val selfLink = HalLink("self", self)
         val links    = scopesHelper.getHalLinks(matchId, exclude, authScopes, None, true) ++ selfLink
         val response = Json.toJson(state(CtMatch.convert(cacheData)) ++ links)
 
@@ -60,16 +61,17 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
 
         Ok(response)
       }
-    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, s"/organisations/matching/corporation-tax?matchId=$matchId")
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
   }
 
   def matchedOrganisationSa(matchId: UUID) : Action[AnyContent] = Action.async { implicit request =>
+    val self = s"/organisations/matching/self-assessment/$matchId"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       val correlationId = validateCorrelationId(request)
       matchedService.fetchSa(matchId) map { cacheData =>
 
         val exclude  = Some(List("details-corporation-tax"))
-        val selfLink = HalLink("self", s"/organisations/matching/self-assessment/$matchId")
+        val selfLink = HalLink("self", self)
         val links    = scopesHelper.getHalLinks(matchId, exclude, authScopes, None, true) ++ selfLink
         val response = Json.toJson(state(SaMatch.convert(cacheData)) ++ links)
 
@@ -79,6 +81,6 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
 
         Ok(response)
       }
-    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, s"/organisations/matching/self-assessment?matchId=$matchId")
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
   }
 }

@@ -45,7 +45,7 @@ class MatchedControllerSpec extends BaseSpec  {
       result(mongoRepository.cache(matchId.toString, "organisations-matching", ctMatch), timeout)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/$matchId")
+      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -80,7 +80,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/$matchId")
+      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -99,7 +99,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/$matchId")
+      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -116,7 +116,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/")
+      val response = Http(s"$serviceUrl/corporation-tax/")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -128,7 +128,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/foo")
+      val response = Http(s"$serviceUrl/corporation-tax/foo")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -145,7 +145,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/$matchId")
+      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
         .headers(requestHeadersInvalid(acceptHeaderP1))
         .asString
 
@@ -162,7 +162,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/corporation-tax/$matchId")
+      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
         .headers(requestHeadersMalformed(acceptHeaderP1))
         .asString
 
@@ -184,7 +184,7 @@ class MatchedControllerSpec extends BaseSpec  {
       result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/$matchId")
+      val response = Http(s"$serviceUrl/self-assessment/$matchId")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -220,7 +220,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/$matchId")
+      val response = Http(s"$serviceUrl/self-assessment/$matchId")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -239,7 +239,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/$matchId")
+      val response = Http(s"$serviceUrl/self-assessment/$matchId")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -256,7 +256,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/")
+      val response = Http(s"$serviceUrl/self-assessment/")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -268,7 +268,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/foo")
+      val response = Http(s"$serviceUrl/self-assessment/foo")
         .headers(requestHeaders(acceptHeaderP1))
         .asString
 
@@ -285,7 +285,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/$matchId")
+      val response = Http(s"$serviceUrl/self-assessment/$matchId")
         .headers(requestHeadersInvalid(acceptHeaderP1))
         .asString
 
@@ -302,7 +302,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/matching/self-assessment/$matchId")
+      val response = Http(s"$serviceUrl/self-assessment/$matchId")
         .headers(requestHeadersMalformed(acceptHeaderP1))
         .asString
 

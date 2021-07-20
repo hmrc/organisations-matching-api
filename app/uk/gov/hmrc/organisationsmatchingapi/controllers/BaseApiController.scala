@@ -60,7 +60,7 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
     implicit request: RequestHeader,
     auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException => {
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, "Not Found")
+      auditHelper.auditApiResponse(correlationId.getOrElse("-"), matchId, "", request, url, Some(Json.toJson("Not Found")))
       ErrorNotFound.toHttpResponse
     }
     case e: InvalidBodyException => {

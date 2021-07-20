@@ -69,7 +69,7 @@ trait BaseSpec
   protected def requestHeadersMalformed(acceptHeader: (String, String) = acceptHeaderP1) =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationIdHeaderMalformed)
 
-  protected def errorResponse(message: String) =
+  protected def invalidRequest(message: String) =
     s"""{"code":"INVALID_REQUEST","message":"$message"}"""
 
   override protected def beforeEach(): Unit = {
