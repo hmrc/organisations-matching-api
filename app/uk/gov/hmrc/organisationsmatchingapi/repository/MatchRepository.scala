@@ -26,6 +26,4 @@ import scala.concurrent.{ExecutionContext}
 class MatchRepository @Inject()(cacheConfig: CacheConfiguration,
                                 configuration: Configuration,
                                 mongo: ReactiveMongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache(cacheConfig, configuration, mongo) {
-
-}
+  extends ShortLivedCache(cacheConfig, configuration, mongo)

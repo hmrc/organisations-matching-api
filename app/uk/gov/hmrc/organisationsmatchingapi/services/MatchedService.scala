@@ -27,23 +27,20 @@ class MatchedService @Inject()(cacheService: CacheService) {
 
   def fetchCt(matchId: UUID)(implicit ec: ExecutionContext) =
     cacheService.fetch[CtMatch](matchId) flatMap {
-      case Some(entry) =>
-        Future.successful(entry)
-      case _ => failed(new MatchNotFoundException)
+      case Some(entry) => Future.successful(entry)
+      case _           => failed(new MatchNotFoundException)
     }
 
   def fetchSa(matchId: UUID)(implicit ec: ExecutionContext) =
     cacheService.fetch[SaMatch](matchId) flatMap {
-      case Some(entry) =>
-        Future.successful(entry)
-      case _ => failed(new MatchNotFoundException)
+      case Some(entry) => Future.successful(entry)
+      case _           => failed(new MatchNotFoundException)
     }
 
   def fetchMatchedOrganisationRecord(matchId: UUID)
                                     (implicit ec: ExecutionContext) =
     cacheService.fetch[UtrMatch](matchId) flatMap {
-      case Some(utrMatch) =>
-        successful(UtrMatch(utrMatch.matchId, utrMatch.utr))
-      case _ => failed(new MatchNotFoundException)
+      case Some(utrMatch) => successful(UtrMatch(utrMatch.matchId, utrMatch.utr))
+      case _              => failed(new MatchNotFoundException)
     }
 }
