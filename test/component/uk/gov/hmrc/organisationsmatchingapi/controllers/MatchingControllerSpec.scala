@@ -21,8 +21,9 @@ import java.util.concurrent.TimeUnit
 import play.api.http.Status
 import play.api.libs.json.{JsString, Json}
 import scalaj.http.{Http, HttpResponse}
-import stubs.{AuthStub, BaseSpec, MatchingStub}
+import stubs.{AuthStub, BaseSpec, IfStub, MatchingStub}
 import uk.gov.hmrc.cache.model.Cache
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 
 import scala.concurrent.Await
@@ -36,10 +37,35 @@ class MatchingControllerSpec extends BaseSpec  {
   val ctRequest = CtMatchingRequest("0213456789", "name", "line1", "NE11NE")
   val saRequest = SaMatchingRequest("0213456789", "A", "name", "line1", "NE11NE")
 
+  val ifCorpTax = IfCorpTaxCompanyDetails(
+    utr = Some("0123456789"),
+    crn = Some("0123456789"),
+    registeredDetails = None,
+    communicationDetails = None
+  )
+
+  val ifSa  = IfSaTaxpayerDetails(
+    utr = Some("0123456789"),
+    taxpayerType = Some("Individual"),
+    taxpayerDetails = Some(Seq(IfSaTaxPayerNameAddress(
+      name = Some("Billy Billyson"),
+      addressType = Some("Base"),
+      address = Some(IfAddress(
+        line1 = Some("line 1"),
+        line2 = None,
+        line3 = None,
+        line4 = None,
+        postcode = Some("ABC DEF")
+      )))
+    )))
+
   Scenario("Valid POST request to corporation-tax endpoint") {
 
     Given("A valid privileged Auth bearer token")
     AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+    Given("Data found in IF")
+    IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
 
     Given("A successful match")
     MatchingStub.willReturnCtMatch( correlationIdHeader._2)
@@ -78,12 +104,13 @@ class MatchingControllerSpec extends BaseSpec  {
     cachedData.isEmpty mustBe false
   }
 
-
-
   Scenario("Valid POST request to corporation-tax endpoint not found") {
 
     Given("A valid privileged Auth bearer token")
     AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+    Given("Data found in IF")
+    IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
 
     Given("A successful match")
     MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
@@ -108,6 +135,9 @@ class MatchingControllerSpec extends BaseSpec  {
 
     Given("A valid privileged Auth bearer token")
     AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+    Given("Data found in IF")
+    IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
 
     Given("A successful match")
     MatchingStub.willReturnSaMatch( correlationIdHeader._2)
@@ -147,6 +177,9 @@ class MatchingControllerSpec extends BaseSpec  {
 
     Given("A valid privileged Auth bearer token")
     AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+    Given("Data found in IF")
+    IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
 
     Given("A successful match")
     MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
