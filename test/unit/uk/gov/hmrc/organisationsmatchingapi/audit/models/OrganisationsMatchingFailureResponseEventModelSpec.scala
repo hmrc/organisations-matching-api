@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.audit.models
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.audit.models.{ApiFailureResponseEventModel, OrganisationsMatchingFailureResponseEventModel}
+import uk.gov.hmrc.organisationsmatchingapi.audit.models.OrganisationsMatchingFailureResponseEventModel
 
 class OrganisationsMatchingFailureResponseEventModelSpec extends AnyWordSpec with Matchers {
   "Serializes to Json Correctly" in {

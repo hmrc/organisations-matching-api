@@ -17,17 +17,21 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, OFormat, Reads}
+import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
+import uk.gov.hmrc.organisationsmatchingapi.errorhandler.{ErrorResponse}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
 import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CitizenNotFoundException, ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+import java.util.UUID
+import scala.concurrent.Future.successful
+import scala.util.{Success, Try}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -46,6 +50,12 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
       case JsSuccess(t, _) => f(t)
       case JsError(errors) =>
         Future.failed(new BadRequestException(errors.toString()))
+    }
+
+  protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] =
+    Try(UUID.fromString(uuidString)) match {
+      case Success(uuid) => f(uuid)
+      case _             => successful(ErrorResponse.NotFound.toResult)
     }
 
   def errorResult(errors: IndexedSeq[NestedError]): Future[Result] =

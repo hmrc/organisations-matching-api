@@ -27,7 +27,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, CtOrganisationsMatchingRequest, SaKnownFacts, SaOrganisationsMatchingRequest}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class MatchingService @Inject()( ifConnector: IfConnector,
                                  matchingConnector: OrganisationsMatchingConnector,

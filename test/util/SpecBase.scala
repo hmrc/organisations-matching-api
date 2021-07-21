@@ -16,9 +16,6 @@
 
 package util
 
-import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.typesafe.config.ConfigFactory
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -35,7 +32,7 @@ trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
           ConfigFactory.parseString("""
                                       | metrics.jvm = false
                                       | metrics.enabled = true
-          """.stripMargin)
+                                      | """.stripMargin)
         ) ++ extraConfig)
       .build()
 

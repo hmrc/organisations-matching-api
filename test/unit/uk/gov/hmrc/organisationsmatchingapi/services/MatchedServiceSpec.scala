@@ -22,7 +22,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.BDDMockito.`given`
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch, UtrMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchedService}
 
@@ -51,8 +51,9 @@ class MatchedServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
     "test"
   )
 
-  private val ctMatch = new CtMatch(matchRequestCt, utr = Some("test"))
-  private val saMatch = new SaMatch(matchRequestSa, utr = Some("test"))
+  private val ctMatch  = new CtMatch(matchRequestCt, utr = Some("test"))
+  private val saMatch  = new SaMatch(matchRequestSa, utr = Some("test"))
+  private val utrMatch = new UtrMatch(matchId, "test")
 
   "fetchCt" should {
     "return cache entry" in {
@@ -84,6 +85,23 @@ class MatchedServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       intercept[MatchNotFoundException] {
         await(matchedService.fetchSa(matchId))
+      }
+    }
+  }
+
+  "fetch any" should {
+    "return cache entry" in {
+      given(cacheService.fetch[UtrMatch](eqTo(matchId))(any())).willReturn(successful(Some(utrMatch)))
+
+      val res = await(matchedService.fetchMatchedOrganisationRecord(matchId))
+      res shouldBe utrMatch
+    }
+
+    "return not found" in {
+      given(cacheService.fetch[UtrMatch](eqTo(matchId))(any())).willReturn(successful(None))
+
+      intercept[MatchNotFoundException] {
+        await(matchedService.fetchMatchedOrganisationRecord(matchId))
       }
     }
   }

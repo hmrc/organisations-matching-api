@@ -42,8 +42,8 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cacheService: CacheService,
                                    matchingService: MatchingService
                                   )(implicit val ec: ExecutionContext, auditHelper: AuditHelper) extends BaseApiController(cc)
-                                                                  with ErrorHandling
-                                                                  with PrivilegedAuthentication {
+  with ErrorHandling
+  with PrivilegedAuthentication {
 
   def matchOrganisationCt() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
     val matchId = UUID.randomUUID()
@@ -67,7 +67,7 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
 
             Ok(response)
           }
-        ))
+          ))
       }}
     }
   }
@@ -93,7 +93,7 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
 
             Ok(response)
           }
-        ))
+          ))
       }}
     }
   }

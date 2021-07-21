@@ -21,15 +21,15 @@ import play.api.libs.json.{Format, JsString, JsSuccess, JsValue, Json, Writes}
 
 object JsonFormatters {
 
-  implicit val errorResponseWrites = new Writes[ErrorResponse] {
-    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
-  }
-
   implicit val uuidJsonFormat = new Format[UUID] {
     override def writes(uuid: UUID) = JsString(uuid.toString)
 
     override def reads(json: JsValue) =
       JsSuccess(UUID.fromString(json.asInstanceOf[JsString].value))
+  }
+
+  implicit val errorResponseWrites = new Writes[ErrorResponse] {
+    def writes(e: ErrorResponse): JsValue = Json.obj("code" -> e.errorCode, "message" -> e.message)
   }
 
 }

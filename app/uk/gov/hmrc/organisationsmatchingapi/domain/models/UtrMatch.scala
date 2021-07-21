@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
+package uk.gov.hmrc.organisationsmatchingapi.domain.models
 
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.Json
 
-case class SaMatchingResponse(taxPayerType: String,
-                              taxPayerName: String,
-                              address: Address)
+import java.util.UUID
 
-object SaMatchingResponse {
+case class UtrMatch(matchId: UUID,
+                    utr: String)
 
-  implicit val saMatchingFormat:Format[SaMatchingResponse] = Json.format[SaMatchingResponse]
-
+object UtrMatch {
+  implicit val formats = Json.format[UtrMatch]
 }

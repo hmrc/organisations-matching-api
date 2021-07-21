@@ -75,15 +75,15 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
     val fakeRequest = FakeRequest("POST", "/")
       .withHeaders(("CorrelationId", UUID.randomUUID().toString))
       .withBody(Json.parse(
-      """
-        |{
-        |   "companyRegistrationNumber":"1234567890",
-        |   "employerName":"name",
-        |   "address": {
-        |     "postcode":"postcode",
-        |     "addressLine1":"line1"
-        |   }
-        |}""".stripMargin))
+        """
+          |{
+          |   "companyRegistrationNumber":"1234567890",
+          |   "employerName":"name",
+          |   "address": {
+          |     "postcode":"postcode",
+          |     "addressLine1":"line1"
+          |   }
+          |}""".stripMargin))
 
     "return 200" in {
       val result = controller.matchOrganisationCt()(fakeRequest)
@@ -96,16 +96,16 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
     val fakeRequest = FakeRequest("POST", "/")
       .withHeaders(("CorrelationId", UUID.randomUUID().toString))
       .withBody(Json.parse(
-      """
-        |{
-        |   "selfAssessmentUniqueTaxPayerRef":"1234567890",
-        |   "taxPayerType":"A",
-        |   "taxPayerName":"name",
-        |   "address":{
-        |     "postcode":"postcode",
-        |     "addressLine1":"line1"
-        |   }
-        | }""".stripMargin))
+        """
+          |{
+          |   "selfAssessmentUniqueTaxPayerRef":"1234567890",
+          |   "taxPayerType":"A",
+          |   "taxPayerName":"name",
+          |   "address":{
+          |     "postcode":"postcode",
+          |     "addressLine1":"line1"
+          |   }
+          | }""".stripMargin))
 
     "return 200" in {
       val result = controller.matchOrganisationSa()(fakeRequest)

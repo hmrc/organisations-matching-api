@@ -19,8 +19,7 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfAddress
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse, CtMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse}
 import util.IfHelpers
 
 class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {

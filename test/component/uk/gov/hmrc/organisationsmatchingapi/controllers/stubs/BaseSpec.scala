@@ -47,13 +47,15 @@ trait BaseSpec
       "mongodb.uri"                     -> "mongodb://localhost:27017/organisations-matching-api",
       "microservice.services.auth.port" -> AuthStub.port,
       "microservice.services.organisations-matching.port" -> MatchingStub.port,
-      "run.mode"                        -> "It"
+      "microservice.services.ifstub.port" -> IfStub.port,
+      "run.mode"                        -> "It",
+      "versioning.unversionedContexts"  -> List("/match-record")
     )
     .build()
 
   val timeout = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://localhost:$port"
-  val mocks = Seq(AuthStub, MatchingStub)
+  val mocks = Seq(AuthStub, IfStub, MatchingStub)
   val authToken = "Bearer AUTH_TOKEN"
   val clientId = "CLIENT_ID"
   val acceptHeaderP1 = ACCEPT -> "application/vnd.hmrc.1.0+json"

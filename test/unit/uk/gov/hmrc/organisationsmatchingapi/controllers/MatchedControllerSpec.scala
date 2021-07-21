@@ -17,7 +17,7 @@
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import akka.stream.Materializer
-import org.mockito.ArgumentMatchers.{any, refEq, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -29,12 +29,12 @@ import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
 import util.SpecBase
 import play.api.test.Helpers
-import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
+import uk.gov.hmrc.http.HeaderCarrier
 import play.api.http.Status._
 import play.api.libs.json.Json
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorInternalServer, ErrorNotFound, MatchNotFoundException, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorNotFound, MatchNotFoundException, MatchingException, SaMatch, UtrMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
@@ -81,6 +81,8 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
     val ctMatch = new CtMatch(matchRequestCt, utr = Some("test"))
     val saMatch = new SaMatch(matchRequestSa, utr = Some("test"))
+    val utrMatch = new UtrMatch(matchId, "test")
+
 
     val controller = new MatchedController(
       mockAuthConnector,
@@ -303,6 +305,72 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
       }
     }
   }
+
+  "verify matchedOrganisation record" when {
+    "given a valid matchId" should {
+      "return 200" in new Setup {
+        given(matchedService.fetchMatchedOrganisationRecord(matchId)).willReturn(Future.successful(utrMatch))
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe OK
+
+        jsonBodyOf(result) shouldBe Json.parse(
+          s"""{
+             |  "matchId": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+             |  "utr": "test"
+             |}""".stripMargin
+        )
+      }
+    }
+
+    "runtime exception is encountered through no match for information provided" should {
+      "return MATCHING_FAILED 403" in new Setup {
+        given(matchedService.fetchMatchedOrganisationRecord(matchId))
+          .willReturn(Future.failed(new MatchingException))
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe 403
+
+        jsonBodyOf(result) shouldBe Json.parse(
+          s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}"""
+        )
+      }
+    }
+
+    "match is not present in cache" should {
+      "return NOT_FOUND 404" in new Setup {
+        given(matchedService.fetchMatchedOrganisationRecord(matchId))
+          .willReturn(Future.failed(new MatchNotFoundException))
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe NOT_FOUND
+
+        jsonBodyOf(result) shouldBe Json.parse(
+          s"""{"code":"NOT_FOUND","message":"The resource can not be found"}"""
+        )
+      }
+    }
+
+    "when an exception is thrown" should {
+      "return INTERNAL_SERVER_ERROR 500" in new Setup {
+        given(matchedService.fetchMatchedOrganisationRecord(matchId))
+          .willReturn(Future.failed(new RuntimeException))
+
+        val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
+        status(result) shouldBe INTERNAL_SERVER_ERROR
+
+        jsonBodyOf(result) shouldBe Json.parse(
+          """
+            |{
+            |  "code": "INTERNAL_SERVER_ERROR",
+            |  "message": "Something went wrong"
+            |}
+            |""".stripMargin
+        )
+      }
+    }
+  }
+
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 }

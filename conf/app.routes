@@ -1,0 +1,2 @@
+# microservice specific routes
+GET         /match-record/:matchId       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController.matchedOrganisation(matchId: java.util.UUID)
