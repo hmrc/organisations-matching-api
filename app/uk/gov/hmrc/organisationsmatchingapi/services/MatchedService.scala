@@ -21,7 +21,6 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoun
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.Future.{failed, successful}
 
 class MatchedService @Inject()(cacheService: CacheService) {
 
