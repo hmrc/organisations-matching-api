@@ -44,7 +44,7 @@
       "description": "A list of links for possible actions related to this endpoint.",
       "required": [
         "self",
-        "getDetails",
+        "getSelfAssessmentDetails",
         "getEmployeeCount"
       ],
       "properties": {
