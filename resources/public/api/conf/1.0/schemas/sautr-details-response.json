@@ -67,7 +67,7 @@
             }
           }
         },
-        "getSelfAssessementDetails": {
+        "getSelfAssessmentDetails": {
           "type": "object",
           "description": "The URI for the endpoint to get Self Assessment details for the matched organisation.",
           "required": [
