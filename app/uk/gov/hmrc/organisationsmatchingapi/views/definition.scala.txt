@@ -6,9 +6,14 @@
  {
    "scopes": [
      {
-       "key": "read:organisations-matching",
+       "key": "assigned",
+       "name": "An OAuth 2.0 Bearer Token with the scopes you have been assigned",
+       "description": "An OAuth 2.0 Bearer Token with the scopes you have been assigned"
+     },
+     {
+       "key": "read:organisations-matching-ho-ssp",
        "name": "The organisations matching scope",
-       "description": "An OAuth 2.0 Bearer Token with the read:organisations-matching scope"
+       "description": "An OAuth 2.0 Bearer Token with the read:organisations-matching-ho-ssp scope"
      }
    ],
      "api": {

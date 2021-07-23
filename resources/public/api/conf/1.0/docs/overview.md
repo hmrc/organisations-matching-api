@@ -2,6 +2,8 @@ This API allows government departments to check HM Revenue and Customs (HMRC) re
 
 On a successful match, the API will give you a matchId.
 
+Data will be filtered using scopes so that only relevant data is shared. We’ll assign scopes based on your data requirements.
+
 ###Corporation Tax and Self Assessment
 If you have a Company Registration number (CRN), you will need to use the Corporation Tax endpoint. This is described in the endpoint documentation.
 
