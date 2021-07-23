@@ -138,11 +138,6 @@ uses:
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/corporation-tax-matched-details-response.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
@@ -178,11 +173,6 @@ uses:
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matched-details-response.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
