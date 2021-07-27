@@ -133,7 +133,7 @@ uses:
       get:
         displayName: "Get links to Corporation Tax and number of employee details for a matched organisation"
         description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Corporation Tax and number of employees details for a matched organisation."
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/corporation-tax-matched-details-response.md
@@ -168,7 +168,7 @@ uses:
       get:
         displayName: "Get links to Self Assessment and number of employees details for a matched organisation"
         description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Self Assessment and number of employees details for a matched organisation."
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matched-details-response.md
