@@ -17,7 +17,7 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.Json
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -46,8 +46,6 @@ class IfConnector @Inject()(
     "microservice.services.integration-framework.environment"
   )
 
-  private val emptyResponse = ""
-
   def fetchSelfAssessment(matchId: String, utr: String)(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
@@ -56,9 +54,7 @@ class IfConnector @Inject()(
     val SAUrl =
       s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    callSa(SAUrl, matchId) map {
-      response => Json.fromJson[IfSaTaxpayerDetails](Json.toJson(response))
-    }
+    callSa(SAUrl, matchId)
 
   }
 
@@ -70,10 +66,7 @@ class IfConnector @Inject()(
     val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
-    callCt(CTUrl, matchId) map {
-      response => Json.fromJson[IfCorpTaxCompanyDetails](Json.toJson(response))
-    }
-
+    callCt(CTUrl, matchId)
   }
 
   private def extractCorrelationId(requestHeader: RequestHeader) = validateCorrelationId(requestHeader).toString

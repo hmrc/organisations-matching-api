@@ -31,22 +31,22 @@ class IfQueriesSpec extends AnyWordSpec with Matchers with ComponentSpec {
 
     "read:organisations-matching-ho-ssp" should {
       "have correct IF query string for corporation-tax" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("corporation-tax"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getCorporationTax"))
         queryString shouldBe res1
       }
 
       "have correct IF query string for corporation-tax-match" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("corporation-tax-match"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getCorporationTaxMatch"))
         queryString shouldBe res1
       }
 
       "have correct IF query string for self-assessment" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("self-assessment"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getSelfAssessment"))
         queryString shouldBe res2
       }
 
       "have correct IF query string for self-assessment-match" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("self-assessment-match"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getSelfAssessmentMatch"))
         queryString shouldBe res2
       }
     }

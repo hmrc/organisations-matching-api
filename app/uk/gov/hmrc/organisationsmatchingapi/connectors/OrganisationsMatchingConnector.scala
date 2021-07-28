@@ -69,7 +69,7 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
     case notFound: NotFoundException => {
       auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(notFound.getMessage))
       // No Kibana for security reasons. Splunk only.
-      throw new MatchingException
+      throw new MatchingException(s"No match found for matchId $matchId")
     }
     case validationError: JsValidationException => {
       Logger.warn("Organisations Matching JsValidationException encountered")

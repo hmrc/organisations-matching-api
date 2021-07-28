@@ -40,8 +40,10 @@ class SaMatchingRequestSpec extends AnyWordSpec with Matchers with IfHelpers {
                                    |  "selfAssessmentUniqueTaxPayerRef" : "1234567890",
                                    |  "taxPayerType" : "A",
                                    |  "taxPayerName" : "name",
-                                   |  "addressLine1" : "line1",
-                                   |  "postcode" : "postcode"
+                                   |  "address": {
+                                   |    "addressLine1" : "line1",
+                                   |    "postcode" : "postcode"
+                                   |  }
                                    |}""".stripMargin)
     }
   }

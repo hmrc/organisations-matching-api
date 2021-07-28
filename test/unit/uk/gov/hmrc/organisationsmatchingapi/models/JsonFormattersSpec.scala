@@ -18,7 +18,7 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.models
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsString, JsSuccess, Json}
+import play.api.libs.json.{JsResult, JsString, JsSuccess, Json}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
 
 import java.util.UUID
@@ -34,7 +34,7 @@ class JsonFormattersSpec extends AnyWordSpec with Matchers {
 
   "Reads UUID String as UUID" in {
     val jsString = JsString("69f0da0d-4e50-4161-badc-fa39f769bed3")
-    val result = Json.fromJson(jsString)
+    val result = Json.fromJson[UUID](jsString)
 
     result shouldBe JsSuccess(UUID.fromString("69f0da0d-4e50-4161-badc-fa39f769bed3"))
   }

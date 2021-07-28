@@ -38,8 +38,10 @@ class CtMatchingRequestSpec extends AnyWordSpec with Matchers with IfHelpers {
       asJson shouldBe Json.parse("""{
                                    |  "companyRegistrationNumber" : "1234567890",
                                    |  "employerName" : "name",
-                                   |  "addressLine1" : "line1",
-                                   |  "postcode" : "postcode"
+                                   |  "address": {
+                                   |    "addressLine1" : "line1",
+                                   |    "postcode" : "postcode"
+                                   |  }
                                    |}""".stripMargin)
     }
   }
