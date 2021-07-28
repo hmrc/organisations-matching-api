@@ -50,7 +50,7 @@ class OrganisationsMatchingConnectorSpec
     with GuiceOneAppPerSuite {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
-  val stubHost = "localhost"
+  val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
   def externalServices: Seq[String] = Seq.empty
@@ -59,7 +59,7 @@ class OrganisationsMatchingConnectorSpec
     .bindings(bindModules: _*)
     .configure(
       "cache.enabled"  -> false,
-      "microservice.services.organisations-matching.host" -> "localhost",
+      "microservice.services.organisations-matching.host" -> "127.0.0.1",
       "microservice.services.organisations-matching.port" -> "11122",
     )
     .build()

@@ -54,7 +54,7 @@ trait BaseSpec
     .build()
 
   val timeout = Duration(5, TimeUnit.SECONDS)
-  val serviceUrl = s"http://localhost:$port"
+  val serviceUrl = s"http://127.0.0.1:$port"
   val mocks = Seq(AuthStub, IfStub, MatchingStub)
   val authToken = "Bearer AUTH_TOKEN"
   val clientId = "CLIENT_ID"
@@ -92,6 +92,6 @@ trait BaseSpec
 
 case class MockHost(port: Int) {
   val server = new WireMockServer(WireMockConfiguration.wireMockConfig().port(port))
-  val mock = new WireMock("localhost", port)
-  val url = s"http://localhost:9000"
+  val mock = new WireMock("127.0.0.1", port)
+  val url = s"http://127.0.0.1:9000"
 }

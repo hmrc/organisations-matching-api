@@ -39,7 +39,7 @@ import scala.concurrent.Future
 
 class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPerTest with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
-  val stubHost: String = "localhost"
+  val stubHost: String = "127.0.0.1"
   val stubPort: Int    = 11111
   val wireMockServer: WireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 

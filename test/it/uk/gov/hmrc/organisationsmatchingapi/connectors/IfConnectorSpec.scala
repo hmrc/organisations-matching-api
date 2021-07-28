@@ -50,7 +50,7 @@ class IfConnectorSpec
     with GuiceOneAppPerSuite {
 
   val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
-  val stubHost = "localhost"
+  val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
   val integrationFrameworkAuthorizationToken = "IF_TOKEN"
   val integrationFrameworkEnvironment = "IF_ENVIRONMENT"
@@ -61,7 +61,7 @@ class IfConnectorSpec
     .bindings(bindModules: _*)
     .configure(
       "cache.enabled"  -> false,
-      "microservice.services.integration-framework.host" -> "localhost",
+      "microservice.services.integration-framework.host" -> "127.0.0.1",
       "microservice.services.integration-framework.port" -> "11122",
       "microservice.services.integration-framework.authorization-token" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.environment" -> integrationFrameworkEnvironment
