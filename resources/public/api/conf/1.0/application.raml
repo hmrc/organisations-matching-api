@@ -79,21 +79,21 @@ uses:
       post:
         displayName: Match Self Assessment details for an organisation
         description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matching-request.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
             required: true
             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+          Content-Type:
+            description: Specifies the format of the request body. This must be JSON.
+            type: string
+            required: true
+            example: "application/json"
         body:
           application/json:
             type: !include schemas/sautr-matching-request.json
@@ -132,16 +132,11 @@ uses:
       get:
         displayName: "Get links to Corporation Tax and number of employee details for a matched organisation"
         description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Corporation Tax and number of employees details for a matched organisation."
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/corporation-tax-matched-details-response.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
@@ -172,16 +167,11 @@ uses:
       get:
         displayName: "Get links to Self Assessment and number of employees details for a matched organisation"
         description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Self Assessment and number of employees details for a matched organisation."
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "read:organisations-matching"
         securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matched-details-response.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
