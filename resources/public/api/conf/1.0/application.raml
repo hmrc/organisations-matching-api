@@ -30,10 +30,10 @@ uses:
   /corporation-tax:
       post:
         displayName: "Match Corporation Tax details for an organisation "
-        description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include: company registration number (CRN), employer name, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
+        description: !include docs/post-corporation-tax-description.md
         is: [headers.acceptHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/corporation-tax-organisations-matching-request.md
         headers:
           CorrelationId:
@@ -78,10 +78,10 @@ uses:
   /self-assessment:
       post:
         displayName: Match Self Assessment details for an organisation
-        description: "Use this endpoint to match details about an organisation against HMRC’s records. Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address. On a successful match, a matchId is returned. The matchId can be used in later calls."
+        description: !include docs/post-self-assessment-tax-description.md
         is: [headers.acceptHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matching-request.md
         headers:
           CorrelationId:
@@ -131,10 +131,10 @@ uses:
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
         displayName: "Get links to Corporation Tax and number of employee details for a matched organisation"
-        description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Corporation Tax and number of employees details for a matched organisation."
+        description: !include docs/get-corporation-tax-description.md
         is: [headers.acceptHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/corporation-tax-matched-details-response.md
         headers:
           CorrelationId:
@@ -166,10 +166,10 @@ uses:
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       get:
         displayName: "Get links to Self Assessment and number of employees details for a matched organisation"
-        description: "This endpoint takes a matchId and returns matched organisation details. It also provides links to get Self Assessment and number of employees details for a matched organisation."
+        description: !include docs/get-self-assessment-tax-description.md
         is: [headers.acceptHeader]
-        (annotations.scope): "read:organisations-matching"
-        securedBy: [ sec.oauth_2_0: { scopes: [ "read:organisations-matching" ] } ]
+        (annotations.scope): "assigned"
+        securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matched-details-response.md
         headers:
           CorrelationId:
