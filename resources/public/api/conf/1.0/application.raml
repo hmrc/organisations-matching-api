@@ -26,8 +26,8 @@ uses:
   annotations: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/annotations.raml
   types: https://developer.service.hmrc.gov.uk/api-documentation/assets/common/modules/types.raml
 
-/organisations:
-  /matching/corporation-tax:
+/organisations/matching:
+  /corporation-tax:
       post:
         displayName: "Match Corporation Tax details for an organisation "
         description: !include docs/post-corporation-tax-description.md
@@ -79,21 +79,21 @@ uses:
       post:
         displayName: Match Self Assessment details for an organisation
         description: !include docs/post-self-assessment-tax-description.md
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matching-request.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
             required: true
             example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+          Content-Type:
+            description: Specifies the format of the request body. This must be JSON.
+            type: string
+            required: true
+            example: "application/json"
         body:
           application/json:
             type: !include schemas/sautr-matching-request.json
@@ -123,7 +123,7 @@ uses:
                     description: "The organisation's details provided did not match with HMRC's records"
                     value:
                       code: MATCHING_FAILED
-  /matching/corporation-tax/{matchId}:
+  /corporation-tax/{matchId}:
       uriParameters:
         matchId:
           description: "A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API."
@@ -132,16 +132,11 @@ uses:
       get:
         displayName: "Get links to Corporation Tax and number of employee details for a matched organisation"
         description: !include docs/get-corporation-tax-description.md
-        is: [headers.acceptHeader, headers.contentHeader]
+        is: [headers.acceptHeader]
         (annotations.scope): "assigned"
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/corporation-tax-matched-details-response.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string
@@ -163,7 +158,7 @@ uses:
                     description: "Not Found"
                     value:
                       code: NOT_FOUND
-  /matching/self-assessment/{matchId}:
+  /self-assessment/{matchId}:
       uriParameters:
         matchId:
           description: "A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API."
@@ -177,11 +172,6 @@ uses:
         securedBy: [ sec.oauth_2_0: { scopes: [ "assigned" ] } ]
         (annotations.sandboxData): !include sandbox/self-assessment-matched-details-response.md
         headers:
-          Content-Type:
-            description: Specifies the format of the request body. This must be JSON.
-            type: string
-            required: true
-            example: "application/json"
           CorrelationId:
             description: !include ./includes/correlationId.md
             type: string

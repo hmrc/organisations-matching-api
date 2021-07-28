@@ -20,8 +20,7 @@ import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.modules.reactivemongo.ReactiveMongoComponent
 import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext}
 
 @Singleton
 class MatchRepository @Inject()(cacheConfig: CacheConfiguration,

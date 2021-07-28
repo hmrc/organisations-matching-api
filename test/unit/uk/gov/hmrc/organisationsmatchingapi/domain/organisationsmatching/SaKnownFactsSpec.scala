@@ -14,31 +14,30 @@
  * limitations under the License.
  */
 
-package unit.uk.gov.hmrc.organisationsmatchingapi.domain.ogd
-
-import java.util.UUID
+package unit.uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.MatchIdResponse
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.SaKnownFacts
 import util.IfHelpers
 
-class MatchIdResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
+class SaKnownFactsSpec extends AnyWordSpec with Matchers with IfHelpers {
 
-  "MatchIdResponse" should {
-
+  "SaKnownFacts" should {
     "Read and write" in {
+      val knownFacts = SaKnownFacts("utr", "individual", "name", "line1", "postcode")
+      val asJson     = Json.toJson(knownFacts)
 
-      val uuid = UUID.randomUUID()
-
-      val matchIdResponse = MatchIdResponse(uuid)
-
-      val asJson = Json.toJson(matchIdResponse)
-
-      asJson shouldBe Json.parse(s"""{
-                                   |  "matchId" : "$uuid"
-                                   |}""".stripMargin)
+      asJson shouldBe Json.parse("""
+        |{
+        |  "utr" : "utr",
+        |  "name" : "name",
+        |  "taxpayerType" : "individual",
+        |  "line1" : "line1",
+        |  "postcode" : "postcode"
+        |}
+        |""".stripMargin)
     }
   }
 }
