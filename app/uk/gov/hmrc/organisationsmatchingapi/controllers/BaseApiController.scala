@@ -19,11 +19,9 @@ package uk.gov.hmrc.organisationsmatchingapi.controllers
 import play.api.Logger
 import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
 import play.api.mvc.{ControllerComponents, Request, RequestHeader, Result}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.{ErrorResponse}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.NestedError
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
@@ -55,16 +53,8 @@ abstract class BaseApiController (cc: ControllerComponents) extends BackendContr
   protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] =
     Try(UUID.fromString(uuidString)) match {
       case Success(uuid) => f(uuid)
-      case _             => successful(ErrorResponse.NotFound.toResult)
+      case _             => successful(ErrorNotFound.toHttpResponse)
     }
-
-  def errorResult(errors: IndexedSeq[NestedError]): Future[Result] =
-    Future.successful(
-      BadRequest(
-        Json.obj(
-          "code" -> "BAD_REQUEST",
-          "message" -> "The request body does not conform to the schema.",
-          "errors" -> Json.toJson(errors.toList))))
 
   private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(
     implicit request: RequestHeader,
