@@ -47,13 +47,13 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
 
   def matchOrganisationCt() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
     val matchId = UUID.randomUUID()
+    val self =  "/organisations/matching/corporation-tax"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       withJsonBody[CtMatchingRequest] { matchRequest => {
         val correlationId = validateCorrelationId(request)
-        handleErrors(
-          matchingService.matchCoTax(matchId, correlationId.toString, matchRequest).map( _ => {
+          matchingService.matchCoTax(matchId, correlationId.toString, matchRequest).map { _ => {
 
-            val selfLink = HalLink("self", s"/organisations/matching/corporation-tax")
+            val selfLink = HalLink("self", self)
             val data = toJson(MatchIdResponse(matchId))
             val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getCorporationTaxMatch"))) ++ selfLink)
 
@@ -67,19 +67,19 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
 
             Ok(response)
           }
-          ))
+        }
       }}
-    }
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
   }
 
   def matchOrganisationSa() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
     val matchId = UUID.randomUUID()
+    val self =  "/organisations/matching/self-assessment"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       withJsonBody[SaMatchingRequest] { matchRequest => {
         val correlationId = validateCorrelationId(request)
-        handleErrors(
-          matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map(_ => {
-            val selfLink = HalLink("self", s"/organisations/matching/self-assessment")
+          matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map { _ => {
+            val selfLink = HalLink("self", self)
             val data = toJson(MatchIdResponse(matchId))
             val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink)
 
@@ -93,12 +93,8 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
 
             Ok(response)
           }
-          ))
+        }
       }}
-    }
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
   }
-
-  def matchedOrganisationSa(matchId: UUID) =  Action.async { implicit request => Future.successful(Ok)}
-
-  def matchedOrganisationCt(matchId: UUID)=  Action.async { implicit request => Future.successful(Ok)}
 }
