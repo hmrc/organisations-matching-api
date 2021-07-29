@@ -71,10 +71,11 @@ class IfConnector @Inject()(
 
   private def extractCorrelationId(requestHeader: RequestHeader) = validateCorrelationId(requestHeader).toString
 
-  def setHeaders = Seq(
-    HeaderNames.authorisation -> s"Bearer $integrationFrameworkBearerToken",
-    "Environment"             -> integrationFrameworkEnvironment
-  )
+  def setHeaders(implicit hc: HeaderCarrier) =
+    Seq(
+      HeaderNames.authorisation -> s"Bearer $integrationFrameworkBearerToken",
+      "Environment"             -> integrationFrameworkEnvironment
+    )
 
   private def callSa(url: String, matchId: String)
                     (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =

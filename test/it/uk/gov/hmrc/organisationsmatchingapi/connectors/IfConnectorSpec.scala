@@ -76,7 +76,7 @@ class IfConnectorSpec
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
     val sampleCorrelationIdHeader: (String, String) = ("CorrelationId" -> sampleCorrelationId)
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders(sampleCorrelationIdHeader)
 
     val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
     val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]
@@ -134,6 +134,7 @@ class IfConnectorSpec
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
           .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
           .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+          .withHeader("CorrelationId", equalTo(sampleCorrelationId))
           .willReturn(
             aResponse()
               .withStatus(200)
@@ -272,6 +273,7 @@ class IfConnectorSpec
             HeaderNames.authorisation,
             equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
           .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+          .withHeader("CorrelationId", equalTo(sampleCorrelationId))
           .willReturn(aResponse()
             .withStatus(200)
             .withBody(Json.toJson(IfSaTaxpayerDetails(
