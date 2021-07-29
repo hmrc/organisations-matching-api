@@ -2,6 +2,38 @@
   "type": "object",
   "description": "Company Matching Response",
   "properties": {
+    "_links": {
+      "type": "object",
+      "description": "A list of links for possible actions related to this endpoint.",
+      "properties": {
+        "getCorporationTaxMatch": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the organisation's details for the requested match ID.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "description": "The URL of the endpoint.",
+              "example": "/organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            },
+            "title": {
+              "type": "string",
+              "description": "Get the organisation's details"
+            }
+          }
+        },
+        "self": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "properties": {
+            "href": {
+              "type": "string",
+              "description": "The URL for this endpoint.",
+              "example": "/organisations/matching/corporation-tax"
+            }
+          }
+        }
+      }
+    },
     "matchId": {
       "type": "string",
       "description": "A short-lived universally unique identifier (UUID), typically valid for 5 hours.",
