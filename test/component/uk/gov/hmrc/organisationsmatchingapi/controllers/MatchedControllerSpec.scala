@@ -136,7 +136,7 @@ class MatchedControllerSpec extends BaseSpec  {
 
       Json.parse(response.body) shouldBe Json.obj(
         "statusCode"    -> 400,
-        "message" -> "bad request"
+        "message" -> "bad request, cause: REDACTED"
       )
     }
 
@@ -276,7 +276,7 @@ class MatchedControllerSpec extends BaseSpec  {
 
       Json.parse(response.body) shouldBe Json.obj(
         "statusCode"    -> 400,
-        "message" -> "bad request"
+        "message" -> "bad request, cause: REDACTED"
       )
     }
 
@@ -364,7 +364,7 @@ class MatchedControllerSpec extends BaseSpec  {
 
       Json.parse(response.body) shouldBe Json.obj(
         "statusCode"    -> 400,
-        "message" -> "bad request"
+        "message" -> "bad request, cause: REDACTED"
       )
     }
   }
