@@ -30,7 +30,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsSuccess, Json}
 import play.api.test.FakeRequest
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException, NotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
@@ -132,7 +132,7 @@ class IfConnectorSpec
 
       stubFor(
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
-          .withHeader("Authorization", equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+          .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
           .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
           .willReturn(
             aResponse()
@@ -269,7 +269,7 @@ class IfConnectorSpec
       stubFor(
         get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .withHeader(
-            "Authorization",
+            HeaderNames.authorisation,
             equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
           .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
           .willReturn(aResponse()
