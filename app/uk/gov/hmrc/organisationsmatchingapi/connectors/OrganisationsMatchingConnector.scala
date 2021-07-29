@@ -22,10 +22,10 @@ import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, JsValidationException, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtOrganisationsMatchingRequest, SaOrganisationsMatchingRequest}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorResponse.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-
 import javax.inject.Inject
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
@@ -69,7 +69,7 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
     case notFound: NotFoundException => {
       auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(notFound.getMessage))
       // No Kibana for security reasons. Splunk only.
-      throw new MatchingException(s"No match found for matchId $matchId")
+      throw new MatchingException
     }
     case validationError: JsValidationException => {
       Logger.warn("Organisations Matching JsValidationException encountered")

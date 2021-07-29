@@ -24,8 +24,9 @@ import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfCorpTaxCompanyDetails, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-
 import javax.inject.Inject
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class IfConnector @Inject()(
@@ -108,7 +109,7 @@ class IfConnector @Inject()(
     case notFound: NotFoundException => {
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, notFound.getMessage)
       logger.warn("Integration Framework NotFoundException encountered")
-      Future.failed(notFound)
+      Future.failed(new MatchingException)
     }
     case Upstream5xxResponse(msg, code, _, _) => {
       logger.warn(s"Integration Framework Upstream5xxResponse encountered: $code")

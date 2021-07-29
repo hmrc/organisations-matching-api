@@ -36,8 +36,10 @@ import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util.UnitSpec
-
 import java.util.UUID
+
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
+
 import scala.concurrent.ExecutionContext
 
 
@@ -60,6 +62,7 @@ class IfConnectorSpec
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .bindings(bindModules: _*)
     .configure(
+      "auditing.enabled" -> false,
       "cache.enabled"  -> false,
       "microservice.services.integration-framework.host" -> "localhost",
       "microservice.services.integration-framework.port" -> "11122",
@@ -221,7 +224,7 @@ class IfConnectorSpec
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
 
-      intercept[NotFoundException] {
+      intercept[MatchingException] {
         await(
           underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678")(
             hc,
@@ -352,7 +355,7 @@ class IfConnectorSpec
         get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
 
-      intercept[NotFoundException] {
+      intercept[MatchingException] {
         await(
           underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")(
             hc,

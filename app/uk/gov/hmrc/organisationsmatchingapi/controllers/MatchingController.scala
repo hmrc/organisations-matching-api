@@ -27,11 +27,10 @@ import play.api.mvc.{Action, ControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, MatchIdResponse, SaMatchingRequest}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils._
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class MatchingController @Inject()(val authConnector: AuthConnector,
@@ -42,7 +41,6 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cacheService: CacheService,
                                    matchingService: MatchingService
                                   )(implicit val ec: ExecutionContext, auditHelper: AuditHelper) extends BaseApiController(cc)
-  with ErrorHandling
   with PrivilegedAuthentication {
 
   def matchOrganisationCt() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
