@@ -8,7 +8,7 @@
       "properties": {
         "getCorporationTaxMatch": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the organisation's details for the requested match ID.",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the organisation's details for the requested matchId.",
           "properties": {
             "href": {
               "type": "string",
