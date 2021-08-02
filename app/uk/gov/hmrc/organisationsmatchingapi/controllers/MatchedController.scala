@@ -24,7 +24,6 @@ import play.api.mvc.{Action, AnyContent, ControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
-import uk.gov.hmrc.organisationsmatchingapi.errorhandler.ErrorHandling
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
 
@@ -40,7 +39,6 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
                                            implicit val auditHelper: AuditHelper,
                                            matchedService: MatchedService)
                                           (implicit ec: ExecutionContext) extends BaseApiController(cc)
-  with ErrorHandling
   with PrivilegedAuthentication {
 
   def matchedOrganisationCt(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>

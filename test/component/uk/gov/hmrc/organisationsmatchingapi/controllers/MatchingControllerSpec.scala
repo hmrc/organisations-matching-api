@@ -104,15 +104,15 @@ class MatchingControllerSpec extends BaseSpec  {
     cachedData.isEmpty mustBe false
   }
 
-  Scenario("Valid POST request to corporation-tax endpoint not found") {
+  Scenario("Valid POST request to corporation-tax endpoint but IF data not found") {
 
     Given("A valid privileged Auth bearer token")
     AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
     Given("Data found in IF")
-    IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
+    IfStub.searchCorpTaxCompanyDetailsNotFound(ctRequest.companyRegistrationNumber, ifCorpTax)
 
-    Given("A successful match")
+    Given("An unsuccessful match")
     MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
 
     val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
@@ -122,13 +122,40 @@ class MatchingControllerSpec extends BaseSpec  {
       .postData(requestString)
       .asString
 
-    Then("The response status should be 404 (Not Found)")
-    response.code mustBe Status.NOT_FOUND
+    Then("The response status should be 403 (Forbidden)")
+    response.code mustBe Status.FORBIDDEN
 
     And("The response should have a valid payload")
     val responseJson = Json.parse(response.body)
 
-    responseJson mustBe Json.parse(s"""{"code":"NOT_FOUND","message":"Resource was not found"}""".stripMargin)
+    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+  }
+
+  Scenario("Valid POST request to corporation-tax endpoint but match not found") {
+
+    Given("A valid privileged Auth bearer token")
+    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+    Given("Data found in IF")
+    IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
+
+    Given("An unsuccessful match")
+    MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
+
+    val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
+
+    val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
+      .headers(requestHeaders(acceptHeaderP1))
+      .postData(requestString)
+      .asString
+
+    Then("The response status should be 403 (Forbidden)")
+    response.code mustBe Status.FORBIDDEN
+
+    And("The response should have a valid payload")
+    val responseJson = Json.parse(response.body)
+
+    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
   }
 
   Scenario("Valid POST request to self-assessment endpoint") {
@@ -173,7 +200,7 @@ class MatchingControllerSpec extends BaseSpec  {
     cachedData.isEmpty mustBe false
   }
 
-  Scenario("Valid POST request to self-assessment endpoint not found") {
+  Scenario("Valid POST request to self-assessment endpoint but match not found") {
 
     Given("A valid privileged Auth bearer token")
     AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
@@ -181,7 +208,7 @@ class MatchingControllerSpec extends BaseSpec  {
     Given("Data found in IF")
     IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
 
-    Given("A successful match")
+    Given("An unsuccessful match")
     MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
 
     val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
@@ -191,13 +218,40 @@ class MatchingControllerSpec extends BaseSpec  {
       .postData(requestString)
       .asString
 
-    Then("The response status should be 404 (Not Found)")
-    response.code mustBe Status.NOT_FOUND
+    Then("The response status should be 403 (Forbidden)")
+    response.code mustBe Status.FORBIDDEN
 
     And("The response should have a valid payload")
     val responseJson = Json.parse(response.body)
 
-    responseJson mustBe Json.parse(s"""{"code":"NOT_FOUND","message":"Resource was not found"}""".stripMargin)
+    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+  }
+
+  Scenario("Valid POST request to self-assessment endpoint but IF data not found") {
+
+    Given("A valid privileged Auth bearer token")
+    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+    Given("Data found in IF")
+    IfStub.searchSaCompanyDetailsNotFound(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
+
+    Given("An unsuccessful match")
+    MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
+
+    val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
+
+    val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
+      .headers(requestHeaders(acceptHeaderP1))
+      .postData(requestString)
+      .asString
+
+    Then("The response status should be 403 (Forbidden)")
+    response.code mustBe Status.FORBIDDEN
+
+    And("The response should have a valid payload")
+    val responseJson = Json.parse(response.body)
+
+    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
   }
 
 }
