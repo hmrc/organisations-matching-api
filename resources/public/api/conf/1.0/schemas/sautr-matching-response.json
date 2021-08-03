@@ -14,10 +14,6 @@
               "type": "string",
               "description": "The URL of the endpoint.",
               "example": "/organisations/matching/self-assessment/57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-            },
-            "title": {
-              "type": "string",
-              "description": "Get the organisation's self assessment details"
             }
           }
         },
