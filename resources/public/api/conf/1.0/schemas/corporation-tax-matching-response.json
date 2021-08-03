@@ -13,7 +13,10 @@
             "href": {
               "type": "string",
               "description": "The URL of the endpoint.",
-              "example": "/organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+              "example": "/organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+            "title": {
+              "type": "string",
+              "description": "Get the organisation's details"
             }
           }
         },

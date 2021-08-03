@@ -1,7 +1,8 @@
 {
   "_links": {
     "getSelfAssessmentMatch": {
-      "href": "/organisations/matching/self-assessment/57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+      "href": "/organisations/matching/self-assessment/57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "title": "Get the organisation's self assessment details"
     },
     "self": {
       "href": "/organisations/matching/self-assessment"
