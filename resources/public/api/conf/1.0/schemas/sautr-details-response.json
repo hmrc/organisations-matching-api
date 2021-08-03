@@ -59,11 +59,6 @@
               "type": "string",
               "description": "The URL of the endpoint.",
               "example": "/organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-            },
-            "name": {
-              "type": "string",
-              "description": "The HTTP Action to use on this endpoint.",
-              "example": "GET"
             }
           }
         },
@@ -78,15 +73,6 @@
               "type": "string",
               "description": "The URL of the endpoint.",
               "example": "/organisations/details/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-            },
-            "name": {
-              "type": "string",
-              "description": "The HTTP Action to use on this endpoint.",
-              "example": "GET"
-            },
-            "title": {
-              "type": "string",
-              "description": "Get the organisation's Self Assessment details"
             }
           }
         },
@@ -101,15 +87,6 @@
               "type": "string",
               "description": "The URL of the endpoint.",
               "example": "/organisations/details/number-of-employees/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
-            },
-            "name": {
-              "type": "string",
-              "description": "The HTTP Action to use on this endpoint.",
-              "example": "GET"
-            },
-            "title": {
-              "type": "string",
-              "description": "Get the organisation's number of employees data"
             }
           }
         }
