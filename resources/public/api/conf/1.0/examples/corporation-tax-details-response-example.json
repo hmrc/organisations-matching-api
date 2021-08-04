@@ -6,17 +6,14 @@
   },
   "_links": {
     "self": {
-      "href": "organisations/matching/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET"
+      "href": "organisations/matching/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
     },
     "getCorporationTaxDetails": {
       "href": "organisations/details/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET",
       "title": "Get the organisation's Corporation Tax details data."
     },
     "getEmployeeCount": {
       "href": "organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET",
       "title": "Get the organisation's paye employee count data."
     }
   }

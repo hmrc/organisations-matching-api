@@ -7,18 +7,14 @@
   },
   "_links": {
     "self": {
-      "href": "organisations/matching/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET",
-      "title": "Get the organisation's sa data."
+      "href": "organisations/matching/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
     },
     "getSelfAssessmentDetails": {
       "href": "organisations/details?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET",
       "title": "Get the organisation's self-assessment details data."
     },
     "getEmployeeCount": {
       "href": "organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "name": "GET",
       "title": "Get the organisation's self-assessment employee count data."
     }
   }
