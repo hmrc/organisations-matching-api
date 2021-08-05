@@ -1,14 +1,26 @@
 {
   "type": "object",
   "description": "Company Matching Response",
+  "required": [
+    "_links",
+    "matchId"
+  ],
   "properties": {
     "_links": {
       "type": "object",
       "description": "A list of links for possible actions related to this endpoint.",
+      "required": [
+        "getSelfAssessmentMatch",
+        "self"
+      ],
       "properties": {
         "getSelfAssessmentMatch": {
           "type": "object",
           "description": "The Uniform Resource Identifier (URI) for the endpoint to get the organisation's self assessment details for the requested matchId.",
+          "required": [
+            "href",
+            "title"
+          ],
           "properties": {
             "href": {
               "type": "string",
@@ -24,6 +36,9 @@
         "self": {
           "type": "object",
           "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "required": [
+           "href"
+          ],
           "properties": {
             "href": {
               "type": "string",
