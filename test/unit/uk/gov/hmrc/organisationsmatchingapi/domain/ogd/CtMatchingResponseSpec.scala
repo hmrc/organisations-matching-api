@@ -28,6 +28,7 @@ class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
     "Read and write" in {
 
       val payeMatchingResponse = CtMatchingResponse(
+        companyRegistrationNumber = "12345",
         employerName = "1234567890",
         address = Address(
           line1 = Some("line1"),
@@ -36,6 +37,7 @@ class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
       val asJson = Json.toJson(payeMatchingResponse)
 
       asJson shouldBe Json.parse("""{
+                                   |  "companyRegistrationNumber": "12345",
                                    |  "employerName" : "1234567890",
                                    |  "address" : {
                                    |    "line1" : "line1",

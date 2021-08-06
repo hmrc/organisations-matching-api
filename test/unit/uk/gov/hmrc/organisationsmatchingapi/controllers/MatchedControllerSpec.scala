@@ -109,6 +109,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
         jsonBodyOf(result) shouldBe Json.parse(
           s"""{
+             |  "companyRegistrationNumber" : "crn",
              |  "employerName": "test",
              |  "address": {
              |    "line1": "test",
@@ -212,6 +213,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
         jsonBodyOf(result) shouldBe Json.parse(
           s"""{
+             |"selfAssessmentUniqueTaxPayerRef": "utr",
              |  "taxPayerType": "individual",
              |  "taxPayerName": "test",
              |  "address": {
