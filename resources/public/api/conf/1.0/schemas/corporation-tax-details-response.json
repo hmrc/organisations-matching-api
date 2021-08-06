@@ -6,6 +6,12 @@
     "address"
   ],
   "properties": {
+    "companyRegistrationNumber": {
+      "type": "string",
+      "description": "Company registration number (CRN). ",
+      "pattern": "^[A-Z0-9]{1,10}$",
+      "example": "AA123456"
+    },
     "employerName": {
       "type": "string",
       "example": "Example Company Ltd",

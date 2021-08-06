@@ -70,6 +70,7 @@ class MatchedControllerSpec extends BaseSpec  {
            |      "title": "Get the organisation's Corporation Tax details data."
            |    }
            |  },
+           |  "companyRegistrationNumber": "crn",
            |  "employerName": "name"
            |}""".stripMargin
       )
@@ -209,6 +210,7 @@ class MatchedControllerSpec extends BaseSpec  {
            |      "href": "/organisations/matching/self-assessment/$matchId"
            |    }
            |  },
+           |  "selfAssessmentUniqueTaxPayerRef": "utr",
            |  "taxPayerType": "Individual",
            |  "taxPayerName": "name"
            |}""".stripMargin
