@@ -21,9 +21,10 @@ import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import play.api.hal.Hal.state
 import play.api.hal.HalLink
+import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
-import play.api.mvc.{Action, ControllerComponents, PlayBodyParsers}
+import play.api.mvc.{Action, ControllerComponents, MessagesControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, MatchIdResponse, SaMatchingRequest}
@@ -35,19 +36,21 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class MatchingController @Inject()(val authConnector: AuthConnector,
                                    cc: ControllerComponents,
+                                   mcc: MessagesControllerComponents,
                                    scopeService: ScopesService,
                                    scopesHelper: ScopesHelper,
                                    bodyParsers: PlayBodyParsers,
                                    cacheService: CacheService,
-                                   matchingService: MatchingService
-                                  )(implicit val ec: ExecutionContext, auditHelper: AuditHelper) extends BaseApiController(cc)
+                                   matchingService: MatchingService)
+                                  (implicit auditHelper: AuditHelper,
+                                  ec: ExecutionContext) extends BaseApiController(mcc, cc)
   with PrivilegedAuthentication {
 
   def matchOrganisationCt() : Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
     val matchId = UUID.randomUUID()
     val self =  "/organisations/matching/corporation-tax"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
-      withJsonBody[CtMatchingRequest] { matchRequest => {
+      withValidJson[CtMatchingRequest] { matchRequest => {
         val correlationId = validateCorrelationId(request)
           matchingService.matchCoTax(matchId, correlationId.toString, matchRequest).map { _ => {
 
@@ -74,7 +77,7 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
     val matchId = UUID.randomUUID()
     val self =  "/organisations/matching/self-assessment"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
-      withJsonBody[SaMatchingRequest] { matchRequest => {
+      withValidJson[SaMatchingRequest] { matchRequest => {
         val correlationId = validateCorrelationId(request)
           matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map { _ => {
             val selfLink = HalLink("self", self)

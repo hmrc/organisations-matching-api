@@ -20,25 +20,27 @@ import play.api.hal.Hal.state
 import play.api.hal.HalLink
 import play.api.libs.json.Json
 import play.api.libs.json.Json.toJson
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, ControllerComponents, MessagesControllerComponents}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.{maybeCorrelationId, validateCorrelationId}
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
-
 import java.util.UUID
+
 import javax.inject.{Inject, Singleton}
+
 import scala.concurrent.ExecutionContext
 
 @Singleton
 class MatchedController @Inject()(val authConnector: AuthConnector,
-                                           cc: ControllerComponents,
-                                           scopeService: ScopesService,
-                                           scopesHelper: ScopesHelper,
-                                           implicit val auditHelper: AuditHelper,
-                                           matchedService: MatchedService)
-                                          (implicit ec: ExecutionContext) extends BaseApiController(cc)
+                                      cc: ControllerComponents,
+                                      mcc: MessagesControllerComponents,
+                                      scopeService: ScopesService,
+                                      scopesHelper: ScopesHelper,
+                                      matchedService: MatchedService)
+                                     (implicit auditHelper: AuditHelper,
+                                      ec: ExecutionContext) extends BaseApiController(mcc, cc)
   with PrivilegedAuthentication {
 
   def matchedOrganisationCt(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>

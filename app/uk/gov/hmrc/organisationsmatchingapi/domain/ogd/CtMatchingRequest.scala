@@ -18,6 +18,7 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, JsPath}
 import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads.pattern
 
 case class CtMatchingRequest(companyRegistrationNumber: String,
                              employerName: String,
@@ -26,9 +27,11 @@ case class CtMatchingRequest(companyRegistrationNumber: String,
 
 object CtMatchingRequest {
 
+  val crnPattern = "^[A-Z0-9]{1,10}$".r
+
   implicit val ctMatchingformat: Format[CtMatchingRequest] = Format(
     (
-      (JsPath \ "companyRegistrationNumber").read[String] and
+      (JsPath \ "companyRegistrationNumber").read[String](pattern(crnPattern, "error.crn")) and
       (JsPath \ "employerName").read[String] and
       (JsPath \ "address" \ "addressLine1").read[String] and
       (JsPath \ "address" \ "postcode").read[String]

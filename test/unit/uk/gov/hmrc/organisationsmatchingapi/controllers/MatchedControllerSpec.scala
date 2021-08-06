@@ -38,8 +38,11 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorNotFoun
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
-
 import java.util.UUID
+
+import play.api.i18n.Lang
+import play.i18n.Langs
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -58,7 +61,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
     lazy val scopeService: ScopesService = new ScopesService(mockConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
 
-    val auditHelper    = mock[AuditHelper]
+    implicit val auditHelper    = mock[AuditHelper]
     val matchedService = mock[MatchedService]
     val matchId        = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
 
@@ -87,9 +90,9 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
     val controller = new MatchedController(
       mockAuthConnector,
       Helpers.stubControllerComponents(),
+      Helpers.stubMessagesControllerComponents(),
       scopeService,
       scopesHelper,
-      auditHelper,
       matchedService
     )
 

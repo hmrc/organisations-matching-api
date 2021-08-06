@@ -19,7 +19,7 @@ package component.uk.gov.hmrc.organisationsmatchingapi.controllers
 import java.util.concurrent.TimeUnit
 
 import play.api.http.Status
-import play.api.libs.json.{JsString, Json}
+import play.api.libs.json.{JsPath, JsString, Json}
 import scalaj.http.{Http, HttpResponse}
 import stubs.{AuthStub, BaseSpec, IfStub, MatchingStub}
 import uk.gov.hmrc.cache.model.Cache
@@ -35,7 +35,10 @@ class MatchingControllerSpec extends BaseSpec  {
 
   val scopes = List("read:organisations-matching-ho-ssp")
   val ctRequest = CtMatchingRequest("0213456789", "name", "line1", "NE11NE")
+  val ctRequestString: String = Json.prettyPrint(Json.toJson(ctRequest))
+
   val saRequest = SaMatchingRequest("0213456789", "A", "name", "line1", "NE11NE")
+  val saRequestString: String = Json.prettyPrint(Json.toJson(saRequest))
 
   val ifCorpTax = IfCorpTaxCompanyDetails(
     utr = Some("0123456789"),
@@ -59,199 +62,394 @@ class MatchingControllerSpec extends BaseSpec  {
       )))
     )))
 
-  Scenario("Valid POST request to corporation-tax endpoint") {
+  Feature("corporation-tax endpoint") {
 
-    Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+    Scenario("Valid POST request") {
 
-    Given("Data found in IF")
-    IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
-    Given("A successful match")
-    MatchingStub.willReturnCtMatch( correlationIdHeader._2)
+      Given("Data found in IF")
+      IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
 
-    val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
+      Given("A successful match")
+      MatchingStub.willReturnCtMatch(correlationIdHeader._2)
 
-    val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
-      .headers(requestHeaders(acceptHeaderP1))
-      .postData(requestString)
-      .asString
+      val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(ctRequestString)
+        .asString
 
-    Then("The response status should be 200 (Ok)")
-    response.code mustBe Status.OK
+      Then("The response status should be 200 (Ok)")
+      response.code mustBe Status.OK
 
-    And("The response should have a valid payload")
-    val responseJson = Json.parse(response.body)
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      val matchId = (responseJson \ "matchId").get.as[String]
+
+      responseJson mustBe Json.parse(
+        s"""{
+           |  "_links" : {
+           |    "getCorporationTaxMatch" : {
+           |      "href" : "/organisations/matching/corporation-tax/$matchId",
+           |      "title" : "Get the organisation's details"
+           |    },
+           |    "self" : {
+           |      "href" : "/organisations/matching/corporation-tax"
+           |    }
+           |  },
+           |  "matchId" : "$matchId"
+           |}""".stripMargin)
 
 
+      val cachedData: List[Cache] = Await.result(mongoRepository.find(("_id", JsString(matchId.toString))), Duration(5, TimeUnit.SECONDS))
+      cachedData.isEmpty mustBe false
+    }
 
-    val matchId = (responseJson \ "matchId").get.as[String]
-    responseJson mustBe Json.parse(s"""{
-                                      |  "_links" : {
-                                      |    "getCorporationTaxMatch" : {
-                                      |      "href" : "/organisations/matching/corporation-tax/$matchId",
-                                      |      "title" : "Get the organisation's details"
-                                      |    },
-                                      |    "self" : {
-                                      |      "href" : "/organisations/matching/corporation-tax"
-                                      |    }
-                                      |  },
-                                      |  "matchId" : "$matchId"
-                                      |}""".stripMargin)
+    Scenario("Bad request with missing fields") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      val requestWithMissingFields =
+        """{
+          | "companyRegistrationNumber": "0213456789",
+          | "employerName": "name",
+          | "address": {
+          |    "postcode": "NE11NE"}
+          | }""".stripMargin
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(requestWithMissingFields)
+        .asString
+
+      Then("The response status should be 400 (Bad request)")
+      response.code mustBe Status.BAD_REQUEST
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(
+        s"""{ "code": "INVALID_REQUEST",
+           | "message" : "/address/addressLine1 is required" }""".stripMargin)
+    }
+
+    Scenario("Bad request with malformed CRN") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      val requestWithMalformedCrn =
+        """{
+          | "companyRegistrationNumber": "021xxx6789",
+          | "employerName": "name",
+          | "address": {
+          |    "addressLine1": "line1",
+          |    "postcode": "NE11NE"}
+          | }""".stripMargin
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(requestWithMalformedCrn)
+        .asString
+
+      Then("The response status should be 400 (Bad request)")
+      response.code mustBe Status.BAD_REQUEST
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(
+        s"""{ "code": "INVALID_REQUEST",
+           | "message" : "Malformed CRN submitted" }""".stripMargin)
+    }
+
+    Scenario("Valid POST request but IF data not found") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data not found in IF")
+      IfStub.searchCorpTaxCompanyDetailsNotFound(ctRequest.companyRegistrationNumber, ifCorpTax)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(ctRequestString)
+        .asString
+
+      Then("The response status should be 403 (Forbidden)")
+      response.code mustBe Status.FORBIDDEN
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+    }
 
 
-    val cachedData:List[Cache] = Await.result(mongoRepository.find(("_id", JsString(matchId.toString))), Duration(5, TimeUnit.SECONDS))
-    cachedData.isEmpty mustBe false
+    Scenario("Valid POST request but match not found") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data found in IF")
+      IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
+
+      Given("An unsuccessful match")
+      MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(ctRequestString)
+        .asString
+
+      Then("The response status should be 403 (Forbidden)")
+      response.code mustBe Status.FORBIDDEN
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+    }
+
+    Scenario("A missing correlation id") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeadersInvalid(acceptHeaderP1))
+        .postData(ctRequestString)
+        .asString
+
+      response.code mustBe Status.BAD_REQUEST
+
+      Json.parse(response.body) mustBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "CorrelationId is required"
+      )
+    }
+
+    Scenario("a request is made with a malformed correlation id") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeadersMalformed(acceptHeaderP1))
+        .postData(ctRequestString)
+        .asString
+
+      response.code mustBe Status.BAD_REQUEST
+
+      Json.parse(response.body) mustBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "Malformed CorrelationId"
+      )
+    }
+
+    Scenario("not authorized") {
+
+      val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
+
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(requestString)
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code mustBe Status.UNAUTHORIZED
+      Json.parse(response.body) mustBe Json.obj(
+        "code"    -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
+    }
   }
 
-  Scenario("Valid POST request to corporation-tax endpoint but IF data not found") {
+  Feature("self-assessment endpoint") {
 
-    Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+    Scenario("Valid POST request") {
 
-    Given("Data found in IF")
-    IfStub.searchCorpTaxCompanyDetailsNotFound(ctRequest.companyRegistrationNumber, ifCorpTax)
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
-    Given("An unsuccessful match")
-    MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
+      Given("Data found in IF")
+      IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
 
-    val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
+      Given("A successful match")
+      MatchingStub.willReturnSaMatch(correlationIdHeader._2)
 
-    val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
-      .headers(requestHeaders(acceptHeaderP1))
-      .postData(requestString)
-      .asString
+      val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(saRequestString)
+        .asString
 
-    Then("The response status should be 403 (Forbidden)")
-    response.code mustBe Status.FORBIDDEN
+      Then("The response status should be 200 (Ok)")
+      response.code mustBe Status.OK
 
-    And("The response should have a valid payload")
-    val responseJson = Json.parse(response.body)
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
 
-    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+      val matchId = (responseJson \ "matchId").get.as[String]
+      responseJson mustBe Json.parse(
+        s"""{
+           |  "_links" : {
+           |    "getSelfAssessmentMatch" : {
+           |      "href" : "/organisations/matching/self-assessment/$matchId",
+           |      "title" : "Get the organisation's self assessment details"
+           |    },
+           |    "self" : {
+           |      "href" : "/organisations/matching/self-assessment"
+           |    }
+           |  },
+           |  "matchId" : "$matchId"
+           |}""".stripMargin)
+
+      val cachedData: List[Cache] = Await.result(mongoRepository.find(("_id", JsString(matchId.toString))), Duration(5, TimeUnit.SECONDS))
+      cachedData.isEmpty mustBe false
+    }
+
+    Scenario("Valid POST request but IF data not found") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data not found in IF")
+      IfStub.searchSaCompanyDetailsNotFound(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(saRequestString)
+        .asString
+
+      Then("The response status should be 403 (Forbidden)")
+      response.code mustBe Status.FORBIDDEN
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+    }
+
+    Scenario("Valid POST request but match not found") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data found in IF")
+      IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
+
+      Given("An unsuccessful match")
+      MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(saRequestString)
+        .asString
+
+      Then("The response status should be 403 (Forbidden)")
+      response.code mustBe Status.FORBIDDEN
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
+    }
+
+    Scenario("Bad request with missing fields") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      val requestWithMissingFields =
+        """{
+          | "selfAssessmentUniqueTaxPayerRef": "0213456789",
+          | "taxPayerType": "A",
+          | "taxPayerName": "name",
+          | "address": {
+          |    "postcode": "NE11NE"
+        |     }
+          | }""".stripMargin
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(requestWithMissingFields)
+        .asString
+
+      Then("The response status should be 400 (Bad request)")
+      response.code mustBe Status.BAD_REQUEST
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(
+        s"""{ "code": "INVALID_REQUEST",
+           | "message" : "/address/addressLine1 is required" }""".stripMargin)
+    }
+
+    Scenario("A missing correlation id") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax")
+        .headers(requestHeadersInvalid(acceptHeaderP1))
+        .postData(ctRequestString)
+        .asString
+
+      response.code mustBe Status.BAD_REQUEST
+
+      Json.parse(response.body) mustBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "CorrelationId is required"
+      )
+    }
+
+    Scenario("a request is made with a malformed correlation id") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/self-assessment")
+        .headers(requestHeadersMalformed(acceptHeaderP1))
+        .postData(saRequestString)
+        .asString
+
+      response.code mustBe Status.BAD_REQUEST
+
+      Json.parse(response.body) mustBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "Malformed CorrelationId"
+      )
+    }
+
+    Scenario("not authorized") {
+
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/self-assessment")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(saRequestString)
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code mustBe Status.UNAUTHORIZED
+      Json.parse(response.body) mustBe Json.obj(
+        "code"    -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
+    }
   }
-
-  Scenario("Valid POST request to corporation-tax endpoint but match not found") {
-
-    Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-    Given("Data found in IF")
-    IfStub.searchCorpTaxCompanyDetails(ctRequest.companyRegistrationNumber, ifCorpTax)
-
-    Given("An unsuccessful match")
-    MatchingStub.willReturnCtMatchNotFound(correlationIdHeader._2)
-
-    val requestString: String = Json.prettyPrint(Json.toJson(ctRequest))
-
-    val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
-      .headers(requestHeaders(acceptHeaderP1))
-      .postData(requestString)
-      .asString
-
-    Then("The response status should be 403 (Forbidden)")
-    response.code mustBe Status.FORBIDDEN
-
-    And("The response should have a valid payload")
-    val responseJson = Json.parse(response.body)
-
-    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
-  }
-
-  Scenario("Valid POST request to self-assessment endpoint") {
-
-    Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-    Given("Data found in IF")
-    IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
-
-    Given("A successful match")
-    MatchingStub.willReturnSaMatch( correlationIdHeader._2)
-
-    val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
-
-    val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
-      .headers(requestHeaders(acceptHeaderP1))
-      .postData(requestString)
-      .asString
-
-    Then("The response status should be 200 (Ok)")
-    response.code mustBe Status.OK
-
-    And("The response should have a valid payload")
-    val responseJson = Json.parse(response.body)
-
-    val matchId = (responseJson \ "matchId").get.as[String]
-    responseJson mustBe Json.parse(s"""{
-                                      |  "_links" : {
-                                      |    "getSelfAssessmentMatch" : {
-                                      |      "href" : "/organisations/matching/self-assessment/$matchId",
-                                      |      "title" : "Get the organisation's self assessment details"
-                                      |    },
-                                      |    "self" : {
-                                      |      "href" : "/organisations/matching/self-assessment"
-                                      |    }
-                                      |  },
-                                      |  "matchId" : "$matchId"
-                                      |}""".stripMargin)
-
-    val cachedData:List[Cache] = Await.result(mongoRepository.find(("_id", JsString(matchId.toString))), Duration(5, TimeUnit.SECONDS))
-    cachedData.isEmpty mustBe false
-  }
-
-  Scenario("Valid POST request to self-assessment endpoint but match not found") {
-
-    Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-    Given("Data found in IF")
-    IfStub.searchSaCompanyDetails(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
-
-    Given("An unsuccessful match")
-    MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
-
-    val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
-
-    val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
-      .headers(requestHeaders(acceptHeaderP1))
-      .postData(requestString)
-      .asString
-
-    Then("The response status should be 403 (Forbidden)")
-    response.code mustBe Status.FORBIDDEN
-
-    And("The response should have a valid payload")
-    val responseJson = Json.parse(response.body)
-
-    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
-  }
-
-  Scenario("Valid POST request to self-assessment endpoint but IF data not found") {
-
-    Given("A valid privileged Auth bearer token")
-    AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-    Given("Data found in IF")
-    IfStub.searchSaCompanyDetailsNotFound(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
-
-    Given("An unsuccessful match")
-    MatchingStub.willReturnSaMatchNotFound(correlationIdHeader._2)
-
-    val requestString: String = Json.prettyPrint(Json.toJson(saRequest))
-
-    val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
-      .headers(requestHeaders(acceptHeaderP1))
-      .postData(requestString)
-      .asString
-
-    Then("The response status should be 403 (Forbidden)")
-    response.code mustBe Status.FORBIDDEN
-
-    And("The response should have a valid payload")
-    val responseJson = Json.parse(response.body)
-
-    responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
-  }
-
 }
