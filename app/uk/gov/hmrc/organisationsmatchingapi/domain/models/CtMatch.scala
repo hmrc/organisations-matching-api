@@ -35,6 +35,7 @@ object CtMatch {
   def convert(cacheData: CtMatch) = {
     Json.toJson(
       CtMatchingResponse(
+        cacheData.request.companyRegistrationNumber,
         cacheData.request.employerName,
         Address(
           Some(cacheData.request.addressLine1),

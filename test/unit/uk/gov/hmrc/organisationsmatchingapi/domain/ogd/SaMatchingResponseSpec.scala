@@ -28,6 +28,7 @@ class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
     "Read and write" in {
 
       val saMatchingResponse = SaMatchingResponse(
+        selfAssessmentUniqueTaxPayerRef = "12345",
         taxPayerType = "A",
         taxPayerName = "name",
         address = Address(
@@ -37,6 +38,7 @@ class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
       val asJson = Json.toJson(saMatchingResponse)
 
       asJson shouldBe Json.parse("""{
+                                   |  "selfAssessmentUniqueTaxPayerRef" : "12345",
                                    |  "taxPayerType" : "A",
                                    |  "taxPayerName" : "name",
                                    |  "address" : {

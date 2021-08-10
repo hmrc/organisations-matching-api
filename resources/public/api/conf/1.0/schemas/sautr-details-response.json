@@ -7,6 +7,12 @@
     "_links"
   ],
   "properties": {
+    "selfAssessmentUniqueTaxPayerRef": {
+      "type": "string",
+      "description": "The organisation's Unique Taxpayer Reference for Self Assessment.",
+      "pattern": "^[0-9]{10}$",
+      "example": "1234567890"
+    },
     "taxPayerType": {
       "type": "string",
       "description": "Individual, Partnership",

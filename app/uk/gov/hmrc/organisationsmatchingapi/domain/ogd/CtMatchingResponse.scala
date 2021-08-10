@@ -18,7 +18,8 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, Json}
 
-case class CtMatchingResponse(employerName: String,
+case class CtMatchingResponse(companyRegistrationNumber: String,
+                              employerName: String,
                               address: Address )
 
 object CtMatchingResponse {
