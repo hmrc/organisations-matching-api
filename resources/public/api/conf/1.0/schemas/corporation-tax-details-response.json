@@ -3,7 +3,8 @@
   "description": "Company Details Response",
   "required": [
     "employerName",
-    "address"
+    "address",
+    "_links"
   ],
   "properties": {
     "companyRegistrationNumber": {
@@ -64,7 +65,8 @@
           "type": "object",
           "description": "The URI for the endpoint to get Corporation Tax details for the matched organisation.",
           "required": [
-            "href"
+            "href",
+            "title"
           ],
           "properties": {
             "href": {
@@ -82,7 +84,8 @@
           "type": "object",
           "description": "The URI for the endpoint to get number of employees data.",
           "required": [
-            "href"
+            "href",
+            "title"
           ],
           "properties": {
             "href": {
