@@ -35,12 +35,22 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
 
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
 
+  def headerConvert(hc: HeaderCarrier): Seq[(String, String)] = {
+    def getValue(headerName: String) = hc.headers(Seq(headerName)).head._2
+    
+    val appId = getValue("X-Application-ID")
+    val correlationId = getValue("CorrelationId")
+
+    Seq(("X-Application-Id", appId),
+      ("CorrelationId", correlationId))
+  }
+
   def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)
                      (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
 
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
-    recover(http.POST[CtOrganisationsMatchingRequest, JsValue](url, postData) map {
+    recover(http.POST[CtOrganisationsMatchingRequest, JsValue](url, postData, headerConvert(hc)) map {
       response =>
         auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
         response
@@ -52,7 +62,7 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
 
     val url = s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 
-    recover(http.POST[SaOrganisationsMatchingRequest, JsValue](url, postData) map {
+    recover(http.POST[SaOrganisationsMatchingRequest, JsValue](url, postData, headerConvert(hc)) map {
       response =>
         auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
         response
