@@ -34,15 +34,11 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
                                               (implicit ec: ExecutionContext) {
 
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
+  private val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
 
   def headerConvert(hc: HeaderCarrier): Seq[(String, String)] = {
     def getValue(headerName: String) = hc.headers(Seq(headerName)).head._2
-    
-    val appId = getValue("X-Application-ID")
-    val correlationId = getValue("CorrelationId")
-
-    Seq(("X-Application-Id", appId),
-      ("CorrelationId", correlationId))
+    requiredHeaders.map(rh => (rh, getValue(rh)))
   }
 
   def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)
