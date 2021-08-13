@@ -539,7 +539,7 @@ class OrganisationsMatchingConnectorSpec
     }
 
     "return appropriate header carrier" in new Setup {
-      hc.headers(underTest.requiredHeaders) shouldBe(Seq("X-Application-ID" -> "12345", "CorrelationId" -> correlationId))
+      hc.headers(underTest.requiredHeaders) shouldBe(Seq("CorrelationId" -> correlationId, "X-Application-ID" -> "12345"))
     }
   }
 }
