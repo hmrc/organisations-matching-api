@@ -59,7 +59,7 @@ class OrganisationsMatchingConnectorSpec
     .bindings(bindModules: _*)
     .configure(
       "auditing.enabled" -> false,
-      "cache.enabled"  -> false,
+      "cache.enabled" -> false,
       "microservice.services.organisations-matching.host" -> "127.0.0.1",
       "microservice.services.organisations-matching.port" -> "11122",
     )
@@ -69,25 +69,28 @@ class OrganisationsMatchingConnectorSpec
     fakeApplication.injector.instanceOf[ExecutionContext]
 
   trait Setup {
-    val matchId       = "80a6bb14-d888-436e-a541-4000674c60aa"
+    val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
     val correlationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-    val ctKnownFacts  = CtKnownFacts("test", "test", "test", "test")
-    val name          = IfNameDetails(Some("test"), Some("test"))
-    val address       = IfAddress(Some("test"), None, None, None, Some("test"))
-    val details       = IfNameAndAddressDetails(Some(name), Some(address))
-    val ctIfData      = IfCorpTaxCompanyDetails(Some("test"), Some("test"), Some(details), Some(details))
-    val ctPostData    = CtOrganisationsMatchingRequest(ctKnownFacts, ctIfData)
+    val applicationId = "12345"
+    val correlationIdHeader: (String, String) = ("CorrelationId" -> correlationId)
+    val applicationIdHeader: (String, String) = ("X-Application-ID" -> "12345")
+    val ctKnownFacts = CtKnownFacts("test", "test", "test", "test")
+    val name = IfNameDetails(Some("test"), Some("test"))
+    val address = IfAddress(Some("test"), None, None, None, Some("test"))
+    val details = IfNameAndAddressDetails(Some(name), Some(address))
+    val ctIfData = IfCorpTaxCompanyDetails(Some("test"), Some("test"), Some(details), Some(details))
+    val ctPostData = CtOrganisationsMatchingRequest(ctKnownFacts, ctIfData)
 
-    val saKnownFacts    = SaKnownFacts("test", "Individual", "test", "test", "test")
-    val saDetails       = IfSaTaxPayerNameAddress(Some("test"), None, Some(address))
+    val saKnownFacts = SaKnownFacts("test", "Individual", "test", "test", "test")
+    val saDetails = IfSaTaxPayerNameAddress(Some("test"), None, Some(address))
     val taxpayerDetails = Some(Seq(saDetails))
-    val saIfData        = IfSaTaxpayerDetails(Some("test"), Some("Individual"), taxpayerDetails)
-    val saPostData      = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)
+    val saIfData = IfSaTaxpayerDetails(Some("test"), Some("Individual"), taxpayerDetails)
+    val saPostData = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = Seq(correlationIdHeader, applicationIdHeader))
 
-    val config: ServicesConfig   = fakeApplication.injector.instanceOf[ServicesConfig]
-    val httpClient: HttpClient   = fakeApplication.injector.instanceOf[HttpClient]
+    val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
+    val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new OrganisationsMatchingConnector(config, httpClient, auditHelper)
@@ -533,6 +536,10 @@ class OrganisationsMatchingConnectorSpec
       verify(underTest.auditHelper,
         times(1)).auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
 
+    }
+
+    "return appropriate header carrier" in new Setup {
+      underTest.headerConvert(hc) shouldBe(Seq("X-Application-ID" -> "12345", "CorrelationId" -> correlationId))
     }
   }
 }
