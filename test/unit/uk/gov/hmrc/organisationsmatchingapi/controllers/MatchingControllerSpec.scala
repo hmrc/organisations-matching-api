@@ -24,9 +24,11 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
+import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.PlayBodyParsers
 import play.api.test.{FakeRequest, Helpers}
+import play.i18n.Langs
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -39,6 +41,7 @@ import scala.concurrent.Future
 class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers with MockitoSugar {
 
   private implicit val ec  = scala.concurrent.ExecutionContext.Implicits.global
+  private implicit val lang = Lang.defaultLang
 
   private val mockAuthConnector = mock[AuthConnector]
   private val mockCacheService = mock[CacheService]
@@ -47,16 +50,18 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
   private val scopesHelper = new ScopesHelper(mockScopesService)
   private val mockMatchingService = mock[MatchingService]
   private val mockBodyParser = mock[PlayBodyParsers]
+  private val mockMessagesApi = Helpers.stubMessagesApi()
 
   private val controller = new MatchingController(
     mockAuthConnector,
     Helpers.stubControllerComponents(),
+    Helpers.stubMessagesControllerComponents(),
     mockScopesService,
     scopesHelper,
     mockBodyParser,
     mockCacheService,
     mockMatchingService
-  )(ec, mockAuditHelper)
+  )(mockAuditHelper, ec)
 
   given(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
     .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope"), Enrolment("test-scope-1")))))

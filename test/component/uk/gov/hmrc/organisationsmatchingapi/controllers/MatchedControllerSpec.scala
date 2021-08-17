@@ -31,13 +31,14 @@ class MatchedControllerSpec extends BaseSpec  {
 
   val matchId   = UUID.randomUUID()
   val scopes    = List("read:organisations-matching-ho-ssp")
-  val ctRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
+  val ctRequest = CtMatchingRequest("0123456789", "name", "line1", "postcode")
   val ctMatch   = CtMatch(ctRequest, matchId, utr = Some("testutr"))
   val saRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
   val saMatch   = SaMatch(saRequest, matchId, utr = Some("testutr"))
 
   Feature("cotax") {
     Scenario("a valid request is made for an existing match") {
+
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
@@ -76,6 +77,23 @@ class MatchedControllerSpec extends BaseSpec  {
       )
     }
 
+    Scenario("a request is made with a missing match id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax/")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe NOT_FOUND
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
+    }
+
     Scenario("a valid request is made for an expired match") {
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
@@ -90,54 +108,6 @@ class MatchedControllerSpec extends BaseSpec  {
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
-      )
-
-    }
-
-    Scenario("not authorized") {
-
-      Given("an invalid privileged Auth bearer token")
-      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
-
-      When("the API is invoked")
-      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
-        .headers(requestHeaders(acceptHeaderP1))
-        .asString
-
-      Then("the response status should be 401 (unauthorized)")
-      response.code shouldBe UNAUTHORIZED
-      Json.parse(response.body) shouldBe Json.obj(
-        "code"    -> "UNAUTHORIZED",
-        "message" -> "Bearer token is missing or not authorized"
-      )
-    }
-
-    Scenario("a request is made with a missing match id") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-      When("the API is invoked")
-      val response = Http(s"$serviceUrl/corporation-tax/")
-        .headers(requestHeaders(acceptHeaderP1))
-        .asString
-
-      response.code shouldBe NOT_FOUND
-    }
-
-    Scenario("a request is made with a malformed match id") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-      When("the API is invoked")
-      val response = Http(s"$serviceUrl/corporation-tax/foo")
-        .headers(requestHeaders(acceptHeaderP1))
-        .asString
-
-      response.code shouldBe BAD_REQUEST
-
-      Json.parse(response.body) shouldBe Json.obj(
-        "statusCode"    -> 400,
-        "message" -> "bad request, cause: REDACTED"
       )
     }
 
@@ -174,9 +144,45 @@ class MatchedControllerSpec extends BaseSpec  {
         "message" -> "Malformed CorrelationId"
       )
     }
+
+    Scenario("not authorized") {
+
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code shouldBe UNAUTHORIZED
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
+    }
+
+    Scenario("a request is made with a malformed match id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/corporation-tax/foo")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "matchId format is invalid"
+      )
+    }
   }
 
   Feature("self-assessment") {
+
     Scenario("a valid request is made for an existing match") {
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
@@ -217,7 +223,25 @@ class MatchedControllerSpec extends BaseSpec  {
       )
     }
 
+    Scenario("a request is made with a missing match id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/self-assessment/")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe NOT_FOUND
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
+    }
+
     Scenario("a valid request is made for an expired match") {
+
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
@@ -231,54 +255,6 @@ class MatchedControllerSpec extends BaseSpec  {
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "NOT_FOUND",
         "message" -> "The resource can not be found"
-      )
-
-    }
-
-    Scenario("not authorized") {
-
-      Given("an invalid privileged Auth bearer token")
-      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
-
-      When("the API is invoked")
-      val response = Http(s"$serviceUrl/self-assessment/$matchId")
-        .headers(requestHeaders(acceptHeaderP1))
-        .asString
-
-      Then("the response status should be 401 (unauthorized)")
-      response.code shouldBe UNAUTHORIZED
-      Json.parse(response.body) shouldBe Json.obj(
-        "code"    -> "UNAUTHORIZED",
-        "message" -> "Bearer token is missing or not authorized"
-      )
-    }
-
-    Scenario("a request is made with a missing match id") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-      When("the API is invoked")
-      val response = Http(s"$serviceUrl/self-assessment/")
-        .headers(requestHeaders(acceptHeaderP1))
-        .asString
-
-      response.code shouldBe NOT_FOUND
-    }
-
-    Scenario("a request is made with a malformed match id") {
-      Given("A valid privileged Auth bearer token")
-      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
-
-      When("the API is invoked")
-      val response = Http(s"$serviceUrl/self-assessment/foo")
-        .headers(requestHeaders(acceptHeaderP1))
-        .asString
-
-      response.code shouldBe BAD_REQUEST
-
-      Json.parse(response.body) shouldBe Json.obj(
-        "statusCode"    -> 400,
-        "message" -> "bad request, cause: REDACTED"
       )
     }
 
@@ -313,6 +289,41 @@ class MatchedControllerSpec extends BaseSpec  {
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
         "message" -> "Malformed CorrelationId"
+      )
+    }
+
+    Scenario("not authorized") {
+
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/self-assessment/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code shouldBe UNAUTHORIZED
+      Json.parse(response.body) shouldBe Json.obj(
+        "code"    -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
+    }
+
+    Scenario("a request is made with a malformed match id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/self-assessment/foo")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" ->"INVALID_REQUEST",
+        "message" ->"matchId format is invalid"
       )
     }
   }
@@ -365,8 +376,8 @@ class MatchedControllerSpec extends BaseSpec  {
       response.code shouldBe BAD_REQUEST
 
       Json.parse(response.body) shouldBe Json.obj(
-        "statusCode"    -> 400,
-        "message" -> "bad request, cause: REDACTED"
+        "code"    -> "INVALID_REQUEST",
+        "message" -> "matchId format is invalid"
       )
     }
   }

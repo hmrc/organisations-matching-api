@@ -34,6 +34,10 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
     new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
   }
 
+lazy val playSettings: Seq[Setting[_]] = Seq(
+  routesImport ++= Seq(
+    "uk.gov.hmrc.organisationsmatchingapi.Binders._"))
+
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .settings(
@@ -50,7 +54,7 @@ lazy val microservice = Project(appName, file("."))
     testOptions in Test := Seq(Tests.Filter(unitFilter))
     // ***************
   )
-
+  .settings(playSettings)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
