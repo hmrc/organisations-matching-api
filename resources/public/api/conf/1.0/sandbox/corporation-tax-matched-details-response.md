@@ -16,6 +16,14 @@
         <td><p>200 (OK)</p><p>Payload as response example above</p></td>
     </tr>
     <tr>
+        <td><p>Malformed matchId</p></td>
+        <td><p>matchId is in the incorrect format. Check the path parameters section for the correct format.</p></td>
+        <td>
+            <p>400 (Bad Request)</p>
+            <p>{ &quot;code&quot; : &quot;INVALID_REQUEST&quot;,<br/>&quot;message&quot; : &quot;matchId format is invalid&quot; }</p>
+        </td>
+    </tr>
+    <tr>
         <td><p>matchId is not included</p></td>
         <td><p>The request is missing the matchId. Check the path parameters section for what should be included.</p></td>
         <td>
