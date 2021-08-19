@@ -329,12 +329,12 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
     }
 
     "runtime exception is encountered through no match for information provided" should {
-      "return MATCHING_FAILED 403" in new Setup {
+      "return MATCHING_FAILED 404" in new Setup {
         given(matchedService.fetchMatchedOrganisationRecord(matchId))
           .willReturn(Future.failed(new MatchingException))
 
         val result = await(controller.matchedOrganisation(matchId)(fakeRequest))
-        status(result) shouldBe 403
+        status(result) shouldBe NOT_FOUND
 
         jsonBodyOf(result) shouldBe Json.parse(
           s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}"""

@@ -71,7 +71,7 @@ class MatchedControllerSpec extends BaseSpec  {
            |      "title": "Get the organisation's Corporation Tax details data."
            |    }
            |  },
-           |  "companyRegistrationNumber": "crn",
+           |  "companyRegistrationNumber": "${ctRequest.companyRegistrationNumber}",
            |  "employerName": "name"
            |}""".stripMargin
       )
