@@ -43,7 +43,7 @@
         <td>
             <p>There is no match for the information provided.</p>
         </td>
-        <td><p>403 (Forbidden)</p>
+        <td><p>404 (Not Found)</p>
         <p>{ &quot;code&quot; : &quot;MATCHING_FAILED&quot;,<br/>&quot;message&quot; : &quot;There is no match for the information provided&quot; }</p></td>
     </tr>
     <tr>
