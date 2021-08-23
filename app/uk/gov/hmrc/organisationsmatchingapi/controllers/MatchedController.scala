@@ -84,10 +84,8 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
   }
 
   def matchedOrganisation(matchId: UUID) = Action.async { implicit request =>
-    withUuid(matchId.toString) { matchUuid =>
-      matchedService.fetchMatchedOrganisationRecord(matchUuid) map { matchedOrganisation =>
+      matchedService.fetchMatchedOrganisationRecord(matchId) map { matchedOrganisation =>
         Ok(toJson(matchedOrganisation))
-      }
     } recover recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/$matchId")
   }
 }
