@@ -57,12 +57,6 @@ abstract class BaseApiController  @Inject()(mcc: MessagesControllerComponents, c
         Future.failed(new BadRequestException(mcc.messagesApi(firstError._2.head.message, firstError._1)))
     }
 
-  protected def withUuid(uuidString: String)(f: UUID => Future[Result]): Future[Result] =
-    Try(UUID.fromString(uuidString)) match {
-      case Success(uuid) => f(uuid)
-      case _             => successful(ErrorNotFound.toHttpResponse)
-    }
-
   private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(
     implicit request: RequestHeader,
     auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
@@ -132,7 +126,4 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
         }
       }
   }
-
-  def requiresPrivilegedAuthentication(body: => Future[Result])(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Result] =
-    authorised(Enrolment("read:individuals-matching"))(body)
 }

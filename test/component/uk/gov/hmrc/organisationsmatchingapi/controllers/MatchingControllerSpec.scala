@@ -179,8 +179,8 @@ class MatchingControllerSpec extends BaseSpec  {
         .postData(ctRequestString)
         .asString
 
-      Then("The response status should be 403 (Forbidden)")
-      response.code mustBe Status.FORBIDDEN
+      Then("The response status should be 404 (Not Found)")
+      response.code mustBe Status.NOT_FOUND
 
       And("The response should have a valid payload")
       val responseJson = Json.parse(response.body)
@@ -205,8 +205,8 @@ class MatchingControllerSpec extends BaseSpec  {
         .postData(ctRequestString)
         .asString
 
-      Then("The response status should be 403 (Forbidden)")
-      response.code mustBe Status.FORBIDDEN
+      Then("The response status should be 404 (Not Found)")
+      response.code mustBe Status.NOT_FOUND
 
       And("The response should have a valid payload")
       val responseJson = Json.parse(response.body)
@@ -330,8 +330,8 @@ class MatchingControllerSpec extends BaseSpec  {
         .postData(saRequestString)
         .asString
 
-      Then("The response status should be 403 (Forbidden)")
-      response.code mustBe Status.FORBIDDEN
+      Then("The response status should be 404 (Not Found)")
+      response.code mustBe Status.NOT_FOUND
 
       And("The response should have a valid payload")
       val responseJson = Json.parse(response.body)
@@ -355,8 +355,8 @@ class MatchingControllerSpec extends BaseSpec  {
         .postData(saRequestString)
         .asString
 
-      Then("The response status should be 403 (Forbidden)")
-      response.code mustBe Status.FORBIDDEN
+      Then("The response status should be 404 (Not Found)")
+      response.code mustBe Status.NOT_FOUND
 
       And("The response should have a valid payload")
       val responseJson = Json.parse(response.body)
