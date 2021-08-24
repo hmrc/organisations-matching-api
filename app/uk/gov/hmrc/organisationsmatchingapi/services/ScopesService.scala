@@ -37,10 +37,6 @@ class ScopesService @Inject()(configuration: Configuration) {
       .map(s => s.endpoints)
       .getOrElse(List())
 
-  def getScopeItems(scope: String): List[String] =
-    getScopeFieldKeys(scope)
-      .flatMap(fieldId => apiConfig.internalEndpoints.flatMap(e => e.fields.get(fieldId)))
-
   def getEndpointFieldKeys(endpointKey: String): Iterable[String] =
     apiConfig
       .getInternalEndpoint(endpointKey)

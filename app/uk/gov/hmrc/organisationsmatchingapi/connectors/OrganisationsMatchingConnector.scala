@@ -33,6 +33,8 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
                                                val auditHelper: AuditHelper)
                                               (implicit ec: ExecutionContext) {
 
+  val logger : Logger = Logger(this.getClass)
+
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
   val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
 
@@ -73,22 +75,22 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
       throw new MatchingException
     }
     case validationError: JsValidationException => {
-      Logger.warn("Organisations Matching JsValidationException encountered")
+      logger.warn("Organisations Matching JsValidationException encountered")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Error parsing organisations matching response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case Upstream5xxResponse(msg, code, _, _) => {
-      Logger.warn(s"Organisations Matching Upstream5xxResponse encountered: $code")
+      logger.warn(s"Organisations Matching Upstream5xxResponse encountered: $code")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case Upstream4xxResponse(msg, code, _, _) => {
-      Logger.warn(s"Organisations Matching Upstream4xxResponse encountered: $code")
+      logger.warn(s"Organisations Matching Upstream4xxResponse encountered: $code")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case e: Exception => {
-      Logger.warn(s"Organisations Matching Exception encountered")
+      logger.warn(s"Organisations Matching Exception encountered")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, e.getMessage)
       Future.failed(new InternalServerException("Something went wrong."))
     }

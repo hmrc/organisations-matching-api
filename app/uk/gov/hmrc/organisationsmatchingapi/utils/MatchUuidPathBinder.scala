@@ -38,6 +38,6 @@ class MatchUuidPathBinder extends PathBindable[UUID] {
     }
   }
 
-  override def unbind(key: String, uuid: UUID) = s"${uuid.toString}"
+  override def unbind(key: String, uuid: UUID) = s"$key=${uuid.toString}"
 
 }
