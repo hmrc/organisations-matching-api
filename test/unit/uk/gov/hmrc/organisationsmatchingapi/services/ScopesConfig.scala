@@ -22,6 +22,8 @@ trait ScopesConfig {
 
   val mockScopeOne: String = "scopeOne"
   val mockScopeTwo: String = "scopeTwo"
+  val mockScopeThree: String = "scopeThree"
+  val mockScopeFour: String = "scopeFour"
 
   val endpointKeyOne : String = "A"
   val endpointKeyTwo : String = "B"
@@ -32,10 +34,20 @@ trait ScopesConfig {
   val endpointThree : String = "sampleEndpointThree"
 
   val mockConfig : Configuration = Configuration(
+
     (s"api-config.scopes.$mockScopeOne.endpoints", Seq(endpointKeyOne, endpointKeyTwo)),
     (s"api-config.scopes.$mockScopeOne.fields", Seq("A", "B", "C", "D")),
+
     (s"api-config.scopes.$mockScopeTwo.endpoints", Seq(endpointKeyTwo, endpointKeyThree)),
     (s"api-config.scopes.$mockScopeTwo.fields", Seq("E", "F", "G", "H", "I")),
+
+    (s"api-config.scopes.$mockScopeThree.endpoints", Seq(endpointKeyThree)),
+    (s"api-config.scopes.$mockScopeThree.fields", Seq("G", "H", "I")),
+    (s"api-config.scopes.$mockScopeThree.filters", Seq("A")),
+
+    (s"api-config.scopes.$mockScopeFour.endpoints", Seq(endpointKeyThree)),
+    (s"api-config.scopes.$mockScopeFour.fields", Seq("G", "H", "I")),
+    (s"api-config.scopes.$mockScopeFour.filters", Seq("B")),
 
     (s"api-config.endpoints.internal.$endpointOne.key", endpointKeyOne),
     (s"api-config.endpoints.internal.$endpointOne.endpoint", "/internal/1"),
@@ -51,6 +63,7 @@ trait ScopesConfig {
     (s"api-config.endpoints.internal.$endpointThree.endpoint", "/internal/3"),
     (s"api-config.endpoints.internal.$endpointThree.title", "Get the third endpoint"),
     (s"api-config.endpoints.internal.$endpointThree.fields", Seq("G", "H", "I")),
+    (s"api-config.endpoints.internal.$endpointThree.filters", Seq("A", "B")),
 
     (s"api-config.endpoints.external.$endpointOne.key", endpointKeyOne),
     (s"api-config.endpoints.external.$endpointOne.endpoint", "/external/1"),
@@ -75,5 +88,8 @@ trait ScopesConfig {
     (s"api-config.fields.G", "path/to/g"),
     (s"api-config.fields.H", "path/to/h"),
     (s"api-config.fields.I", "path/to/i"),
+
+    (s"api-config.filters.A", "contains(path/to/g,'FILTERED_VALUE_1')"),
+    (s"api-config.filters.B", "contains(path/to/g,'FILTERED_VALUE_2')"),
   )
 }

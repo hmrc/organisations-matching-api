@@ -30,7 +30,6 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
     endpoints.map(_.key) shouldBe Seq(endpointKeyOne, endpointKeyTwo)
     endpoints.map(_.link) shouldBe Seq("/external/1", "/external/2")
     endpoints.map(_.title) shouldBe Seq("Get the first endpoint", "Get the second endpoint")
-
   }
 
   "Gets correct external endpoints from configuration for second scope" in {
@@ -56,6 +55,6 @@ class ScopesServiceSpec extends UnitSpec with Matchers with ScopesConfig {
 
   "Gets all scopes correctly" in {
     val scopes = scopesService.getAllScopes
-    scopes.toSeq shouldBe Seq(mockScopeOne, mockScopeTwo)
+    scopes.toSeq shouldBe Seq(mockScopeFour, mockScopeOne, mockScopeThree, mockScopeTwo)
   }
 }
