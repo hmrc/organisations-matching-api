@@ -72,21 +72,22 @@ class IfConnector @Inject()(
 
   private def extractCorrelationId(requestHeader: RequestHeader) = validateCorrelationId(requestHeader).toString
 
-  def setHeaders = Seq(
+  def setHeaders(requestHeader: RequestHeader) = Seq(
     HeaderNames.authorisation -> s"Bearer $integrationFrameworkBearerToken",
-    "Environment"             -> integrationFrameworkEnvironment
+    "Environment"             -> integrationFrameworkEnvironment,
+    "CorrelationId"           -> extractCorrelationId(requestHeader)
   )
 
   private def callSa(url: String, matchId: String)
                     (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover[IfSaTaxpayerDetails](http.GET[IfSaTaxpayerDetails](url, headers = setHeaders) map { response =>
+    recover[IfSaTaxpayerDetails](http.GET[IfSaTaxpayerDetails](url, headers = setHeaders(request)) map { response =>
       auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, Json.toJson(response).toString)
       response
     }, extractCorrelationId(request), matchId, request, url)
 
   private def callCt(url: String, matchId: String)
                     (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover[IfCorpTaxCompanyDetails](http.GET[IfCorpTaxCompanyDetails](url, headers = setHeaders)map { response =>
+    recover[IfCorpTaxCompanyDetails](http.GET[IfCorpTaxCompanyDetails](url, headers = setHeaders(request))map { response =>
       auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, Json.toJson(response).toString)
       response
     }, extractCorrelationId(request), matchId, request, url)
