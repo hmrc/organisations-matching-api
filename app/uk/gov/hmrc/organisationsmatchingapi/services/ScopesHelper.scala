@@ -33,7 +33,7 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     */
   def getQueryStringFor(scopes: Iterable[String], endpoints: List[String]): String = {
     val filters = scopesService.getValidFilters(scopes, endpoints)
-    s"${PathTree(scopesService.getValidItemsFor(scopes, endpoints)).toString}${if (filters.nonEmpty)
+    s"${PathTree(scopesService.getIfDataPaths(scopes, endpoints)).toString}${if (filters.nonEmpty)
       s"&filter=${filters.mkString("&filter=")}"
     else ""}"
   }
