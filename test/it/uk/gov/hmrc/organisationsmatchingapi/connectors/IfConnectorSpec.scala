@@ -79,7 +79,7 @@ class IfConnectorSpec
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
     val sampleCorrelationIdHeader: (String, String) = ("CorrelationId" -> sampleCorrelationId)
 
-    implicit val hc: HeaderCarrier = HeaderCarrier().withExtraHeaders(sampleCorrelationIdHeader)
+    implicit val hc: HeaderCarrier = HeaderCarrier()
 
     val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
     val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]
