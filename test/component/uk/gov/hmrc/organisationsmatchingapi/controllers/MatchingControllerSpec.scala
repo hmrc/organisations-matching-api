@@ -93,7 +93,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |  "_links" : {
            |    "getCorporationTaxMatch" : {
            |      "href" : "/organisations/matching/corporation-tax/$matchId",
-           |      "title" : "Get links to Corporation Tax and number of employee details for a matched organisation"
+           |      "title" : "Get links to Corporation Tax and number of employees details for a matched organisation"
            |    },
            |    "self" : {
            |      "href" : "/organisations/matching/corporation-tax"
