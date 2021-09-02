@@ -29,7 +29,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get links to Corporation Tax and number of employee details for a matched organisation"
+              "description": "Get links to Corporation Tax and number of employees details for a matched organisation"
             }
           }
         },

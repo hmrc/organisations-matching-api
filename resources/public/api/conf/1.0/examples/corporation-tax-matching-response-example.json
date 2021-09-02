@@ -2,7 +2,7 @@
   "_links": {
     "getCorporationTaxMatch": {
       "href": "/organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "title": "Get links to Corporation Tax and number of employee details for a matched organisation"
+      "title": "Get links to Corporation Tax and number of employees details for a matched organisation"
     },
     "self": {
       "href": "/organisations/matching/corporation-tax"
