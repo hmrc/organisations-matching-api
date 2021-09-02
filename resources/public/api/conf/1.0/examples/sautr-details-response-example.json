@@ -4,7 +4,7 @@
   "taxPayerName": "Partnership Name",
   "address": {
     "addressLine1": "123 Long Road",
-    "postcode": "t"
+    "postcode": "AB12 3CD"
   },
   "_links": {
     "self": {
