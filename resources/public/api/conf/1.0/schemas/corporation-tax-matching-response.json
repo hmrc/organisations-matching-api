@@ -16,7 +16,7 @@
       "properties": {
         "getCorporationTaxMatch": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the organisation's details for the requested matchId.",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint that provides links to get Corporation Tax details for the matched organisation.",
           "required": [
             "href",
             "title"
@@ -29,13 +29,13 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's details"
+              "description": "Get links to Corporation Tax and number of employee details for a matched organisation"
             }
           }
         },
         "self": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "description": "The URI for this endpoint.",
           "required": [
             "href"
           ],

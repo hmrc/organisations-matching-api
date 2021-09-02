@@ -11,7 +11,7 @@
     },
     "getCorporationTaxDetails": {
       "href": "organisations/details/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "title": "Get the organisation's Corporation Tax details data."
+      "title": "Get an organisation's Corporation Tax details"
     },
     "getEmployeeCount": {
       "href": "organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",

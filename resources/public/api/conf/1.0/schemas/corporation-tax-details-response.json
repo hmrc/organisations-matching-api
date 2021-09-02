@@ -76,7 +76,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's PAYE details"
+              "description": "Get an organisation's Corporation Tax details"
             }
           }
         },
@@ -95,7 +95,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's number of employees data"
+              "description": "Find the number of employees for an organisation"
             }
           }
         }
