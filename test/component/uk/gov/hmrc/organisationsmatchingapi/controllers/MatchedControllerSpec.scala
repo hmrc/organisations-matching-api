@@ -61,7 +61,7 @@ class MatchedControllerSpec extends BaseSpec  {
            |  "_links": {
            |    "getEmployeeCount": {
            |      "href": "/organisations/details/number-of-employees?matchId=$matchId",
-           |      "title": "Get the organisation's paye employee count data."
+           |      "title": "Find the number of employees for an organisation"
            |    },
            |    "self": {
            |      "href": "/organisations/matching/corporation-tax/$matchId"
@@ -206,7 +206,7 @@ class MatchedControllerSpec extends BaseSpec  {
            |  "_links": {
            |    "getEmployeeCount": {
            |      "href": "/organisations/details/number-of-employees?matchId=$matchId",
-           |      "title": "Get the organisation's paye employee count data."
+           |      "title": "Find the number of employees for an organisation"
            |    },
            |    "getSelfAssessmentDetails": {
            |      "href": "/organisations/details/self-assessment?matchId=$matchId",
