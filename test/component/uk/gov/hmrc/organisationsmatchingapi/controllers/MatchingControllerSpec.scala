@@ -304,7 +304,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |  "_links" : {
            |    "getSelfAssessmentMatch" : {
            |      "href" : "/organisations/matching/self-assessment/$matchId",
-           |      "title" : "Get an organisation's Self Assessment details"
+           |      "title" : "Get links to Self Assessment and number of employees details for a matched organisation"
            |    },
            |    "self" : {
            |      "href" : "/organisations/matching/self-assessment"
