@@ -16,7 +16,7 @@
     },
     "getEmployeeCount": {
       "href": "organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-      "title": "Get an organisation's Self Assessment details"
+      "title": "Find the number of employees for an organisation"
     }
   }
 }
