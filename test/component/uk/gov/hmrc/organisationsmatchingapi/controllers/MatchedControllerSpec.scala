@@ -61,14 +61,14 @@ class MatchedControllerSpec extends BaseSpec  {
            |  "_links": {
            |    "getEmployeeCount": {
            |      "href": "/organisations/details/number-of-employees?matchId=$matchId",
-           |      "title": "Get the organisation's paye employee count data."
+           |      "title": "Find the number of employees for an organisation"
            |    },
            |    "self": {
            |      "href": "/organisations/matching/corporation-tax/$matchId"
            |    },
            |    "getCorporationTaxDetails": {
            |      "href": "/organisations/details/corporation-tax?matchId=$matchId",
-           |      "title": "Get the organisation's Corporation Tax details data."
+           |      "title": "Get an organisation's Corporation Tax details"
            |    }
            |  },
            |  "companyRegistrationNumber": "${ctRequest.companyRegistrationNumber}",
@@ -206,11 +206,11 @@ class MatchedControllerSpec extends BaseSpec  {
            |  "_links": {
            |    "getEmployeeCount": {
            |      "href": "/organisations/details/number-of-employees?matchId=$matchId",
-           |      "title": "Get the organisation's paye employee count data."
+           |      "title": "Find the number of employees for an organisation"
            |    },
            |    "getSelfAssessmentDetails": {
            |      "href": "/organisations/details/self-assessment?matchId=$matchId",
-           |      "title": "Get the organisation's self-assessment details data."
+           |      "title": "Get an organisation's Self Assessment details"
            |    },
            |    "self": {
            |      "href": "/organisations/matching/self-assessment/$matchId"

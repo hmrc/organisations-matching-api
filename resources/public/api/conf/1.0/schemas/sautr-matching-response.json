@@ -16,7 +16,7 @@
       "properties": {
         "getSelfAssessmentMatch": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for the endpoint to get the organisation's self assessment details for the requested matchId.",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint that provides links to get Self Assessment details for the matched organisation.",
           "required": [
             "href",
             "title"
@@ -29,13 +29,13 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's self assessment details"
+              "description": "Get links to Self Assessment and number of employees details for a matched organisation"
             }
           }
         },
         "self": {
           "type": "object",
-          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "description": "The URI for this endpoint.",
           "required": [
            "href"
           ],

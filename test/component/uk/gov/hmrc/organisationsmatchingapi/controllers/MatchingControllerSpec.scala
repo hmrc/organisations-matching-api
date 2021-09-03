@@ -93,7 +93,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |  "_links" : {
            |    "getCorporationTaxMatch" : {
            |      "href" : "/organisations/matching/corporation-tax/$matchId",
-           |      "title" : "Get the organisation's details"
+           |      "title" : "Get links to Corporation Tax and number of employees details for a matched organisation"
            |    },
            |    "self" : {
            |      "href" : "/organisations/matching/corporation-tax"
@@ -304,7 +304,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |  "_links" : {
            |    "getSelfAssessmentMatch" : {
            |      "href" : "/organisations/matching/self-assessment/$matchId",
-           |      "title" : "Get the organisation's self assessment details"
+           |      "title" : "Get links to Self Assessment and number of employees details for a matched organisation"
            |    },
            |    "self" : {
            |      "href" : "/organisations/matching/self-assessment"

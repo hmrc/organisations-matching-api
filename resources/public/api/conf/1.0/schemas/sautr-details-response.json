@@ -84,7 +84,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's Self Assessment details"
+              "description": "Get an organisation's Self Assessment details"
             }
           }
         },
@@ -103,7 +103,7 @@
             },
             "title": {
               "type": "string",
-              "description": "Get the organisation's number of employees data"
+              "description": "Find the number of employees for an organisation"
             }
           }
         }
