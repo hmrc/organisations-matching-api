@@ -18,7 +18,7 @@ object AppDependencies {
   )
 
   def test(scope: String = "test, it, component") = Seq(
-    hmrc                           %% "bootstrap-test-play-28"   % "5.12.0"                 % scope,
+    hmrc                           %% "bootstrap-test-play-28"   % "5.12.0"                % scope,
     hmrcMongo                      %% "hmrc-mongo-test-play-27"  % "0.53.0"                % scope,
     "org.scalatestplus"            %% "mockito-3-4"              % "3.2.7.0"               % scope,
     "org.scalatest"                %% "scalatest"                % "3.2.9"                 % scope,
