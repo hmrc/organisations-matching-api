@@ -30,7 +30,7 @@ object AppDependencies {
     "org.mockito"                  %  "mockito-core"             % "3.8.0"                 % scope,
     hmrc                           %% "service-integration-test" % "1.1.0-play-27"         % scope,
     "org.scalaj"                   %% "scalaj-http"              % "2.4.2"                 % scope,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"     % "2.12.2"
+    "com.fasterxml.jackson.module" %% "jackson-module-scala"     % "2.12.2"                % scope
   )
 
 }
