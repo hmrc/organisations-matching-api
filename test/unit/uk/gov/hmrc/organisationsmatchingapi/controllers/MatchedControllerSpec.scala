@@ -147,7 +147,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result = await(controller.matchedOrganisationCt(matchId)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        jsonBodyOf(result) shouldBe Json.toJson(ErrorNotFound)
+        jsonBodyOf(result) shouldBe Json.parse(s"""{"code":"NOT_FOUND", "message":"The resource can not be found"}""")
       }
     }
 
@@ -252,7 +252,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result = await(controller.matchedOrganisationSa(matchId)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        jsonBodyOf(result) shouldBe Json.toJson(ErrorNotFound)
+        jsonBodyOf(result) shouldBe Json.parse(s"""{"code":"NOT_FOUND", "message":"The resource can not be found"}""")
       }
     }
 
