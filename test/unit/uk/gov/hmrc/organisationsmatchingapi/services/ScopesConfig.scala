@@ -22,20 +22,34 @@ trait ScopesConfig {
 
   val mockScopeOne: String = "scopeOne"
   val mockScopeTwo: String = "scopeTwo"
+  val mockScopeThree: String = "scopeThree"
+  val mockScopeFour: String = "scopeFour"
 
   val endpointKeyOne : String = "A"
   val endpointKeyTwo : String = "B"
   val endpointKeyThree : String = "C"
+  val endpointKeyFour : String = "D"
 
   val endpointOne : String = "sampleEndpointOne"
   val endpointTwo : String = "sampleEndpointTwo"
   val endpointThree : String = "sampleEndpointThree"
+  val endpointFour : String = "sampleEndpointFour"
 
   val mockConfig : Configuration = Configuration(
+
     (s"api-config.scopes.$mockScopeOne.endpoints", Seq(endpointKeyOne, endpointKeyTwo)),
     (s"api-config.scopes.$mockScopeOne.fields", Seq("A", "B", "C", "D")),
+
     (s"api-config.scopes.$mockScopeTwo.endpoints", Seq(endpointKeyTwo, endpointKeyThree)),
     (s"api-config.scopes.$mockScopeTwo.fields", Seq("E", "F", "G", "H", "I")),
+
+    (s"api-config.scopes.$mockScopeThree.endpoints", Seq(endpointKeyThree)),
+    (s"api-config.scopes.$mockScopeThree.fields", Seq("G", "H", "I")),
+    (s"api-config.scopes.$mockScopeThree.filters", Seq("A")),
+
+    (s"api-config.scopes.$mockScopeFour.endpoints", Seq(endpointKeyThree, endpointKeyFour)),
+    (s"api-config.scopes.$mockScopeFour.fields", Seq("G", "H", "I", "J")),
+    (s"api-config.scopes.$mockScopeFour.filters", Seq("B", "C")),
 
     (s"api-config.endpoints.internal.$endpointOne.key", endpointKeyOne),
     (s"api-config.endpoints.internal.$endpointOne.endpoint", "/internal/1"),
@@ -51,6 +65,13 @@ trait ScopesConfig {
     (s"api-config.endpoints.internal.$endpointThree.endpoint", "/internal/3"),
     (s"api-config.endpoints.internal.$endpointThree.title", "Get the third endpoint"),
     (s"api-config.endpoints.internal.$endpointThree.fields", Seq("G", "H", "I")),
+    (s"api-config.endpoints.internal.$endpointThree.filters", Seq("A", "B")),
+
+    (s"api-config.endpoints.internal.$endpointFour.key", endpointKeyFour),
+    (s"api-config.endpoints.internal.$endpointFour.endpoint", "/internal/4"),
+    (s"api-config.endpoints.internal.$endpointFour.title", "Get the fourth endpoint"),
+    (s"api-config.endpoints.internal.$endpointFour.fields", Seq("J")),
+    (s"api-config.endpoints.internal.$endpointFour.filters", Seq("C")),
 
     (s"api-config.endpoints.external.$endpointOne.key", endpointKeyOne),
     (s"api-config.endpoints.external.$endpointOne.endpoint", "/external/1"),
@@ -75,5 +96,11 @@ trait ScopesConfig {
     (s"api-config.fields.G", "path/to/g"),
     (s"api-config.fields.H", "path/to/h"),
     (s"api-config.fields.I", "path/to/i"),
+
+    (s"api-config.fields.J", "path/to/j"),
+
+    (s"api-config.filters.A", "contains(path/to/g,'FILTERED_VALUE_1')"),
+    (s"api-config.filters.B", "contains(path/to/g,'FILTERED_VALUE_2')"),
+    (s"api-config.filters.C", "contains(path/to/j,'<token>')")
   )
 }

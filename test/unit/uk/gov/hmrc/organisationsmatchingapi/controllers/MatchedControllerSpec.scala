@@ -22,27 +22,22 @@ import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.test.FakeRequest
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
-import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController
-import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
-import util.SpecBase
-import play.api.test.Helpers
-import uk.gov.hmrc.http.HeaderCarrier
 import play.api.http.Status._
 import play.api.libs.json.Json
+import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, ErrorNotFound, MatchNotFoundException, MatchingException, SaMatch, UtrMatch}
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController
+import uk.gov.hmrc.organisationsmatchingapi.domain.models._
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
+import util.SpecBase
+
 import java.util.UUID
-
-import play.api.i18n.Lang
-import play.i18n.Langs
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -96,19 +91,18 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
       matchedService
     )
 
-    given(
-      mockAuthConnector.authorise(
-        refEq(authPredicate(List("scopeOne", "scopeTwo"))), refEq(Retrievals.allEnrolments))(any(), any())
-    ).willReturn(Future.successful(Enrolments(Set(Enrolment("scopeOne"), Enrolment("scopeTwo")))))
+    given(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
+      .willReturn(Future.successful(Enrolments(Set(Enrolment(mockScopeOne), Enrolment(mockScopeTwo)))))
   }
 
   "GET matchedOrganisationCt" when {
     "given a valid matchId" should {
       "return 200" in new Setup {
         given(matchedService.fetchCt(matchId)).willReturn(Future.successful(ctMatch))
-
         val result = await(controller.matchedOrganisationCt(matchId)(fakeRequest))
         status(result) shouldBe OK
+
+        print(jsonBodyOf(result))
 
         jsonBodyOf(result) shouldBe Json.parse(
           s"""{
