@@ -23,10 +23,10 @@ import uk.gov.hmrc.organisationsmatchingapi.services.{ScopesHelper, ScopesServic
 import util.UnitSpec
 
 class ScopesHelperSpec
-    extends UnitSpec
+  extends UnitSpec
+    with Matchers
     with ScopesConfig
-    with BeforeAndAfterEach
-    with Matchers {
+    with BeforeAndAfterEach {
 
   "Scopes helper" should {
 
@@ -34,8 +34,34 @@ class ScopesHelperSpec
     val scopesHelper = new ScopesHelper(scopesService)
 
     "return correct query string" in {
-      val result = scopesHelper.getQueryStringFor(List(mockScopeOne, mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
-      result shouldBe "path(to(a,b,c,d,e,f,g,h,i))"
+      val scopeOneResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointOne, endpointTwo, endpointThree))
+      scopeOneResult shouldBe "path(to(a,b,c,d))"
+
+      val scopeOneEndpointOneResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointOne))
+      scopeOneEndpointOneResult shouldBe "path(to(a,b,c))"
+
+      val scopeOneEndpointTwoResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointTwo))
+      scopeOneEndpointTwoResult shouldBe "path(to(d))"
+
+      val scopeOneEndpointThreeResult = scopesHelper.getQueryStringFor(List(mockScopeOne), List(endpointThree))
+      scopeOneEndpointThreeResult shouldBe ""
+
+      val scopeTwoResult = scopesHelper.getQueryStringFor(List(mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
+      scopeTwoResult shouldBe "path(to(e,f,g,h,i))"
+
+      val twoScopesResult = scopesHelper.getQueryStringFor(List(mockScopeOne, mockScopeTwo), List(endpointOne, endpointTwo, endpointThree))
+      twoScopesResult shouldBe "path(to(a,b,c,d,e,f,g,h,i))"
+    }
+
+    "return correct query string with filter" in {
+      val scopeThreeResult = scopesHelper.getQueryStringFor(List(mockScopeThree), List(endpointThree))
+      scopeThreeResult shouldBe "path(to(g,h,i))&filter=contains(path/to/g,'FILTERED_VALUE_1')"
+
+      val scopeFourFirstResult = scopesHelper.getQueryStringFor(List(mockScopeFour), List(endpointThree))
+      scopeFourFirstResult shouldBe "path(to(g,h,i))&filter=contains(path/to/g,'FILTERED_VALUE_2')"
+
+      val scopeFourSecondResult = scopesHelper.getQueryStringFor(List(mockScopeFour), List(endpointFour))
+      scopeFourSecondResult shouldBe "path(to(j))&filter=contains(path/to/j,'<token>')"
     }
 
     "generate Hal response" in {
@@ -80,3 +106,4 @@ class ScopesHelperSpec
     }
   }
 }
+

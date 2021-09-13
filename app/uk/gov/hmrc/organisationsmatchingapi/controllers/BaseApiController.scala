@@ -114,14 +114,11 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
     request: RequestHeader,
     auditHelper: AuditHelper,
     ec: ExecutionContext): Future[Result] = {
-
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
       authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) {
-        case scopes => {
-
+        scopes => {
           auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
-
           f(scopes.enrolments.map(e => e.key))
         }
       }
