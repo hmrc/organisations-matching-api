@@ -17,24 +17,21 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.Logger
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
-import play.api.mvc.{ControllerComponents, MessagesControllerComponents, PlayBodyParsers, Request, RequestHeader, Result}
+import play.api.libs.json._
+import play.api.mvc._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
-import uk.gov.hmrc.auth.core.{AuthConnector, AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{ErrorInternalServer, ErrorInvalidRequest, ErrorMatchingFailed, ErrorNotFound, ErrorTooManyRequests, ErrorUnauthorized, InvalidBodyException, MatchNotFoundException, MatchingException}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models._
+import uk.gov.hmrc.organisationsmatchingapi.utils.UuidValidator
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
+
 import java.util.UUID
-
 import javax.inject.Inject
-import play.api.i18n.{Lang, Langs, MessagesApi}
-import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
-
 import scala.concurrent.Future.successful
-import scala.util.{Success, Try}
 import scala.concurrent.{ExecutionContext, Future}
 
 abstract class BaseApiController  @Inject()(mcc: MessagesControllerComponents, cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
@@ -45,6 +42,13 @@ abstract class BaseApiController  @Inject()(mcc: MessagesControllerComponents, c
 
   protected override implicit def hc(implicit rh: RequestHeader): HeaderCarrier =
     HeaderCarrierConverter.fromRequest(rh)
+
+  protected def withValidUuid(uuidString: String, uuidName: String)(f: UUID => Future[Result]): Future[Result] =
+    if (UuidValidator.validate(uuidString)) {
+      f(UUID.fromString(uuidString))
+    } else {
+      successful(ErrorInvalidRequest(s"$uuidName format is invalid").toHttpResponse)
+    }
 
   def withValidJson[T](f: T => Future[Result])(implicit ec: ExecutionContext,
                                                hc: HeaderCarrier,
