@@ -58,7 +58,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
     .in(Mode.Test)
     .build()
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)
     stubFor(post(urlMatching("/registration")).willReturn(aResponse().withStatus(204)))
@@ -68,7 +68,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
     implicit lazy val actorSystem: ActorSystem = app.actorSystem
     implicit lazy val materializer: Materializer = app.materializer
 
-    val documentationController = app.injector.instanceOf[DocumentationController]
+    val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   }
 

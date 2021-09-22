@@ -29,12 +29,12 @@ import scala.concurrent.Await.result
 
 class MatchedControllerSpec extends BaseSpec  {
 
-  val matchId   = UUID.randomUUID()
+  val matchId: UUID = UUID.randomUUID()
   val scopes    = List("read:organisations-matching-ho-ssp")
-  val ctRequest = CtMatchingRequest("0123456789", "name", "line1", "postcode")
-  val ctMatch   = CtMatch(ctRequest, matchId, utr = Some("testutr"))
-  val saRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
-  val saMatch   = SaMatch(saRequest, matchId, utr = Some("testutr"))
+  val ctRequest: CtMatchingRequest = CtMatchingRequest("0123456789", "name", "line1", "postcode")
+  val ctMatch: CtMatch = CtMatch(ctRequest, matchId, utr = Some("testutr"))
+  val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
+  val saMatch: SaMatch = SaMatch(saRequest, matchId, utr = Some("testutr"))
 
   Feature("cotax") {
     Scenario("a valid request is made for an existing match") {

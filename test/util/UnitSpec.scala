@@ -17,7 +17,6 @@
 package util
 
 import java.nio.charset.Charset
-
 import akka.stream.Materializer
 import akka.util.ByteString
 import org.scalatest.wordspec.AnyWordSpec
@@ -26,6 +25,7 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.Result
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.language.{implicitConversions, postfixOps}
 
 trait UnitSpec extends AnyWordSpec {
 

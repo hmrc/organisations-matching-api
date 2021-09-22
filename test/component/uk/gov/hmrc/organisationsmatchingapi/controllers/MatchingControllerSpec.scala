@@ -33,20 +33,20 @@ import scala.concurrent.duration.Duration
 class MatchingControllerSpec extends BaseSpec  {
 
   val scopes = List("read:organisations-matching-ho-ssp")
-  val ctRequest = CtMatchingRequest("0213456789", "name", "line1", "NE11NE")
+  val ctRequest: CtMatchingRequest = CtMatchingRequest("0213456789", "name", "line1", "NE11NE")
   val ctRequestString: String = Json.prettyPrint(Json.toJson(ctRequest))
 
-  val saRequest = SaMatchingRequest("0213456789", "A", "name", "line1", "NE11NE")
+  val saRequest: SaMatchingRequest = SaMatchingRequest("0213456789", "A", "name", "line1", "NE11NE")
   val saRequestString: String = Json.prettyPrint(Json.toJson(saRequest))
 
-  val ifCorpTax = IfCorpTaxCompanyDetails(
+  val ifCorpTax: IfCorpTaxCompanyDetails = IfCorpTaxCompanyDetails(
     utr = Some("0123456789"),
     crn = Some("0123456789"),
     registeredDetails = None,
     communicationDetails = None
   )
 
-  val ifSa  = IfSaTaxpayerDetails(
+  val ifSa: IfSaTaxpayerDetails = IfSaTaxpayerDetails(
     utr = Some("0123456789"),
     taxpayerType = Some("Individual"),
     taxpayerDetails = Some(Seq(IfSaTaxPayerNameAddress(

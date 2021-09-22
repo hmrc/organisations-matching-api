@@ -23,7 +23,7 @@ import util.IfHelpers
 
 class IfSaTaxpayerDetailsSpec extends AnyWordSpec with Matchers with IfHelpers {
 
-  val saTaxPayerDetailsString = """{
+  val saTaxPayerDetailsString: String = """{
                                   |  "utr": "1234567890",
                                   |  "taxpayerType": "Individual",
                                   |  "taxpayerDetails": [

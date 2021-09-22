@@ -20,7 +20,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddre
 
 trait IfHelpers {
 
-  val ifCorpTaxCompanyDetails = IfCorpTaxCompanyDetails(
+  val ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails = IfCorpTaxCompanyDetails(
     utr = Some("1234567890"),
     crn = Some("12345678"),
     registeredDetails = Some(IfNameAndAddressDetails(
@@ -51,7 +51,7 @@ trait IfHelpers {
     ))
   )
 
-  val saTaxpayerDetails = IfSaTaxpayerDetails(
+  val saTaxpayerDetails: IfSaTaxpayerDetails = IfSaTaxpayerDetails(
     utr = Some( "1234567890"),
     taxpayerType = Some( "Individual"),
     taxpayerDetails = Some( Seq (
