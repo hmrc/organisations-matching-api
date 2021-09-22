@@ -16,25 +16,26 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.services
 
+import play.api.libs.json.JsValue
+
 import java.time.LocalDateTime
 import java.util.UUID
-
 import javax.inject.Inject
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.{HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, CtOrganisationsMatchingRequest, SaKnownFacts, SaOrganisationsMatchingRequest}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
 class MatchingService @Inject()( ifConnector: IfConnector,
                                  matchingConnector: OrganisationsMatchingConnector,
                                  cacheService: CacheService)
                                ( implicit val ec: ExecutionContext  ) {
 
-  def matchCoTax(matchId: UUID, correlationId: String, ctMatchingRequest: CtMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader) = {
+  def matchCoTax(matchId: UUID, correlationId: String, ctMatchingRequest: CtMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader): Future[JsValue] = {
     for {
       ifData <- ifConnector.fetchCorporationTax(matchId.toString, ctMatchingRequest.companyRegistrationNumber)
       matched   <-  matchingConnector.matchCycleCotax(matchId.toString,  correlationId, CtOrganisationsMatchingRequest(
@@ -49,7 +50,7 @@ class MatchingService @Inject()( ifConnector: IfConnector,
     } yield matched
   }
 
-  def matchSaTax(matchId: UUID, correlationId: String, saMatchingRequest: SaMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader) = {
+  def matchSaTax(matchId: UUID, correlationId: String, saMatchingRequest: SaMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader): Future[JsValue] = {
     for {
       ifData <- ifConnector.fetchSelfAssessment(matchId.toString, saMatchingRequest.selfAssessmentUniqueTaxPayerRef)
       matched   <-  matchingConnector.matchCycleSelfAssessment(matchId.toString,  correlationId, SaOrganisationsMatchingRequest(

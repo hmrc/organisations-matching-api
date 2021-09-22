@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.utils
 
+import play.api.mvc.PathBindable
+
 import java.util.UUID
-
-import play.api.mvc.{PathBindable, QueryStringBindable}
-
 import scala.util.Try
 
 class MatchUuidPathBinder extends PathBindable[UUID] {
 
   private val parameterName = "matchId"
 
-  override def bind(key: String, value:String) = {
+  override def bind(key: String, value:String): Either[String, UUID] = {
     if(value.isEmpty)
       Left(s"$parameterName is required")
     else {

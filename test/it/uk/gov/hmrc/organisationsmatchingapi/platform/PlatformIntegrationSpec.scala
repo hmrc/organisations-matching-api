@@ -74,9 +74,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
 
   "microservice" should {
     "provide definition endpoint and documentation endpoint for each api" in new Setup {
-      def normalizeEndpointName(endpointName: String): String = endpointName.replaceAll(" ", "-")
-
-      def verifyDocumentationPresent(version: String, endpointName: String) {
+      def verifyDocumentationPresent(version: String, endpointName: String): Unit = {
         withClue(s"Getting documentation version '$version' of endpoint '$endpointName'") {
           val documentationResult = documentationController.documentation(version, endpointName)(request)
           status(documentationResult) shouldBe 200

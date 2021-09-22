@@ -30,8 +30,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
                                                http: HttpClient,
-                                               val auditHelper: AuditHelper)
-                                              (implicit ec: ExecutionContext) {
+                                               val auditHelper: AuditHelper) {
 
   val logger : Logger = Logger(this.getClass)
 
@@ -39,7 +38,7 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
   val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
 
   def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)
-                     (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
+                     (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
 
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
@@ -51,7 +50,7 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
   }
 
   def matchCycleSelfAssessment(matchId: String, correlationId: String, postData: SaOrganisationsMatchingRequest)
-                              (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
+                              (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
 
     val url = s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 

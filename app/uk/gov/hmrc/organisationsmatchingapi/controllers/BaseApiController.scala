@@ -50,9 +50,7 @@ abstract class BaseApiController  @Inject()(mcc: MessagesControllerComponents, c
       successful(ErrorInvalidRequest(s"$uuidName format is invalid").toHttpResponse)
     }
 
-  def withValidJson[T](f: T => Future[Result])(implicit ec: ExecutionContext,
-                                               hc: HeaderCarrier,
-                                               request: Request[JsValue],
+  def withValidJson[T](f: T => Future[Result])(implicit request: Request[JsValue],
                                                r: Reads[T]): Future[Result] =
     request.body.validate[T] match {
       case JsSuccess(t, _) => f(t)

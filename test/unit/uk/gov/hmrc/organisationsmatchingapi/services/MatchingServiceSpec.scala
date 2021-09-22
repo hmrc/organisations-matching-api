@@ -79,7 +79,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     given(mockIfConnector.fetchCorporationTax(any(), any())(any(), any(), any()))
       .willReturn(Future.successful(corpTaxCompanyDetails))
 
-    given(mockCacheService.cacheCtUtr(any(), any())).willReturn()
+    given(mockCacheService.cacheCtUtr(any(), any())).willReturn(())
 
     "Matching connector returns a match" in {
 
@@ -127,7 +127,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     given(mockIfConnector.fetchSelfAssessment(any(), any())(any(), any(), any()))
       .willReturn(Future.successful(saTaxpayerDetails))
 
-    given(mockCacheService.cacheSaUtr(any(), any())).willReturn()
+    given(mockCacheService.cacheSaUtr(any(), any())).willReturn(())
 
     "Matching connector returns a match" in {
       given(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(any(), any(), any()))

@@ -32,11 +32,11 @@ class CacheService @Inject()(
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def cacheCtUtr(ctMatch: CtMatch, utr: String) = {
+  def cacheCtUtr(ctMatch: CtMatch, utr: String): Future[Unit] = {
     save(ctMatch.matchId.toString, conf.key, ctMatch.copy(utr = Some(utr)))
   }
 
-  def cacheSaUtr(saMatch: SaMatch, utr: String) = {
+  def cacheSaUtr(saMatch: SaMatch, utr: String): Future[Unit] = {
     save(saMatch.matchId.toString, conf.key, saMatch.copy(utr = Some(utr)))
   }
 

@@ -16,16 +16,15 @@
 
 package component.uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import java.util.concurrent.TimeUnit
-
+import component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs.{AuthStub, BaseSpec, IfStub, MatchingStub}
 import play.api.http.Status
-import play.api.libs.json.{JsPath, JsString, Json}
+import play.api.libs.json.{JsString, Json}
 import scalaj.http.{Http, HttpResponse}
-import stubs.{AuthStub, BaseSpec, IfStub, MatchingStub}
 import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 
+import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration

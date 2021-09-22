@@ -16,33 +16,30 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import java.util.UUID
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.http.Status
-import play.api.i18n.{Lang, MessagesApi}
 import play.api.libs.json.Json
 import play.api.mvc.PlayBodyParsers
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
-import play.i18n.Langs
-import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
+import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
 import util.SpecBase
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers with MockitoSugar {
 
   private implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
-  private implicit val lang: Lang = Lang.defaultLang
 
   private val mockAuthConnector = mock[AuthConnector]
   private val mockCacheService = mock[CacheService]
@@ -51,7 +48,6 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
   private val scopesHelper = new ScopesHelper(mockScopesService)
   private val mockMatchingService = mock[MatchingService]
   private val mockBodyParser = mock[PlayBodyParsers]
-  private val mockMessagesApi = Helpers.stubMessagesApi()
 
   private val controller = new MatchingController(
     mockAuthConnector,

@@ -32,7 +32,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class IfConnector @Inject()(
                              servicesConfig: ServicesConfig,
                              http: HttpClient,
-                             val auditHelper: AuditHelper)(implicit ec: ExecutionContext) {
+                             val auditHelper: AuditHelper) {
 
   private val logger = Logger(classOf[IfConnector].getName)
 
@@ -50,7 +50,7 @@ class IfConnector @Inject()(
   def fetchSelfAssessment(matchId: String, utr: String)(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext) = {
+    ec: ExecutionContext): Future[IfSaTaxpayerDetails] = {
 
     val SAUrl =
       s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
@@ -62,7 +62,7 @@ class IfConnector @Inject()(
   def fetchCorporationTax(matchId: String, crn: String)(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext) = {
+    ec: ExecutionContext): Future[IfCorpTaxCompanyDetails] = {
 
     val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
