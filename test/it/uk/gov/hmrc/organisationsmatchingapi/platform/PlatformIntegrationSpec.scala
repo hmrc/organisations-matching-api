@@ -58,7 +58,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
     .in(Mode.Test)
     .build()
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     wireMockServer.start()
     WireMock.configureFor(stubHost, stubPort)
     stubFor(post(urlMatching("/registration")).willReturn(aResponse().withStatus(204)))
@@ -68,15 +68,13 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
     implicit lazy val actorSystem: ActorSystem = app.actorSystem
     implicit lazy val materializer: Materializer = app.materializer
 
-    val documentationController = app.injector.instanceOf[DocumentationController]
+    val documentationController: DocumentationController = app.injector.instanceOf[DocumentationController]
     val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
   }
 
   "microservice" should {
     "provide definition endpoint and documentation endpoint for each api" in new Setup {
-      def normalizeEndpointName(endpointName: String): String = endpointName.replaceAll(" ", "-")
-
-      def verifyDocumentationPresent(version: String, endpointName: String) {
+      def verifyDocumentationPresent(version: String, endpointName: String): Unit = {
         withClue(s"Getting documentation version '$version' of endpoint '$endpointName'") {
           val documentationResult = documentationController.documentation(version, endpointName)(request)
           status(documentationResult) shouldBe 200

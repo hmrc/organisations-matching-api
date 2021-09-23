@@ -17,15 +17,15 @@
 package unit.uk.gov.hmrc.organisationsmatchingapi.services
 
 import java.util.UUID
-
 import org.mockito.ArgumentMatchers.any
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import play.api.libs.json.JsString
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
-import uk.gov.hmrc.http.NotFoundException
+import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
@@ -33,15 +33,15 @@ import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingServ
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import util.SpecBase
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with MockitoSugar {
 
-  private implicit val ec  = scala.concurrent.ExecutionContext.Implicits.global
+  private implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
-  val mockIfConnector = mock[IfConnector]
-  val mockMatchingConnector = mock[OrganisationsMatchingConnector]
-  val mockCacheService = mock[CacheService]
+  val mockIfConnector: IfConnector = mock[IfConnector]
+  val mockMatchingConnector: OrganisationsMatchingConnector = mock[OrganisationsMatchingConnector]
+  val mockCacheService: CacheService = mock[CacheService]
 
   val matchingService = new MatchingService(
     mockIfConnector,
@@ -51,8 +51,8 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
 
   val utr = "0123456789"
 
-  implicit val fakeRequest = FakeRequest("GET", "/")
-  implicit val hc = HeaderCarrierConverter.fromRequest(fakeRequest)
+  implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/")
+  implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(fakeRequest)
 
   "MatchCoTax" when {
 
@@ -79,7 +79,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     given(mockIfConnector.fetchCorporationTax(any(), any())(any(), any(), any()))
       .willReturn(Future.successful(corpTaxCompanyDetails))
 
-    given(mockCacheService.cacheCtUtr(any(), any())).willReturn()
+    given(mockCacheService.cacheCtUtr(any(), any())).willReturn(())
 
     "Matching connector returns a match" in {
 
@@ -127,7 +127,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     given(mockIfConnector.fetchSelfAssessment(any(), any())(any(), any(), any()))
       .willReturn(Future.successful(saTaxpayerDetails))
 
-    given(mockCacheService.cacheSaUtr(any(), any())).willReturn()
+    given(mockCacheService.cacheSaUtr(any(), any())).willReturn(())
 
     "Matching connector returns a match" in {
       given(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(any(), any(), any()))

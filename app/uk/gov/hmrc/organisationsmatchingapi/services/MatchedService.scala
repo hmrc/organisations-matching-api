@@ -24,20 +24,20 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class MatchedService @Inject()(cacheService: CacheService) {
 
-  def fetchCt(matchId: UUID)(implicit ec: ExecutionContext) =
+  def fetchCt(matchId: UUID)(implicit ec: ExecutionContext): Future[CtMatch] =
     cacheService.fetch[CtMatch](matchId) flatMap {
       case Some(entry) => Future.successful(entry)
       case _           => Future.failed(new MatchNotFoundException)
     }
 
-  def fetchSa(matchId: UUID)(implicit ec: ExecutionContext) =
+  def fetchSa(matchId: UUID)(implicit ec: ExecutionContext): Future[SaMatch] =
     cacheService.fetch[SaMatch](matchId) flatMap {
       case Some(entry) => Future.successful(entry)
       case _           => Future.failed(new MatchNotFoundException)
     }
 
   def fetchMatchedOrganisationRecord(matchId: UUID)
-                                    (implicit ec: ExecutionContext) =
+                                    (implicit ec: ExecutionContext): Future[UtrMatch] =
     cacheService.fetch[UtrMatch](matchId) flatMap {
       case Some(utrMatch) => Future.successful(UtrMatch(utrMatch.matchId, utrMatch.utr))
       case _              => Future.failed(new MatchNotFoundException)

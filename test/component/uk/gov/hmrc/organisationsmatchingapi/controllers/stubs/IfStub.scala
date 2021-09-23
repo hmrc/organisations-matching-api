@@ -24,42 +24,42 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfCorpT
 object IfStub extends MockHost(8443) {
 
 
-  def searchCorpTaxCompanyDetails(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails) =
+  def searchCorpTaxCompanyDetails(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(ifCorpTaxCompanyDetails).toString())))
 
-  def searchCorpTaxCompanyDetailsNotFound(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails) =
+  def searchCorpTaxCompanyDetailsNotFound(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.NOT_FOUND).withBody("NO_DATA_FOUND")))
 
-  def searchCorpTaxCompanyDetailsRateLimited(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails) =
+  def searchCorpTaxCompanyDetailsRateLimited(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))
 
-  def searchCorpTaxCompanyDetailsCustomResponse(crn: String, status:Int, response: JsValue) =
+  def searchCorpTaxCompanyDetailsCustomResponse(crn: String, status:Int, response: JsValue): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
 
-  def searchSaCompanyDetails(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails) =
+  def searchSaCompanyDetails(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(ifSaTaxpayerDetails).toString())))
 
-  def searchSaCompanyDetailsNotFound(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails) =
+  def searchSaCompanyDetailsNotFound(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.NOT_FOUND).withBody("NO_DATA_FOUND")))
 
-  def searchSaCompanyDetailsRateLimited(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails) =
+  def searchSaCompanyDetailsRateLimited(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))
 
-  def searchSaCompanyDetailsCustomResponse(utr: String, status:Int, response: JsValue) =
+  def searchSaCompanyDetailsCustomResponse(utr: String, status:Int, response: JsValue): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))

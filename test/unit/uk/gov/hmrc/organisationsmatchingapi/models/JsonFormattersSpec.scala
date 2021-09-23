@@ -18,7 +18,7 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.models
 
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
-import play.api.libs.json.{JsResult, JsString, JsSuccess, Json}
+import play.api.libs.json.{JsString, JsSuccess, Json}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.JsonFormatters._
 
 import java.util.UUID

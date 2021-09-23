@@ -22,16 +22,16 @@ import play.api.Configuration
 @Singleton
 class CacheConfiguration @Inject()(configuration: Configuration) {
 
-  lazy val cacheEnabled = configuration.getOptional[Boolean]("cache.enabled")
+  lazy val cacheEnabled: Boolean = configuration.getOptional[Boolean]("cache.enabled")
     .getOrElse(true)
 
-  lazy val cacheTtl = configuration.getOptional[Int]("cache.ttlInSeconds")
+  lazy val cacheTtl: Int = configuration.getOptional[Int]("cache.ttlInSeconds")
     .getOrElse(60 * 60 * 5)
 
-  lazy val colName = configuration.getOptional[String]("cache.colName")
+  lazy val colName: String = configuration.getOptional[String]("cache.colName")
     .getOrElse("matching-cache")
 
-  lazy val key = configuration.getOptional[String]("cache.key")
+  lazy val key: String = configuration.getOptional[String]("cache.key")
     .getOrElse("organisations-matching")
 
 }

@@ -31,8 +31,7 @@ import play.mvc.Http.MimeTypes.JSON
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
 import scala.concurrent.Await.result
-import scala.concurrent.duration.Duration
-
+import scala.concurrent.duration.{Duration, FiniteDuration}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 trait BaseSpec
@@ -53,15 +52,15 @@ trait BaseSpec
     )
     .build()
 
-  val timeout = Duration(5, TimeUnit.SECONDS)
+  val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://127.0.0.1:$port"
   val mocks = Seq(AuthStub, IfStub, MatchingStub)
   val authToken = "Bearer AUTH_TOKEN"
   val clientId = "CLIENT_ID"
-  val acceptHeaderP1 = ACCEPT -> "application/vnd.hmrc.1.0+json"
-  val correlationIdHeader = "CorrelationId" -> "188e9400-b636-4a3b-80ba-230a8c72b92a"
-  val correlationIdHeaderMalformed = "CorrelationId" -> "foo"
-  val mongoRepository = app.injector.instanceOf[MatchRepository]
+  val acceptHeaderP1: (String, String) = ACCEPT -> "application/vnd.hmrc.1.0+json"
+  val correlationIdHeader: (String, String) = "CorrelationId" -> "188e9400-b636-4a3b-80ba-230a8c72b92a"
+  val correlationIdHeaderMalformed: (String, String) = "CorrelationId" -> "foo"
+  val mongoRepository: MatchRepository = app.injector.instanceOf[MatchRepository]
 
   protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderP1) =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationIdHeader)

@@ -16,12 +16,8 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import java.util.UUID
-
-import javax.inject.{Inject, Singleton}
 import play.api.hal.Hal.state
 import play.api.hal.HalLink
-import play.api.i18n.{Lang, Langs, MessagesApi}
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, MessagesControllerComponents, PlayBodyParsers}
@@ -31,6 +27,8 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, Match
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils._
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
 
+import java.util.UUID
+import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton

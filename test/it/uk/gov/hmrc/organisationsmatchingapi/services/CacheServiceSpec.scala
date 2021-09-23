@@ -38,14 +38,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures {
 
-    val mockCacheConfig = mock[CacheConfiguration]
-    val mockMatchRepo = mock[MatchRepository]
+    val mockCacheConfig: CacheConfiguration = mock[CacheConfiguration]
+    val mockMatchRepo: MatchRepository = mock[MatchRepository]
     val matchId: UUID = UUID.fromString("69f0da0d-4e50-4161-badc-fa39f769bed3")
     val cacheService = new CacheService(mockMatchRepo, mockCacheConfig)
-    val ctRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
-    val ctMatch = CtMatch(ctRequest, matchId)
-    val saRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
-    val saMatch = SaMatch(saRequest, matchId)
+    val ctRequest: CtMatchingRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
+    val ctMatch: CtMatch = CtMatch(ctRequest, matchId)
+    val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
+    val saMatch: SaMatch = SaMatch(saRequest, matchId)
 
   "getByMatchId" should {
     "Retrieve CT match details from cache service" in  {
@@ -97,7 +97,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       val expected = ctMatch.copy(utr = Some(ctUtr))
 
       given(mockMatchRepo.cache(any(), any(), any())(any()))
-        .willReturn(Future.successful())
+        .willReturn(Future.successful(()))
 
       await {
         cacheService.cacheCtUtr(ctMatch, ctUtr)
@@ -114,7 +114,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       val expected = saMatch.copy(utr = Some(saUtr))
 
       given(mockMatchRepo.cache(any(), any(), any())(any()))
-        .willReturn(Future.successful())
+        .willReturn(Future.successful(()))
 
       await {
         cacheService.cacheSaUtr(saMatch, saUtr)

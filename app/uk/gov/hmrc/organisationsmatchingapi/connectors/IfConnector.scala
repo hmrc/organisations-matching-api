@@ -26,13 +26,14 @@ import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorr
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class IfConnector @Inject()(
                              servicesConfig: ServicesConfig,
                              http: HttpClient,
-                             val auditHelper: AuditHelper)(implicit ec: ExecutionContext) {
+                             val auditHelper: AuditHelper) {
 
   private val logger = Logger(classOf[IfConnector].getName)
 
@@ -50,7 +51,7 @@ class IfConnector @Inject()(
   def fetchSelfAssessment(matchId: String, utr: String)(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext) = {
+    ec: ExecutionContext): Future[IfSaTaxpayerDetails] = {
 
     val SAUrl =
       s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
@@ -62,7 +63,7 @@ class IfConnector @Inject()(
   def fetchCorporationTax(matchId: String, crn: String)(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext) = {
+    ec: ExecutionContext): Future[IfCorpTaxCompanyDetails] = {
 
     val CTUrl =
       s"$baseUrl/organisations/corporation-tax/$crn/company/details"
@@ -104,8 +105,8 @@ class IfConnector @Inject()(
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     }
-    case notFound: NotFoundException => {
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, notFound.getMessage)
+    case Upstream4xxResponse(msg, 404, _, _) => {
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       logger.warn("Integration Framework NotFoundException encountered")
       Future.failed(new MatchingException)
     }

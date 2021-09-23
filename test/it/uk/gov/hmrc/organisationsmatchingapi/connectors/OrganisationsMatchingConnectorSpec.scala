@@ -28,7 +28,7 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -49,7 +49,7 @@ class OrganisationsMatchingConnectorSpec
     with Matchers
     with GuiceOneAppPerSuite {
 
-  val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
+  val stubPort: Int = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
@@ -74,18 +74,18 @@ class OrganisationsMatchingConnectorSpec
     val applicationId = "12345"
     val correlationIdHeader: (String, String) = ("CorrelationId" -> correlationId)
     val applicationIdHeader: (String, String) = ("X-Application-ID" -> "12345")
-    val ctKnownFacts = CtKnownFacts("test", "test", "test", "test")
-    val name = IfNameDetails(Some("test"), Some("test"))
-    val address = IfAddress(Some("test"), None, None, None, Some("test"))
-    val details = IfNameAndAddressDetails(Some(name), Some(address))
-    val ctIfData = IfCorpTaxCompanyDetails(Some("test"), Some("test"), Some(details), Some(details))
-    val ctPostData = CtOrganisationsMatchingRequest(ctKnownFacts, ctIfData)
+    val ctKnownFacts: CtKnownFacts = CtKnownFacts("test", "test", "test", "test")
+    val name: IfNameDetails = IfNameDetails(Some("test"), Some("test"))
+    val address: IfAddress = IfAddress(Some("test"), None, None, None, Some("test"))
+    val details: IfNameAndAddressDetails = IfNameAndAddressDetails(Some(name), Some(address))
+    val ctIfData: IfCorpTaxCompanyDetails = IfCorpTaxCompanyDetails(Some("test"), Some("test"), Some(details), Some(details))
+    val ctPostData: CtOrganisationsMatchingRequest = CtOrganisationsMatchingRequest(ctKnownFacts, ctIfData)
 
-    val saKnownFacts = SaKnownFacts("test", "Individual", "test", "test", "test")
-    val saDetails = IfSaTaxPayerNameAddress(Some("test"), None, Some(address))
-    val taxpayerDetails = Some(Seq(saDetails))
-    val saIfData = IfSaTaxpayerDetails(Some("test"), Some("Individual"), taxpayerDetails)
-    val saPostData = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)
+    val saKnownFacts: SaKnownFacts = SaKnownFacts("test", "Individual", "test", "test", "test")
+    val saDetails: IfSaTaxPayerNameAddress = IfSaTaxPayerNameAddress(Some("test"), None, Some(address))
+    val taxpayerDetails: Option[Seq[IfSaTaxPayerNameAddress]] = Some(Seq(saDetails))
+    val saIfData: IfSaTaxpayerDetails = IfSaTaxpayerDetails(Some("test"), Some("Individual"), taxpayerDetails)
+    val saPostData: SaOrganisationsMatchingRequest = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)
 
     implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = Seq(correlationIdHeader, applicationIdHeader))
 
@@ -96,12 +96,12 @@ class OrganisationsMatchingConnectorSpec
     val underTest = new OrganisationsMatchingConnector(config, httpClient, auditHelper)
   }
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     wireMockServer.start()
     configureFor(stubHost, stubPort)
   }
 
-  override def afterEach() {
+  override def afterEach(): Unit = {
     wireMockServer.stop()
   }
 
@@ -270,7 +270,7 @@ class OrganisationsMatchingConnectorSpec
             .withStatus(200)
             .withBody(Json.toJson("match").toString())))
 
-      val result = await(
+      val result: JsValue = await(
         underTest.matchCycleCotax(matchId, correlationId, ctPostData)(
           hc,
           FakeRequest(),

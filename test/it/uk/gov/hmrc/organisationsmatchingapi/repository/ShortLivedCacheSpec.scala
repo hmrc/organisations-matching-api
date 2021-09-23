@@ -36,9 +36,9 @@ import scala.concurrent.ExecutionContext
 class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val cacheTtl = 60
-  val id = UUID.randomUUID().toString
-  val cachekey = "test-class-key"
-  val testValue = TestClass("one", "two")
+  val id: String = UUID.randomUUID().toString
+  val cachekey: String = "test-class-key"
+  val testValue: TestClass = TestClass("one", "two")
 
   override def fakeApplication: Application =
     GuiceApplicationBuilder()
@@ -52,18 +52,18 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
       .build()
 
   implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
-  val cacheConfig = fakeApplication.injector.instanceOf[CacheConfiguration]
-  val configuration = fakeApplication.injector.instanceOf[Configuration]
-  val mongo = fakeApplication.injector.instanceOf[ReactiveMongoComponent]
+  val cacheConfig: CacheConfiguration = fakeApplication.injector.instanceOf[CacheConfiguration]
+  val configuration: Configuration = fakeApplication.injector.instanceOf[Configuration]
+  val mongo: ReactiveMongoComponent = fakeApplication.injector.instanceOf[ReactiveMongoComponent]
 
   val shortLivedCache = new ShortLivedCache(cacheConfig, configuration, mongo)
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     super.beforeEach()
     await(shortLivedCache.drop)
   }
 
-  override def afterEach() {
+  override def afterEach(): Unit = {
     super.afterEach()
     await(shortLivedCache.drop)
   }

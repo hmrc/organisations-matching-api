@@ -19,5 +19,5 @@ package uk.gov.hmrc.organisationsmatchingapi
 import uk.gov.hmrc.organisationsmatchingapi.utils.MatchUuidPathBinder
 
 package object Binders {
-  implicit val matchUuidPathBinder = new MatchUuidPathBinder
+  implicit val matchUuidPathBinder: MatchUuidPathBinder = new MatchUuidPathBinder
 }

@@ -17,13 +17,12 @@
 package component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs
 
 import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.stubbing.StubMapping
 import play.api.http.Status
 
 object MatchingStub extends MockHost(9658) {
 
   def willReturnCtMatch(
-    correlationId: String): StubMapping =
+    correlationId: String): Unit =
     mock.register(
       post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
         .willReturn(aResponse()
@@ -31,14 +30,14 @@ object MatchingStub extends MockHost(9658) {
           .withBody(s""""match"""")))
 
   def willReturnCtMatchNotFound(
-                       correlationId: String): StubMapping =
+                       correlationId: String): Unit =
     mock.register(
       post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
         .willReturn(aResponse()
           .withStatus(Status.NOT_FOUND)))
 
   def willReturnSaMatch(
-                         correlationId: String): StubMapping =
+                         correlationId: String): Unit =
     mock.register(
       post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
         .willReturn(aResponse()
@@ -46,7 +45,7 @@ object MatchingStub extends MockHost(9658) {
           .withBody(s""""match"""")))
 
   def willReturnSaMatchNotFound(
-                                 correlationId: String): StubMapping =
+                                 correlationId: String): Unit =
     mock.register(
       post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
         .willReturn(aResponse()

@@ -22,7 +22,6 @@ import uk.gov.hmrc.http.BadRequestException
 import uk.gov.hmrc.organisationsmatchingapi.utils.UuidValidator
 
 import java.util.UUID
-import scala.util.{Success, Try}
 
 object RequestHeaderUtils {
 
@@ -32,7 +31,7 @@ object RequestHeaderUtils {
 
   private val uriRegex = "(/[a-zA-Z0-9-_]*)/?.*$".r
 
-  def extractUriContext(requestHeader: RequestHeader) =
+  def extractUriContext(requestHeader: RequestHeader): String =
     (uriRegex.findFirstMatchIn(requestHeader.uri) map (_.group(1))).get
 
   def validateCorrelationId(requestHeader: RequestHeader): UUID =
@@ -68,7 +67,7 @@ object RequestHeaderUtils {
     }
 
 
-  def getVersionedRequest(originalRequest: RequestHeader) = {
+  def getVersionedRequest(originalRequest: RequestHeader): RequestHeader = {
     val version = getVersion(originalRequest)
 
     originalRequest.withTarget(
@@ -78,7 +77,7 @@ object RequestHeaderUtils {
     )
   }
 
-  def getClientIdHeader(requestHeader: RequestHeader) =
+  def getClientIdHeader(requestHeader: RequestHeader): (String, String) =
     CLIENT_ID_HEADER -> requestHeader.headers
       .get(CLIENT_ID_HEADER)
       .getOrElse("-")

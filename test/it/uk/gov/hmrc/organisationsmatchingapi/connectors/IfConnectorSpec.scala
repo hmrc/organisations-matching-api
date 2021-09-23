@@ -28,18 +28,17 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework._
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util.UnitSpec
+
 import java.util.UUID
-
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
-
 import scala.concurrent.ExecutionContext
 
 
@@ -51,7 +50,7 @@ class IfConnectorSpec
     with Matchers
     with GuiceOneAppPerSuite {
 
-  val stubPort = sys.env.getOrElse("WIREMOCK", "11122").toInt
+  val stubPort: Int = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
   val integrationFrameworkAuthorizationToken = "IF_TOKEN"
@@ -88,12 +87,12 @@ class IfConnectorSpec
     val underTest = new IfConnector(config, httpClient, auditHelper)
   }
 
-  override def beforeEach() {
+  override def beforeEach(): Unit = {
     wireMockServer.start()
     configureFor(stubHost, stubPort)
   }
 
-  override def afterEach() {
+  override def afterEach(): Unit = {
     wireMockServer.stop()
   }
 
@@ -103,7 +102,7 @@ class IfConnectorSpec
 
     "return data on successful call" in new Setup {
 
-      val registeredDetails = IfNameAndAddressDetails(
+      val registeredDetails: IfNameAndAddressDetails = IfNameAndAddressDetails(
         Some(IfNameDetails(
           Some("Waitrose"),
           Some("And Partners")
@@ -117,7 +116,7 @@ class IfConnectorSpec
         ))
       )
 
-      val communicationDetails = IfNameAndAddressDetails(
+      val communicationDetails: IfNameAndAddressDetails = IfNameAndAddressDetails(
         Some(IfNameDetails(
           Some("Waitrose"),
           Some("And Partners")
@@ -153,7 +152,7 @@ class IfConnectorSpec
           )
       )
 
-      val result = await(
+      val result: IfCorpTaxCompanyDetails = await(
         underTest
           .fetchCorporationTax(matchId, crn)(
             hc,
@@ -244,7 +243,7 @@ class IfConnectorSpec
 
     "return data on successful request" in new Setup {
 
-      val taxpayerJohnNameAddress = IfSaTaxPayerNameAddress(
+      val taxpayerJohnNameAddress: IfSaTaxPayerNameAddress = IfSaTaxPayerNameAddress(
         Some("John Smith II"),
         Some("Base"),
         Some(IfAddress(
@@ -256,7 +255,7 @@ class IfConnectorSpec
         ))
       )
 
-      val taxpayerJoanneNameAddress = IfSaTaxPayerNameAddress(
+      val taxpayerJoanneNameAddress: IfSaTaxPayerNameAddress = IfSaTaxPayerNameAddress(
         Some("Joanne Smith"),
         Some("Correspondence"),
         Some(IfAddress(
@@ -285,7 +284,7 @@ class IfConnectorSpec
               Some(Seq(taxpayerJohnNameAddress, taxpayerJoanneNameAddress))
             )).toString())))
 
-      val result = await(
+      val result: IfSaTaxpayerDetails = await(
         underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")(
           hc,
           FakeRequest().withHeaders(sampleCorrelationIdHeader),
