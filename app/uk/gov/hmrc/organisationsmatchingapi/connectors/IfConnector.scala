@@ -26,6 +26,7 @@ import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorr
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -104,8 +105,8 @@ class IfConnector @Inject()(
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     }
-    case notFound: NotFoundException => {
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, notFound.getMessage)
+    case Upstream4xxResponse(msg, 404, _, _) => {
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       logger.warn("Integration Framework NotFoundException encountered")
       Future.failed(new MatchingException)
     }
