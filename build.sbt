@@ -1,5 +1,5 @@
+import play.sbt.routes.RoutesKeys
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.DefaultBuildSettings.integrationTestSettings
 import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "organisations-matching-api"
@@ -34,9 +34,10 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
     new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
   }
 
-lazy val playSettings: Seq[Setting[_]] = Seq(
-  routesImport ++= Seq(
-    "uk.gov.hmrc.organisationsmatchingapi.Binders._"))
+TwirlKeys.templateImports := Seq.empty
+RoutesKeys.routesImport := Seq(
+  "uk.gov.hmrc.organisationsmatchingapi.Binders._"
+)
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
@@ -54,7 +55,6 @@ lazy val microservice = Project(appName, file("."))
     testOptions in Test := Seq(Tests.Filter(unitFilter))
     // ***************
   )
-  .settings(playSettings)
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
