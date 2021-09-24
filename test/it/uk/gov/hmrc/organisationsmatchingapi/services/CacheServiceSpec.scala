@@ -26,7 +26,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
-import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
+import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, InsertResult}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
@@ -51,7 +51,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     "Retrieve CT match details from cache service" in  {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[CtMatch](any(), any())(any()))
+      given(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
         .willReturn(Future.successful(Some(ctMatch)))
 
       val result = cacheService.fetch[CtMatch](matchId)
@@ -61,7 +61,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     "CT return none where no details found in cache" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[CtMatch](any(), any())(any()))
+      given(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
         .willReturn(Future.successful(None))
 
       val result = cacheService.fetch[CtMatch](matchId)
@@ -71,7 +71,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     "Retrieve SA match details from cache service" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[SaMatch](any(), any())(any()))
+      given(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
         .willReturn(Future.successful(Some(saMatch)))
 
       val result = cacheService.fetch[SaMatch](matchId)
@@ -81,7 +81,7 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
     "SA return none where no details found in cache" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[SaMatch](any(), any())(any()))
+      given(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
         .willReturn(Future.successful(None))
 
       val result = cacheService.fetch[SaMatch](matchId)
@@ -96,13 +96,13 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       val ctUtr = "SOMECTUTR"
       val expected = ctMatch.copy(utr = Some(ctUtr))
 
-      given(mockMatchRepo.cache(any(), any(), any())(any()))
-        .willReturn(Future.successful(()))
+      given(mockMatchRepo.cache(any(), any())(any()))
+        .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await {
         cacheService.cacheCtUtr(ctMatch, ctUtr)
       }
-      verify(mockMatchRepo, times(1)).cache(any(), any(), eqTo(expected))(any())
+      verify(mockMatchRepo, times(1)).cache(any(), eqTo(expected))(any())
     }
   }
 
@@ -113,13 +113,13 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
       val saUtr = "SOMESAUTR"
       val expected = saMatch.copy(utr = Some(saUtr))
 
-      given(mockMatchRepo.cache(any(), any(), any())(any()))
-        .willReturn(Future.successful(()))
+      given(mockMatchRepo.cache(any(), any())(any()))
+        .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await {
         cacheService.cacheSaUtr(saMatch, saUtr)
       }
-      verify(mockMatchRepo, times(1)).cache(any(), any(), eqTo(expected))(any())
+      verify(mockMatchRepo, times(1)).cache(any(), eqTo(expected))(any())
     }
   }
 }

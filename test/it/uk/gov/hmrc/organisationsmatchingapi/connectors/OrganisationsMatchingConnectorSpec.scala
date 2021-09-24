@@ -328,7 +328,7 @@ class OrganisationsMatchingConnectorSpec
             """.stripMargin
           ))
           .willReturn(aResponse()
-            .withStatus(404).withBody("NOT_FOUND")))
+            .withStatus(404).withBody("{ \"code\" : \"NOT_FOUND\"}")))
 
       intercept[MatchingException] {
         await(
@@ -521,7 +521,7 @@ class OrganisationsMatchingConnectorSpec
             """.stripMargin
           ))
           .willReturn(aResponse()
-            .withStatus(404).withBody("NOT_FOUND")))
+            .withStatus(404).withBody("{ \"code\" : \"NOT_FOUND\"}")))
 
       intercept[MatchingException] {
         await(

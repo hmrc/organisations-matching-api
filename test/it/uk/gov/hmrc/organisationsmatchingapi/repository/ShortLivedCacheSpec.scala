@@ -16,8 +16,7 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.repository
 
-import java.util.UUID
-
+import org.mongodb.scala.model.Filters
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
@@ -26,11 +25,12 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Json, OFormat}
 import play.api.{Application, Configuration, Mode}
-import play.modules.reactivemongo.ReactiveMongoComponent
-import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
-import uk.gov.hmrc.organisationsmatchingapi.repository.ShortLivedCache
+import uk.gov.hmrc.mongo.MongoComponent
+import uk.gov.hmrc.mongo.play.json.Codecs.toBson
+import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, ShortLivedCache}
 import util.UnitSpec
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 
 class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
@@ -54,58 +54,50 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
   implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
   val cacheConfig: CacheConfiguration = fakeApplication.injector.instanceOf[CacheConfiguration]
   val configuration: Configuration = fakeApplication.injector.instanceOf[Configuration]
-  val mongo: ReactiveMongoComponent = fakeApplication.injector.instanceOf[ReactiveMongoComponent]
+  val mongoComponent: MongoComponent = fakeApplication.injector.instanceOf[MongoComponent]
 
-  val shortLivedCache = new ShortLivedCache(cacheConfig, configuration, mongo)
+  val shortLivedCache = new ShortLivedCache(cacheConfig, configuration, mongoComponent)
 
   override def beforeEach(): Unit = {
     super.beforeEach()
-    await(shortLivedCache.drop)
+    await(shortLivedCache.collection.drop().toFuture())
   }
 
   override def afterEach(): Unit = {
     super.afterEach()
-    await(shortLivedCache.drop)
+    await(shortLivedCache.collection.drop().toFuture())
   }
 
   "cache" should {
     "store the encrypted version of a value" in {
-      await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString(
+      await(shortLivedCache.cache(id, testValue)(TestClass.format))
+      retrieveRawCachedValue(id) shouldBe JsString(
         "I9gl6p5GRucOfXOFmhtiYfePGl5Nnksdk/aJFXf0iVQ=")
-    }
-
-    "update a cached value for a given id and key" in {
-      val newValue = TestClass("three", "four")
-
-      await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString(
-        "I9gl6p5GRucOfXOFmhtiYfePGl5Nnksdk/aJFXf0iVQ=")
-
-      await(shortLivedCache.cache(id, cachekey, newValue)(TestClass.format))
-      retrieveRawCachedValue(id, cachekey) shouldBe JsString(
-        "6yAvgtwLMcdiqTvdRvLTVKSkY3JwUZ/TzklThFfSqvA=")
     }
   }
 
   "fetch" should {
     "retrieve the unencrypted cached value for a given id and key" in {
-      await(shortLivedCache.cache(id, cachekey, testValue)(TestClass.format))
+      await(shortLivedCache.cache(id, testValue)(TestClass.format))
       await(
-        shortLivedCache.fetchAndGetEntry(id, cachekey)(
+        shortLivedCache.fetchAndGetEntry(id)(
           TestClass.format)) shouldBe Some(testValue)
     }
 
     "return None if no cached value exists for a given id and key" in {
       await(
-        shortLivedCache.fetchAndGetEntry(id, cachekey)(
+        shortLivedCache.fetchAndGetEntry(id)(
           TestClass.format)) shouldBe None
     }
   }
 
-  private def retrieveRawCachedValue(id: String, key: String) = {
-    val storedValue = await(shortLivedCache.findById(id)).get
-    (storedValue.data.get \ cachekey).get
+  private def retrieveRawCachedValue(id: String) = {
+    await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
+      .headOption
+      .map {
+        case Some(entry) => entry.data.organisationsData
+        case None => None
+      })
   }
 
   case class TestClass(one: String, two: String)

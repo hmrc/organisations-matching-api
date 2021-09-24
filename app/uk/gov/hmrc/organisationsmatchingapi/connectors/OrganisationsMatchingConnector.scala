@@ -25,6 +25,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtOrga
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
+import uk.gov.hmrc.http.HttpReads.Implicits._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -68,30 +69,37 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
                       request: RequestHeader,
                       requestUrl: String)
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = x.recoverWith {
-    case notFound: NotFoundException => {
-      auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(notFound.getMessage))
+    case Upstream4xxResponse(msg, 404, _, _) => {
+      printAndError(new Exception(msg))
+      auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(msg))
       // No Kibana for security reasons. Splunk only.
       throw new MatchingException
     }
     case validationError: JsValidationException => {
+      printAndError(validationError)
       logger.warn("Organisations Matching JsValidationException encountered")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Error parsing organisations matching response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case Upstream5xxResponse(msg, code, _, _) => {
+      printAndError(new Exception(msg))
       logger.warn(s"Organisations Matching Upstream5xxResponse encountered: $code")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case Upstream4xxResponse(msg, code, _, _) => {
+      printAndError(new Exception(msg))
       logger.warn(s"Organisations Matching Upstream4xxResponse encountered: $code")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case e: Exception => {
+      printAndError(e)
       logger.warn(s"Organisations Matching Exception encountered")
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, e.getMessage)
       Future.failed(new InternalServerException("Something went wrong."))
     }
   }
+
+  private def printAndError(msg: Throwable) = println(s"\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nORGANISATION_MATCHING_CONNECTOR\n${msg}\n\n\n\n\n\n\n\n\n\n")
 }

@@ -20,7 +20,7 @@ import play.api.libs.json.Format
 
 import java.util.UUID
 import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.cache.CacheConfiguration
+import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, InsertResult}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
@@ -32,23 +32,18 @@ class CacheService @Inject()(
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def cacheCtUtr(ctMatch: CtMatch, utr: String): Future[Unit] = {
-    save(ctMatch.matchId.toString, conf.key, ctMatch.copy(utr = Some(utr)))
+  def cacheCtUtr(ctMatch: CtMatch, utr: String): Future[InsertResult] = {
+    matchRepository.cache(ctMatch.matchId.toString, ctMatch.copy(utr = Some(utr)))
   }
 
-  def cacheSaUtr(saMatch: SaMatch, utr: String): Future[Unit] = {
-    save(saMatch.matchId.toString, conf.key, saMatch.copy(utr = Some(utr)))
+  def cacheSaUtr(saMatch: SaMatch, utr: String): Future[InsertResult] = {
+    matchRepository.cache(saMatch.matchId.toString, saMatch.copy(utr = Some(utr)))
   }
 
   def fetch[T: Format](matchId: UUID): Future[Option[T]] = {
-    matchRepository.fetchAndGetEntry(matchId.toString, conf.key) flatMap  {
+    matchRepository.fetchAndGetEntry(matchId.toString) flatMap  {
       result =>
         Future.successful(result)
     }
-  }
-
-  private def save[T](id: String, key: String, value: T)
-                     (implicit formats: Format[T]): Future[Unit] = {
-    matchRepository.cache(id, key, value)
   }
 }
