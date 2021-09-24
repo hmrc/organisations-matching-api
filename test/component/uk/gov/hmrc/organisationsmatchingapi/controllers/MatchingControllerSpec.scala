@@ -26,7 +26,8 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMat
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import uk.gov.hmrc.organisationsmatchingapi.cache.Entry
+import uk.gov.hmrc.organisationsmatchingapi.cache.{Data, Entry}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.SaMatch
 
 
 class MatchingControllerSpec extends BaseSpec  {
@@ -311,7 +312,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |  "matchId" : "$matchId"
            |}""".stripMargin)
 
-      val cachedData: Option[Entry] = Await.result(mongoRepository.fetchAndGetEntry[Entry](matchId), Duration(5, TimeUnit.SECONDS))
+      val cachedData: Option[SaMatch] = Await.result(mongoRepository.fetchAndGetEntry[SaMatch](matchId), Duration(5, TimeUnit.SECONDS))
       cachedData.isEmpty mustBe false
     }
 

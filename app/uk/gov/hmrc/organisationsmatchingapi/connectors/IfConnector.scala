@@ -101,19 +101,16 @@ class IfConnector @Inject()(
                      (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
 
     case validationError: JsValidationException => {
-      printAndError(validationError)
       logger.warn("Integration Framework JsValidationException encountered")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case Upstream4xxResponse(msg, 404, _, _) => {
-      printAndError(new Exception(msg))
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       logger.warn("Integration Framework NotFoundException encountered")
       Future.failed(new MatchingException)
     }
     case Upstream5xxResponse(msg, code, _, _) => {
-      printAndError(new Exception(msg))
       logger.warn(s"Integration Framework Upstream5xxResponse encountered: $code")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
       Future.failed(new InternalServerException("Something went wrong."))
@@ -124,18 +121,14 @@ class IfConnector @Inject()(
       Future.failed(new TooManyRequestException(msg))
     }
     case Upstream4xxResponse(msg, code, _, _) => {
-      printAndError(new Exception(msg))
       logger.warn(s"Integration Framework Upstream4xxResponse encountered: $code")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
     }
     case e: Exception => {
-      printAndError(e)
       logger.warn(s"Integration Framework Exception encountered")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, e.getMessage)
       Future.failed(new InternalServerException("Something went wrong."))
     }
   }
-
-  private def printAndError(msg: Throwable) = println(s"\n\n\n\n\n\n\\n\n\n\n\n\n\n\n\n\n\nIF_CONNECTOR\n${msg}\n\n\n\n\n\n\n\n\n\n")
 }
