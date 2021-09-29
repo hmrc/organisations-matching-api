@@ -26,6 +26,7 @@ import play.api.libs.json.JsString
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.organisationsmatchingapi.cache.InsertResult
 import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
@@ -79,7 +80,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     given(mockIfConnector.fetchCorporationTax(any(), any())(any(), any(), any()))
       .willReturn(Future.successful(corpTaxCompanyDetails))
 
-    given(mockCacheService.cacheCtUtr(any(), any())).willReturn(())
+    given(mockCacheService.cacheCtUtr(any(), any())).willReturn(InsertResult.InsertSucceeded)
 
     "Matching connector returns a match" in {
 
@@ -127,7 +128,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     given(mockIfConnector.fetchSelfAssessment(any(), any())(any(), any(), any()))
       .willReturn(Future.successful(saTaxpayerDetails))
 
-    given(mockCacheService.cacheSaUtr(any(), any())).willReturn(())
+    given(mockCacheService.cacheSaUtr(any(), any())).willReturn(InsertResult.InsertSucceeded)
 
     "Matching connector returns a match" in {
       given(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(any(), any(), any()))

@@ -14,17 +14,11 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.repository
+package uk.gov.hmrc.organisationsmatchingapi.cache
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, ShortLivedCache}
-
-import scala.concurrent.ExecutionContext
-
-@Singleton
-class MatchRepository @Inject()(cacheConfig: CacheConfiguration,
-                                configuration: Configuration,
-                                mongo: MongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache(cacheConfig, configuration, mongo)
+object MongoErrors {
+  object Duplicate {
+    def unapply(ex: Exception): Option[Exception] =
+      if (ex.getMessage.contains("E11000")) Some(ex) else None
+  }
+}

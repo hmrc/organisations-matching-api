@@ -76,7 +76,7 @@ trait BaseSpec
 
   override protected def beforeEach(): Unit = {
     mocks.foreach(m => if (!m.server.isRunning) m.server.start())
-    result(mongoRepository.drop, timeout)
+    result(mongoRepository.collection.drop().toFuture(), timeout)
     result(mongoRepository.ensureIndexes, timeout)
   }
 
@@ -85,7 +85,7 @@ trait BaseSpec
 
   override def afterAll(): Unit = {
     mocks.foreach(_.server.stop())
-    result(mongoRepository.drop, timeout)
+    result(mongoRepository.collection.drop().toFuture(), timeout)
   }
 }
 

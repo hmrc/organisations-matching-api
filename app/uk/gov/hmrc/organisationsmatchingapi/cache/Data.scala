@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.repository
+package uk.gov.hmrc.organisationsmatchingapi.cache
 
-import javax.inject.{Inject, Singleton}
-import play.api.Configuration
-import uk.gov.hmrc.mongo.MongoComponent
-import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, ShortLivedCache}
+import play.api.libs.json.{JsValue, Json, OFormat}
 
-import scala.concurrent.ExecutionContext
+case class Data(organisationsData: JsValue)
 
-@Singleton
-class MatchRepository @Inject()(cacheConfig: CacheConfiguration,
-                                configuration: Configuration,
-                                mongo: MongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache(cacheConfig, configuration, mongo)
+object Data {
+  implicit val format: OFormat[Data] = Json.format[Data]
+}

@@ -20,14 +20,14 @@ import component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs.{AuthStu
 import play.api.http.Status
 import play.api.libs.json.{JsString, Json}
 import scalaj.http.{Http, HttpResponse}
-import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import uk.gov.hmrc.organisationsmatchingapi.cache.{Data, Entry}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 
 
 class MatchingControllerSpec extends BaseSpec  {
@@ -102,7 +102,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |}""".stripMargin)
 
 
-      val cachedData: List[Cache] = Await.result(mongoRepository.find(("_id", JsString(matchId.toString))), Duration(5, TimeUnit.SECONDS))
+      val cachedData: Option[CtMatch] = Await.result(mongoRepository.fetchAndGetEntry[CtMatch](matchId), Duration(5, TimeUnit.SECONDS))
       cachedData.isEmpty mustBe false
     }
 
@@ -312,7 +312,7 @@ class MatchingControllerSpec extends BaseSpec  {
            |  "matchId" : "$matchId"
            |}""".stripMargin)
 
-      val cachedData: List[Cache] = Await.result(mongoRepository.find(("_id", JsString(matchId.toString))), Duration(5, TimeUnit.SECONDS))
+      val cachedData: Option[SaMatch] = Await.result(mongoRepository.fetchAndGetEntry[SaMatch](matchId), Duration(5, TimeUnit.SECONDS))
       cachedData.isEmpty mustBe false
     }
 

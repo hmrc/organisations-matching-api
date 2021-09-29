@@ -43,7 +43,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match exist")
-      result(mongoRepository.cache(matchId.toString, "organisations-matching", ctMatch), timeout)
+      result(mongoRepository.cache(matchId.toString, ctMatch), timeout)
 
       When("the API is invoked")
       val response = Http(s"$serviceUrl/corporation-tax/$matchId")
@@ -188,7 +188,7 @@ class MatchedControllerSpec extends BaseSpec  {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match exist")
-      result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
+      result(mongoRepository.cache(matchId.toString, saMatch), timeout)
 
       When("the API is invoked")
       val response = Http(s"$serviceUrl/self-assessment/$matchId")
@@ -333,7 +333,7 @@ class MatchedControllerSpec extends BaseSpec  {
       Given("A valid privileged Auth bearer token")
 
       And("A valid match exist")
-      result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
+      result(mongoRepository.cache(matchId.toString, saMatch), timeout)
 
       When("the API is invoked")
       val response = Http(s"$serviceUrl/match-record/$matchId").asString
@@ -368,7 +368,7 @@ class MatchedControllerSpec extends BaseSpec  {
       Given("A valid privileged Auth bearer token")
 
       And("A valid match exist")
-      result(mongoRepository.cache(matchId.toString, "organisations-matching", saMatch), timeout)
+      result(mongoRepository.cache(matchId.toString, saMatch), timeout)
 
       When("the API is invoked")
       val response = Http(s"$serviceUrl/match-record/foo").asString
