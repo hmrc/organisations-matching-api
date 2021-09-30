@@ -18,7 +18,7 @@ package uk.gov.hmrc.organisationsmatchingapi.cache
 
 import play.api.libs.json.{JsValue, Json, OFormat}
 
-case class Data(organisationsData: JsValue)
+case class Data(organisationsMatching: JsValue)
 
 object Data {
   implicit val format: OFormat[Data] = Json.format[Data]

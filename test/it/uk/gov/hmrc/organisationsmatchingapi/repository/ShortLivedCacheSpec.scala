@@ -95,7 +95,7 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
     await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
       .headOption
       .map {
-        case Some(entry) => entry.data.organisationsData
+        case Some(entry) => entry.data.organisationsMatching
         case None => None
       })
   }
