@@ -90,7 +90,7 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
       .find(Filters.equal("id", toBson(id)))
       .headOption
       .map {
-        case Some(entry) => decryptor.reads(entry.data.organisationsMatching).asOpt map (_.decryptedValue)
+        case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
         case None => None
       }
   }
