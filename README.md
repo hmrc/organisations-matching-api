@@ -11,6 +11,14 @@ The documentation on [confluence](https://confluence.tools.tax.service.gov.uk/di
 Please ensure you reference the OGD Data Item matrix to ensure the right data items are mapped and keep this document up to date if further data items are added.
 (The matrix was last validated at V1.1, please ensure you update with any changes you make.)
 
+### Running the service
+
+The service can be run with:
+
+    sbt run
+
+And will run on port 9657. 
+
 ### Running tests
 
 Unit, integration and component tests can be run with the following:
