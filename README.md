@@ -1,4 +1,4 @@
-# organisations-matching-api
+# Organisations Matching API
 
 This API allows users to match HMRC data for organisations.
 
@@ -13,11 +13,17 @@ Please ensure you reference the OGD Data Item matrix to ensure the right data it
 
 ### Running the service
 
-The service can be run with:
+Run service manager (for auth wizard and organisations-matching microservice)
 
-    sbt run
+```sm --start OVHO -r```
 
-And will run on port 9657. 
+```sm --stop ORGANISATIONS_MATCHING_API```
+
+The service runs on port 9657 with:
+
+```sbt run```
+
+Headers, endpoints, and example request bodies can be found in the documentation on [DevHub](https://developer.qa.tax.service.gov.uk/api-documentation/docs/api/service/organisations-matching-api/1.0).
 
 ### Running tests
 
