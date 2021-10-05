@@ -1,15 +1,36 @@
+# Organisations Matching API
 
-# organisations-matching-api
+This API allows users to match HMRC data for organisations.
 
-API Documentation can be viewed [here](docs/organisations-matching.md)
+### Documentation
+The documentation on [confluence](https://confluence.tools.tax.service.gov.uk/display/MDS/Development+space) includes:
+- Configuration driven management of data and scopes
+- Scope driven query strings for Integration Framework (IF)
+- Caching strategy to alleviate load on backend systems
 
-### Testing Locally
+Please ensure you reference the OGD Data Item matrix to ensure the right data items are mapped and keep this document up to date if further data items are added.
+(The matrix was last validated at V1.1, please ensure you update with any changes you make.)
 
-Ensure mongodb is running on your machine, then in sbt shell:
-```
-clean; compile; test
-```
+### Running the service
+
+Run service manager (for auth wizard and organisations-matching microservice)
+
+```sm --start OVHO -r```
+
+```sm --stop ORGANISATIONS_MATCHING_API```
+
+The service runs on port 9657 with:
+
+```sbt run```
+
+Headers, endpoints, and example request bodies can be found in the documentation on [DevHub](https://developer.qa.tax.service.gov.uk/api-documentation/docs/api/service/organisations-matching-api/1.0).
+
+### Running tests
+
+Unit, integration and component tests can be run with the following:
+
+    sbt test it:test component:test
 
 ### License
 
-This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html").
+This code is open source software licensed under the [Apache 2.0 License]("http://www.apache.org/licenses/LICENSE-2.0.html")
