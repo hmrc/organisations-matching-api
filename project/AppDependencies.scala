@@ -9,16 +9,16 @@ object AppDependencies {
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    hmrcMongo             %% "hmrc-mongo-play-28"         % "0.53.0",
-    hmrc                  %% "bootstrap-backend-play-28"  % "5.12.0",
+    hmrcMongo             %% "hmrc-mongo-play-28"         % "0.55.0",
+    hmrc                  %% "bootstrap-backend-play-28"  % "5.14.0",
     hmrc                  %% "play-hmrc-api"              % "6.4.0-play-28",
-    hmrc                  %% "play-hal"                   % "2.1.0-play-27",
+    hmrc                  %% "play-hal"                   % "3.1.0-play-28",
     hmrc                  %% "json-encryption"            % "4.10.0-play-28"
   )
 
   def test(scope: String = "test, it, component") = Seq(
-    hmrc                           %% "bootstrap-test-play-28"   % "5.12.0"                % scope,
-    hmrcMongo                      %% "hmrc-mongo-test-play-28"  % "0.53.0"                % scope,
+    hmrc                           %% "bootstrap-test-play-28"   % "5.14.0"                % scope,
+    hmrcMongo                      %% "hmrc-mongo-test-play-28"  % "0.55.0"                % scope,
     "org.scalatestplus"            %% "mockito-3-4"              % "3.2.7.0"               % scope,
     "org.scalatest"                %% "scalatest"                % "3.2.9"                 % scope,
     "com.typesafe.play"            %% "play-test"                % PlayVersion.current     % scope,
