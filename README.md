@@ -13,7 +13,7 @@ Please ensure you reference the OGD Data Item matrix to ensure the right data it
 
 ### Running the service
 
-Run service manager (for auth wizard and organisations-matching microservice)
+Ensure mongodb and service manager (for auth wizard and organisations-matching microservice) are running.
 
 ```sm --start OVHO -r```
 
