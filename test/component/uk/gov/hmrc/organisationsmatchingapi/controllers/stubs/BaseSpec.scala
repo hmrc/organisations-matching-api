@@ -32,7 +32,6 @@ import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
 import scala.concurrent.Await.result
 import scala.concurrent.duration.{Duration, FiniteDuration}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 trait BaseSpec
     extends AnyFeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with GuiceOneServerPerSuite
