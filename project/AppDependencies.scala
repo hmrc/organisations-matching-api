@@ -20,6 +20,7 @@ object AppDependencies {
     hmrc                           %% "bootstrap-test-play-28"   % "5.12.0"                % scope,
     hmrcMongo                      %% "hmrc-mongo-test-play-28"  % "0.53.0"                % scope,
     "org.scalatestplus"            %% "mockito-3-4"              % "3.2.7.0"               % scope,
+    "org.scalatestplus"            %% "scalacheck-1-15"          % "3.2.10.0"              % scope,
     "org.scalatest"                %% "scalatest"                % "3.2.9"                 % scope,
     "com.typesafe.play"            %% "play-test"                % PlayVersion.current     % scope,
     "com.vladsch.flexmark"         %  "flexmark-all"             % "0.36.8"                % scope,
