@@ -110,7 +110,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
              |  "companyRegistrationNumber" : "crn",
              |  "employerName": "test",
              |  "address": {
-             |    "line1": "test",
+             |    "addressLine1": "test",
              |    "postcode": "test"
              |  },
              |  "_links": {
@@ -215,7 +215,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
              |  "taxPayerType": "individual",
              |  "taxPayerName": "test",
              |  "address": {
-             |    "line1": "test",
+             |    "addressLine1": "test",
              |    "postcode": "test"
              |  },
              |  "_links": {
