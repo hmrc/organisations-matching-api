@@ -55,7 +55,7 @@ class MatchedControllerSpec extends BaseSpec  {
       Json.parse(response.body) shouldBe Json.parse(
         s"""{
            |  "address": {
-           |    "line1": "line1",
+           |    "addressLine1": "line1",
            |    "postcode": "postcode"
            |  },
            |  "_links": {
@@ -200,7 +200,7 @@ class MatchedControllerSpec extends BaseSpec  {
       Json.parse(response.body) shouldBe Json.parse(
         s"""{
            |  "address": {
-           |    "line1": "line1",
+           |    "addressLine1": "line1",
            |    "postcode": "postcode"
            |  },
            |  "_links": {

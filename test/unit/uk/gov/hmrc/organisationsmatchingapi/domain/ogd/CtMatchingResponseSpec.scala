@@ -31,7 +31,7 @@ class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
         companyRegistrationNumber = "12345",
         employerName = "1234567890",
         address = Address(
-          line1 = Some("line1"),
+          addressLine1 = Some("line1"),
           postcode = Some("postcode")))
 
       val asJson = Json.toJson(payeMatchingResponse)
@@ -40,7 +40,7 @@ class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
                                    |  "companyRegistrationNumber": "12345",
                                    |  "employerName" : "1234567890",
                                    |  "address" : {
-                                   |    "line1" : "line1",
+                                   |    "addressLine1" : "line1",
                                    |    "postcode" : "postcode"
                                    |  }
                                    |}""".stripMargin)

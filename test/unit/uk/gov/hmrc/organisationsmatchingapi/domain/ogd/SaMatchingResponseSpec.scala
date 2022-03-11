@@ -32,7 +32,7 @@ class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
         taxPayerType = "A",
         taxPayerName = "name",
         address = Address(
-          line1 = Some("line1"),
+          addressLine1 = Some("line1"),
           postcode = Some("postcode")))
 
       val asJson = Json.toJson(saMatchingResponse)
@@ -42,7 +42,7 @@ class SaMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
                                    |  "taxPayerType" : "A",
                                    |  "taxPayerName" : "name",
                                    |  "address" : {
-                                   |    "line1" : "line1",
+                                   |    "addressLine1" : "line1",
                                    |    "postcode" : "postcode"
                                    |  }
                                    |}""".stripMargin)
