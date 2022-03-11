@@ -11,7 +11,7 @@
       "href": "organisations/matching/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
     },
     "getSelfAssessmentDetails": {
-      "href": "organisations/details?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
+      "href": "organisations/details/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430",
       "title": "Get an organisation's self-assessment details"
     },
     "getEmployeeCount": {
