@@ -1,9 +1,9 @@
 {
   "type": "object",
   "required": [
-    "taxpayerType",
+    "taxPayerType",
     "selfAssessmentUniqueTaxPayerRef",
-    "taxpayerName",
+    "taxPayerName",
     "address"
   ],
   "properties": {
