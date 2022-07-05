@@ -31,7 +31,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
 
 class MatchingControllerSpec extends BaseSpec  {
 
-  val scopes = List("read:organisations-matching-ho-ssp")
+  val scopes = List("read:organisations-matching-ho")
   val ctRequest: CtMatchingRequest = CtMatchingRequest("0213456789", "name", "line1", "NE11NE")
   val ctRequestString: String = Json.prettyPrint(Json.toJson(ctRequest))
 

@@ -29,24 +29,24 @@ class IfQueriesSpec extends AnyWordSpec with Matchers with ComponentSpec {
     val res2 =  "taxPayerDetails(address(line1,postcode),name),taxPayerType,utr"
 
 
-    "read:organisations-matching-ho-ssp" should {
+    "read:organisations-matching-ho" should {
       "have correct IF query string for corporation-tax" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getCorporationTax"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho"), List("getCorporationTax"))
         queryString shouldBe res1
       }
 
       "have correct IF query string for corporation-tax-match" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getCorporationTaxMatch"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho"), List("getCorporationTaxMatch"))
         queryString shouldBe res1
       }
 
       "have correct IF query string for self-assessment" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getSelfAssessment"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho"), List("getSelfAssessment"))
         queryString shouldBe res2
       }
 
       "have correct IF query string for self-assessment-match" in {
-        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho-ssp"), List("getSelfAssessmentMatch"))
+        val queryString = helper.getQueryStringFor(Seq("read:organisations-matching-ho"), List("getSelfAssessmentMatch"))
         queryString shouldBe res2
       }
     }

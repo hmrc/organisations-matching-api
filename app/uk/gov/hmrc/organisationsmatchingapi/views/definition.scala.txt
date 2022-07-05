@@ -11,9 +11,9 @@
        "description": "An OAuth 2.0 Bearer Token with the scopes you have been assigned"
      },
      {
-       "key": "read:organisations-matching-ho-ssp",
+       "key": "read:organisations-matching-ho",
        "name": "The organisations matching scope",
-       "description": "An OAuth 2.0 Bearer Token with the read:organisations-matching-ho-ssp scope"
+       "description": "An OAuth 2.0 Bearer Token with the read:organisations-matching-ho scope"
      }
    ],
      "api": {

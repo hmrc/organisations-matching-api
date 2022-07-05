@@ -30,7 +30,7 @@ import scala.concurrent.Await.result
 class MatchedControllerSpec extends BaseSpec  {
 
   val matchId: UUID = UUID.randomUUID()
-  val scopes    = List("read:organisations-matching-ho-ssp")
+  val scopes    = List("read:organisations-matching-ho")
   val ctRequest: CtMatchingRequest = CtMatchingRequest("0123456789", "name", "line1", "postcode")
   val ctMatch: CtMatch = CtMatch(ctRequest, matchId, utr = Some("testutr"))
   val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
