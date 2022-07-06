@@ -12,8 +12,8 @@
      },
      {
        "key": "read:organisations-matching-ho",
-       "name": "The organisations matching scope",
-       "description": "An OAuth 2.0 Bearer Token with the read:organisations-matching-ho scope"
+       "name": "The organisations matching scope for HO",
+       "description": "Scope to be used by HO for Match ID generation"
      }
    ],
      "api": {
