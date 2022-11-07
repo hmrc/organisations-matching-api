@@ -21,7 +21,7 @@ import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Decrypter, Encrypter, Protected}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -56,7 +56,7 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
         expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)))
 ) {
 
-  implicit lazy val crypto: CompositeSymmetricCrypto = new ApplicationCrypto(
+  implicit lazy val crypto: Encrypter with Decrypter = new ApplicationCrypto(
     configuration.underlying).JsonCrypto
 
   def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[InsertResult] = {

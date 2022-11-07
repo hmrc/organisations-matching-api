@@ -35,6 +35,7 @@ import play.api.{Application, Mode}
 import uk.gov.hmrc.organisationsmatchingapi.controllers.DocumentationController
 import util.UnitSpec
 
+import scala.collection.Seq
 import scala.concurrent.Future
 
 class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPerTest with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
