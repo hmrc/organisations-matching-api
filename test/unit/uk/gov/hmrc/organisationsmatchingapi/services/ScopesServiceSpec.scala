@@ -20,6 +20,8 @@ import org.scalatest.matchers.should.Matchers
 import uk.gov.hmrc.organisationsmatchingapi.services.ScopesService
 import util.UnitSpec
 
+import scala.collection._
+
 class ScopesServiceSpec
   extends UnitSpec
     with Matchers
@@ -30,10 +32,11 @@ class ScopesServiceSpec
   "Gets correct external endpoints" when {
     "using first scope" in {
       val endpoints = scopesService.getExternalEndpoints(Seq(mockScopeOne))
+      println(s"THIS IS $endpoints")
       endpoints.size shouldBe 2
-      endpoints.map(_.key) shouldBe Seq(endpointKeyOne, endpointKeyTwo)
-      endpoints.map(_.link) shouldBe Seq("/external/1", "/external/2")
-      endpoints.map(_.title) shouldBe Seq("Get the first endpoint", "Get the second endpoint")
+      endpoints.map(_.key).toSeq.sorted shouldBe Seq(endpointKeyOne, endpointKeyTwo)
+      endpoints.map(_.link).toSeq.sorted shouldBe Seq("/external/1", "/external/2")
+      endpoints.map(_.title).toSeq.sorted shouldBe Seq("Get the first endpoint", "Get the second endpoint")
     }
 
     "using second scope" in {
@@ -41,7 +44,7 @@ class ScopesServiceSpec
       endpoints.size shouldBe 2
       endpoints.map(_.key).toSeq.sorted shouldBe Seq(endpointKeyThree, endpointKeyTwo).sorted
       endpoints.map(_.link).toSeq.sorted shouldBe Seq("/external/3", "/external/2").toSeq.sorted
-      endpoints.map(_.title).toSeq.sorted shouldBe Seq("Get the third endpoint", "Get the second endpoint").toSeq.sorted
+      endpoints.map(_.title).toSeq.sorted shouldBe Seq("Get the second endpoint", "Get the third endpoint").toSeq.sorted
     }
 
     "using invalid scope" in {
@@ -60,8 +63,8 @@ class ScopesServiceSpec
 
     "using second scope" in {
       val endpoints = scopesService.getInternalEndpoints(Seq(mockScopeTwo))
-      endpoints.map(_.link) shouldBe Seq("/internal/3", "/internal/2")
-      endpoints.map(_.title) shouldBe Seq("Get the third endpoint", "Get the second endpoint")
+      endpoints.map(_.link).toSeq.sorted shouldBe Seq("/internal/2", "/internal/3")
+      endpoints.map(_.title).toSeq.sorted shouldBe Seq("Get the second endpoint", "Get the third endpoint")
     }
 
     "using invalid scope" in {
