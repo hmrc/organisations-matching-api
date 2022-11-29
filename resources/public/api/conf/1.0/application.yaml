@@ -1,0 +1,769 @@
+openapi: 3.0.0
+
+info:
+  title: Organisations Matching
+  contact: {}
+  version: '1.0'
+
+servers:
+- url: https://api.isc.development.tax.service.gov.uk
+  description: Development
+- url: https://api.qa.tax.service.gov.uk
+  description: QA
+
+paths:
+  /organisations/matching/corporation-tax:
+    post:
+      tags:
+      - organisations
+      summary: Match Corporation Tax details for an organisation
+      description: >
+        <p>Use this endpoint to match details about an organisation against HMRC’s records.</p>
+
+        <p>Details include: company registration number (CRN), employer name, and address.</p>
+
+        <p>On a successful match, a matchId is returned. The matchId can be used in later calls.</p>
+      operationId: MatchCorporationTaxdetailsforanorganisation
+      parameters:
+      - name: CorrelationId
+        in: header
+        description: >-
+          <p>A UUID, used for traceability purposes.</p>
+
+          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/OrganisationsMatchingCorporationTaxrequest'
+              - example:
+                  companyRegistrationNumber: AA123456
+                  employerName: Example Company Ltd
+                  address:
+                    addressLine1: 123 Long Road
+                    postcode: AB12 3CD
+            example:
+              companyRegistrationNumber: AA123456
+              employerName: Example Company Ltd
+              address:
+                addressLine1: 123 Long Road
+                postcode: AB12 3CD
+        required: true
+      responses:
+        '200':
+          description: Returns a matchId which can be used to make calls to details endpoints
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/OrganisationsMatchingCorporationTaxresponse'
+                - example:
+                    _links:
+                      getCorporationTaxMatch:
+                        href: /organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Get links to Corporation Tax and number of employees details for a matched organisation
+                      self:
+                        href: /organisations/matching/corporation-tax
+                    matchId: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+              example:
+                _links:
+                  getCorporationTaxMatch:
+                    href: /organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Get links to Corporation Tax and number of employees details for a matched organisation
+                  self:
+                    href: /organisations/matching/corporation-tax
+                matchId: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: BAD_REQUEST
+              examples:
+                BadRequest:
+                  description: The request body does not conform to the schema
+                  value:
+                    code: BAD_REQUEST
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: MATCHING_FAILED
+              examples:
+                Forbidden:
+                  description: The organisation's details provided did not match with HMRC's records
+                  value:
+                    code: MATCHING_FAILED
+      deprecated: false
+  /organisations/matching/self-assessment:
+    post:
+      tags:
+      - organisations
+      summary: Match Self Assessment details for an organisation
+      description: >
+        <p>Use this endpoint to match details about an organisation against HMRC’s records.</p>
+
+        <p>Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address.</p>
+
+        <p>On a successful match, a matchId is returned. The matchId can be used in later calls.</p>
+      operationId: MatchSelfAssessmentdetailsforanorganisation
+      parameters:
+      - name: CorrelationId
+        in: header
+        description: >-
+          <p>A UUID, used for traceability purposes.</p>
+
+          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+              - $ref: '#/components/schemas/OrganisationsMatchingSelfAssessmentrequest'
+              - example:
+                  selfAssessmentUniqueTaxPayerRef: '1234567890'
+                  taxPayerType: Partnership
+                  taxPayerName: Partnership Name
+                  address:
+                    addressLine1: 123 Long Road
+                    postcode: AB12 3CD
+            example:
+              selfAssessmentUniqueTaxPayerRef: '1234567890'
+              taxPayerType: Partnership
+              taxPayerName: Partnership Name
+              address:
+                addressLine1: 123 Long Road
+                postcode: AB12 3CD
+        required: true
+      responses:
+        '200':
+          description: Returns a matchId which can be used to make calls to details endpoints
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/OrganisationsMatchingSelfAssessmentresponse'
+                - example:
+                    _links:
+                      getSelfAssessmentMatch:
+                        href: /organisations/matching/self-assessment/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Get links to Self Assessment and number of employees details for a matched organisation
+                      self:
+                        href: /organisations/matching/self-assessment
+                    matchId: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+              example:
+                _links:
+                  getSelfAssessmentMatch:
+                    href: /organisations/matching/self-assessment/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Get links to Self Assessment and number of employees details for a matched organisation
+                  self:
+                    href: /organisations/matching/self-assessment
+                matchId: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: BAD_REQUEST
+              examples:
+                BadRequest:
+                  description: The request body does not conform to the schema
+                  value:
+                    code: BAD_REQUEST
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: MATCHING_FAILED
+              examples:
+                Forbidden:
+                  description: The organisation's details provided did not match with HMRC's records
+                  value:
+                    code: MATCHING_FAILED
+      deprecated: false
+  /organisations/matching/corporation-tax/{matchId}:
+    get:
+      tags:
+      - organisations
+      summary: Get links to Corporation Tax and number of employees details for a matched organisation
+      description: >
+        <p>This endpoint takes a matchId and returns matched organisation details.</p>
+
+        <p>The endpoint also provides links to get Corporation Tax and number of employees details for a matched organisation.</p>
+
+        <p>You will get a subset of the JSON response shown below based on your assigned scopes.</p>
+      operationId: GetlinkstoCorporationTaxandnumberofemployeesdetailsforamatchedorganisation
+      parameters:
+      - name: matchId
+        in: path
+        description: A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      - name: CorrelationId
+        in: header
+        description: >-
+          <p>A UUID, used for traceability purposes.</p>
+
+          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+      responses:
+        '200':
+          description: The company's Corporation Tax details
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/OrganisationsMatchingCorporationTaxresponse1'
+                - example:
+                    companyRegistrationNumber: AA123456
+                    employerName: Example Company Ltd
+                    address:
+                      addressLine1: 123 Long Road
+                      postcode: AB12 3CD
+                    _links:
+                      self:
+                        href: organisations/matching/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                      getCorporationTaxDetails:
+                        href: organisations/details/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Get an organisation's Corporation Tax details
+                      getEmployeeCount:
+                        href: organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Find the number of employees for an organisation
+              example:
+                companyRegistrationNumber: AA123456
+                employerName: Example Company Ltd
+                address:
+                  addressLine1: 123 Long Road
+                  postcode: AB12 3CD
+                _links:
+                  self:
+                    href: organisations/matching/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                  getCorporationTaxDetails:
+                    href: organisations/details/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Get an organisation's Corporation Tax details
+                  getEmployeeCount:
+                    href: organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Find the number of employees for an organisation
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                NotFound:
+                  description: Not Found
+                  value:
+                    code: NOT_FOUND
+      deprecated: false
+  /organisations/matching/self-assessment/{matchId}:
+    get:
+      tags:
+      - organisations
+      summary: Get links to Self Assessment and number of employees details for a matched organisation
+      description: >
+        <p>This endpoint takes a matchId and returns matched organisation details.</p>
+
+        <p>The endpoint also provides links to get Self Assessment and number of employees details for a matched organisation.</p>
+
+        <p>You will get a subset of the JSON response shown below based on your assigned scopes.</p>
+      operationId: GetlinkstoSelfAssessmentandnumberofemployeesdetailsforamatchedorganisation
+      parameters:
+      - name: matchId
+        in: path
+        description: A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      - name: CorrelationId
+        in: header
+        description: >-
+          <p>A UUID, used for traceability purposes.</p>
+
+          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+      responses:
+        '200':
+          description: The Organisation's Self Assessment details
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/OrganisationsMatchingSelfAssessmentresponse1'
+                - example:
+                    selfAssessmentUniqueTaxPayerRef: '1234567890'
+                    taxPayerType: Partnership
+                    taxPayerName: Partnership Name
+                    address:
+                      addressLine1: 123 Long Road
+                      postcode: AB12 3CD
+                    _links:
+                      self:
+                        href: organisations/matching/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                      getSelfAssessmentDetails:
+                        href: organisations/details/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Get an organisation's self-assessment details
+                      getEmployeeCount:
+                        href: organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Find the number of employees for an organisation
+              example:
+                selfAssessmentUniqueTaxPayerRef: '1234567890'
+                taxPayerType: Partnership
+                taxPayerName: Partnership Name
+                address:
+                  addressLine1: 123 Long Road
+                  postcode: AB12 3CD
+                _links:
+                  self:
+                    href: organisations/matching/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                  getSelfAssessmentDetails:
+                    href: organisations/details/self-assessment?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Get an organisation's self-assessment details
+                  getEmployeeCount:
+                    href: organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Find the number of employees for an organisation
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                NotFound:
+                  description: Not Found
+                  value:
+                    code: NOT_FOUND
+      deprecated: false
+components:
+  schemas:
+    errorResponse:
+      title: errorResponse
+      required:
+      - code
+      type: object
+      properties:
+        code:
+          type: string
+    Address:
+      title: Address
+      required:
+      - addressLine1
+      - postcode
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          description: Address line 1.
+          example: 123 Long Road
+        postcode:
+          type: string
+          description: The postcode for the address.
+          example: AB12 3CD
+      description: The employer's address details.
+    Address1:
+      title: Address1
+      required:
+      - addressLine1
+      - postcode
+      type: object
+      properties:
+        addressLine1:
+          type: string
+          description: Address line 1.
+          example: 123 Long Road
+        postcode:
+          type: string
+          description: The postcode for the address.
+          example: AB12 3CD
+      description: The organisation's address.
+    GetCorporationTaxDetails:
+      title: GetCorporationTaxDetails
+      required:
+      - href
+      - title
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/details/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        title:
+          type: string
+          description: Get an organisation's Corporation Tax details
+      description: The URI for the endpoint to get Corporation Tax details for the matched organisation.
+    GetCorporationTaxMatch:
+      title: GetCorporationTaxMatch
+      required:
+      - href
+      - title
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/matching/corporation-tax/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        title:
+          type: string
+          description: Get links to Corporation Tax and number of employees details for a matched organisation
+      description: The Uniform Resource Identifier (URI) for the endpoint that provides links to get Corporation Tax details for the matched organisation.
+    GetEmployeeCount:
+      title: GetEmployeeCount
+      required:
+      - href
+      - title
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/details/number-of-employees?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        title:
+          type: string
+          description: Find the number of employees for an organisation
+      description: The URI for the endpoint to get number of employees data.
+    GetSelfAssessmentDetails:
+      title: GetSelfAssessmentDetails
+      required:
+      - href
+      - title
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/details/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        title:
+          type: string
+          description: Get an organisation's Self Assessment details
+      description: The URI for the endpoint to get Self Assessment details for the matched organisation.
+    GetSelfAssessmentMatch:
+      title: GetSelfAssessmentMatch
+      required:
+      - href
+      - title
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/matching/self-assessment/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        title:
+          type: string
+          description: Get links to Self Assessment and number of employees details for a matched organisation
+      description: The Uniform Resource Identifier (URI) for the endpoint that provides links to get Self Assessment details for the matched organisation.
+    Links:
+      title: Links
+      required:
+      - getCorporationTaxMatch
+      - self
+      type: object
+      properties:
+        getCorporationTaxMatch:
+          allOf:
+          - $ref: '#/components/schemas/GetCorporationTaxMatch'
+          - description: The Uniform Resource Identifier (URI) for the endpoint that provides links to get Corporation Tax details for the matched organisation.
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Self'
+          - description: The URI for this endpoint.
+      description: A list of links for possible actions related to this endpoint.
+    Links1:
+      title: Links1
+      required:
+      - getSelfAssessmentMatch
+      - self
+      type: object
+      properties:
+        getSelfAssessmentMatch:
+          allOf:
+          - $ref: '#/components/schemas/GetSelfAssessmentMatch'
+          - description: The Uniform Resource Identifier (URI) for the endpoint that provides links to get Self Assessment details for the matched organisation.
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Self'
+          - description: The URI for this endpoint.
+      description: A list of links for possible actions related to this endpoint.
+    Links2:
+      title: Links2
+      required:
+      - self
+      - getCorporationTaxDetails
+      - getEmployeeCount
+      type: object
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Self2'
+          - description: The Uniform Resource Identifier (URI) for this endpoint.
+        getCorporationTaxDetails:
+          allOf:
+          - $ref: '#/components/schemas/GetCorporationTaxDetails'
+          - description: The URI for the endpoint to get Corporation Tax details for the matched organisation.
+        getEmployeeCount:
+          allOf:
+          - $ref: '#/components/schemas/GetEmployeeCount'
+          - description: The URI for the endpoint to get number of employees data.
+      description: A list of links for possible actions related to this endpoint.
+    Links3:
+      title: Links3
+      required:
+      - self
+      - getSelfAssessmentDetails
+      - getEmployeeCount
+      type: object
+      properties:
+        self:
+          allOf:
+          - $ref: '#/components/schemas/Self3'
+          - description: The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment data.
+        getSelfAssessmentDetails:
+          allOf:
+          - $ref: '#/components/schemas/GetSelfAssessmentDetails'
+          - description: The URI for the endpoint to get Self Assessment details for the matched organisation.
+        getEmployeeCount:
+          allOf:
+          - $ref: '#/components/schemas/GetEmployeeCount'
+          - description: The URI for the endpoint to get number of employees data.
+      description: A list of links for possible actions related to this endpoint.
+    OrganisationsMatchingCorporationTaxrequest:
+      title: OrganisationsMatchingCorporationTaxrequest
+      required:
+      - companyRegistrationNumber
+      - employerName
+      - address
+      type: object
+      properties:
+        companyRegistrationNumber:
+          pattern: ^[A-Z0-9]{1,10}$
+          type: string
+          description: Company registration number (CRN).
+          example: AA123456
+        employerName:
+          type: string
+          description: The name of the employer.
+          example: Example Company Ltd
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          - description: The employer's address details.
+      description: Company's CRN and known facts
+    OrganisationsMatchingCorporationTaxresponse:
+      title: OrganisationsMatchingCorporationTaxresponse
+      required:
+      - _links
+      - matchId
+      type: object
+      properties:
+        _links:
+          allOf:
+          - $ref: '#/components/schemas/Links'
+          - description: A list of links for possible actions related to this endpoint.
+        matchId:
+          type: string
+          description: A short-lived universally unique identifier (UUID), typically valid for 5 hours.
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: Company Matching Response
+    OrganisationsMatchingCorporationTaxresponse1:
+      title: OrganisationsMatchingCorporationTaxresponse1
+      required:
+      - employerName
+      - address
+      - _links
+      type: object
+      properties:
+        companyRegistrationNumber:
+          pattern: ^[A-Z0-9]{1,10}$
+          type: string
+          description: Company registration number (CRN).
+          example: AA123456
+        employerName:
+          type: string
+          description: The name of the employer.
+          example: Example Company Ltd
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address'
+          - description: The employer's address details.
+        _links:
+          allOf:
+          - $ref: '#/components/schemas/Links2'
+          - description: A list of links for possible actions related to this endpoint.
+      description: Company Details Response
+    OrganisationsMatchingSelfAssessmentrequest:
+      title: OrganisationsMatchingSelfAssessmentrequest
+      required:
+      - selfAssessmentUniqueTaxPayerRef
+      - taxPayerType
+      - taxPayerName
+      - address
+      type: object
+      properties:
+        selfAssessmentUniqueTaxPayerRef:
+          pattern: ^[0-9]{10}$
+          type: string
+          description: The organisation's Unique Taxpayer Reference for Self Assessment.
+          example: '1234567890'
+        taxPayerType:
+          allOf:
+          - $ref: '#/components/schemas/TaxPayerType'
+          - description: The type of taxpayer the organisation is.
+        taxPayerName:
+          type: string
+          description: The name of the organisation.
+          example: Partnership Name
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address1'
+          - description: The organisation's address.
+    OrganisationsMatchingSelfAssessmentresponse:
+      title: OrganisationsMatchingSelfAssessmentresponse
+      required:
+      - _links
+      - matchId
+      type: object
+      properties:
+        _links:
+          allOf:
+          - $ref: '#/components/schemas/Links1'
+          - description: A list of links for possible actions related to this endpoint.
+        matchId:
+          type: string
+          description: A short-lived universally unique identifier (UUID), typically valid for 5 hours.
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: Company Matching Response
+    OrganisationsMatchingSelfAssessmentresponse1:
+      title: OrganisationsMatchingSelfAssessmentresponse1
+      required:
+      - taxPayerType
+      - taxPayerName
+      - address
+      - _links
+      type: object
+      properties:
+        selfAssessmentUniqueTaxPayerRef:
+          pattern: ^[0-9]{10}$
+          type: string
+          description: The organisation's Unique Taxpayer Reference for Self Assessment.
+          example: '1234567890'
+        taxPayerType:
+          allOf:
+          - $ref: '#/components/schemas/TaxPayerType1'
+          - description: Individual, Partnership
+        taxPayerName:
+          type: string
+          description: The name of the organisation.
+          example: Partnership Name
+        address:
+          allOf:
+          - $ref: '#/components/schemas/Address1'
+          - description: The organisation's address.
+        _links:
+          allOf:
+          - $ref: '#/components/schemas/Links3'
+          - description: A list of links for possible actions related to this endpoint.
+    Self:
+      title: Self
+      required:
+      - href
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL for this endpoint.
+          example: /organisations/matching/corporation-tax
+      description: The URI for this endpoint.
+    Self2:
+      title: Self2
+      required:
+      - href
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/matching/corporation-tax?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: The Uniform Resource Identifier (URI) for this endpoint.
+    Self3:
+      title: Self3
+      required:
+      - href
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment data.
+    TaxPayerType:
+      title: TaxPayerType
+      enum:
+      - Individual
+      - Partnership
+      type: string
+      description: The type of taxpayer the organisation is.
+    TaxPayerType1:
+      title: TaxPayerType1
+      enum:
+      - Individual
+      - Partnership
+      type: string
+      description: Individual, Partnership
+tags:
+- name: organisations
+  description: ''
