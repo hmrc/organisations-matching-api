@@ -6,10 +6,14 @@ info:
   version: '1.0'
 
 servers:
-- url: https://api.isc.development.tax.service.gov.uk
-  description: Development
-- url: https://api.qa.tax.service.gov.uk
-  description: QA
+  - url: https://api.isc.development.tax.service.gov.uk
+    description: Development
+  - url: https://api.qa.tax.service.gov.uk
+    description: QA
+  - url: https://test-api.service.hmrc.gov.uk
+    description: Sandbox
+  - url: https://api.service.hmrc.gov.uk
+    description: PRD
 
 paths:
   /organisations/matching/corporation-tax:
