@@ -100,11 +100,11 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
         .foreach { case (version, endpointName) => verifyDocumentationPresent(version, endpointName) }
     }
 
-    "provide raml documentation" in new Setup {
-      val result: Future[Result] = documentationController.raml("1.0", "application.raml")(request)
+    "provide oas documentation" in new Setup {
+      val result: Future[Result] = documentationController.raml("1.0", "application.yaml")(request)
 
       status(result) shouldBe 200
-      bodyOf(await(result)) should startWith("#%RAML 1.0")
+      bodyOf(await(result)) should startWith("openapi: 3.0.0")
 
     }
   }
