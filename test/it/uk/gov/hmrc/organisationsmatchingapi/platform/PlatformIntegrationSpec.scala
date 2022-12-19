@@ -104,7 +104,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
       val result: Future[Result] = documentationController.raml("1.0", "application.yaml")(request)
 
       status(result) shouldBe 200
-      bodyOf(await(result)) should startWith("openapi: 3.0.0")
+      bodyOf(await(result)) should startWith("openapi: 3.0.3")
 
     }
   }

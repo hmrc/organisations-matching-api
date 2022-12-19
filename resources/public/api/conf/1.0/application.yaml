@@ -1,4 +1,4 @@
-openapi: 3.0.0
+openapi: 3.0.3
 
 info:
   title: Organisations Matching
@@ -14,6 +14,10 @@ servers:
     description: Sandbox
   - url: https://api.service.hmrc.gov.uk
     description: PRD
+
+security:
+  - userRestricted:
+      - assigned
 
 paths:
   /organisations/matching/corporation-tax:
@@ -457,6 +461,7 @@ components:
       - href
       - title
       type: object
+      properties:
       properties:
         href:
           type: string
