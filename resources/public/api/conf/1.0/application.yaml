@@ -413,21 +413,7 @@ components:
           tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
           refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
           scopes:
-            O : corporation tax utr
-            A : corporation tax crn
-            B : corporation tax registeredDetails/name/name1
-            C : corporation tax registeredDetails/name/name2
-            D : corporation tax registeredDetails/address/line1
-            E : corporation tax registeredDetails/address/postcode
-            F : corporation tax communicationsDetails/name/name1
-            G : corporation tax communicationsDetails/name/name2
-            H : corporation tax communicationsDetails/address/line1
-            I : corporation tax communicationsDetails/address/postcode
-            J : self-assessment utr
-            K : self-assessment taxPayerType
-            L : self-assessment taxPayerDetails/name
-            M : self-assessment taxPayerDetails/address/line1
-            N : self-assessment taxPayerDetails/address/postcode
+            assigned : depending on your assigned scopes you will see the json keys your scopes allow.
   schemas:
     errorResponse:
       title: errorResponse
