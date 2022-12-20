@@ -4,6 +4,8 @@ info:
   title: Organisations Matching
   contact: {}
   version: '1.0'
+  description: |
+    This API allows users to match HMRC data for organisations.
 
 servers:
   - url: https://api.isc.development.tax.service.gov.uk
@@ -399,6 +401,18 @@ paths:
                     code: NOT_FOUND
       deprecated: false
 components:
+  securitySchemes:
+    userRestricted:
+      type: oauth2
+      description: |
+        HMRC supports OAuth 2.0 for authenticating user restricted API requests using an OAuth 2.0 Bearer Token in the AUTHORIZATION header.
+        See https://developer.service.hmrc.gov.uk/api-documentation/docs/authorisation/user-restricted-endpoints for details.
+      flows:
+        authorizationCode:
+          authorizationUrl: https://api.service.hmrc.gov.uk/oauth/authorize
+          tokenUrl: https://api.service.hmrc.gov.uk/oauth/token
+          refreshUrl: https://api.service.hmrc.gov.uk/oauth/refresh
+          scopes: { }
   schemas:
     errorResponse:
       title: errorResponse
@@ -461,7 +475,6 @@ components:
       - href
       - title
       type: object
-      properties:
       properties:
         href:
           type: string
