@@ -102,7 +102,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse400'
                 - example:
                     code: BAD_REQUEST
               examples:
@@ -117,7 +117,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404A'
                 - example:
                     code: MATCHING_FAILED
               examples:
@@ -209,7 +209,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse400'
                 - example:
                     code: BAD_REQUEST
               examples:
@@ -224,7 +224,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404A'
                 - example:
                     code: MATCHING_FAILED
               examples:
@@ -316,7 +316,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404B'
                 - example:
                     code: NOT_FOUND
               examples:
@@ -410,7 +410,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404B'
                 - example:
                     code: NOT_FOUND
               examples:
@@ -434,7 +434,7 @@ components:
           scopes:
             assigned : depending on your assigned scopes you will see the json keys your scopes allow.
   schemas:
-    errorResponse:
+    errorResponse400:
       title: errorResponse
       required:
       - code
@@ -442,6 +442,25 @@ components:
       properties:
         code:
           type: string
+          description: Bad request
+    errorResponse404A:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: Matching failed
+    errorResponse404B:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: Not found
     Address:
       title: Address
       required:
