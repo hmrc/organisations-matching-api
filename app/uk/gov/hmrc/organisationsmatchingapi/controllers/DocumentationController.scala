@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 HM Revenue & Customs
+ * Copyright 2023 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,26 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
+import akka.stream.Materializer
 import controllers.Assets
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.filters.cors.CORSActionBuilder
 import uk.gov.hmrc.organisationsmatchingapi.views._
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
+import javax.inject.{Inject, Singleton}
+import scala.concurrent.ExecutionContext
+
 @Singleton
-class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets, config: Configuration)
+class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets, config: Configuration)(
+  implicit materializer: Materializer, executionContext: ExecutionContext)
   extends BackendController(cc) {
+
+  def specification(version: String, file: String): Action[AnyContent] =
+    CORSActionBuilder(config).async { request =>
+      assets.at(s"/public/api/conf/$version", file)(request)
+    }
 
   private lazy val v1EndpointsEnabled: Boolean =
     config

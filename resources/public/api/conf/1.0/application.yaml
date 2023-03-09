@@ -27,20 +27,24 @@ paths:
       tags:
       - organisations
       summary: Match Corporation Tax details for an organisation
-      description: >
-        <p>Use this endpoint to match details about an organisation against HMRC’s records.</p>
+      description: |-
+        Use this endpoint to match details about an organisation against HMRC’s records.
 
-        <p>Details include: company registration number (CRN), employer name, and address.</p>
+        Details include: company registration number (CRN), employer name, and address.
 
-        <p>On a successful match, a matchId is returned. The matchId can be used in later calls.</p>
+        On a successful match, a matchId is returned. The matchId can be used in later calls.
+        
+        See also [fraud prevention](https://developer.service.hmrc.gov.uk/guides/fraud-prevention/)."
+
       operationId: MatchCorporationTaxdetailsforanorganisation
       parameters:
       - name: CorrelationId
         in: header
-        description: >-
-          <p>A UUID, used for traceability purposes.</p>
-
-          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+        description: |-
+          A UUID, used for traceability purposes.
+          Must conform to the regular expression:
+          
+          <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
         required: true
         style: simple
         schema:
@@ -98,7 +102,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse400'
                 - example:
                     code: BAD_REQUEST
               examples:
@@ -113,7 +117,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404A'
                 - example:
                     code: MATCHING_FAILED
               examples:
@@ -127,20 +131,25 @@ paths:
       tags:
       - organisations
       summary: Match Self Assessment details for an organisation
-      description: >
-        <p>Use this endpoint to match details about an organisation against HMRC’s records.</p>
+      description: |-
+        Use this endpoint to match details about an organisation against HMRC’s records.
 
-        <p>Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address.</p>
+        Details include Unique Taxpayer Reference, taxpayer name, taxpayer type, and address.
 
-        <p>On a successful match, a matchId is returned. The matchId can be used in later calls.</p>
+        On a successful match, a matchId is returned. The matchId can be used in later calls.
+        
+        See also [fraud prevention](https://developer.service.hmrc.gov.uk/guides/fraud-prevention/).
+
       operationId: MatchSelfAssessmentdetailsforanorganisation
       parameters:
       - name: CorrelationId
         in: header
-        description: >-
-          <p>A UUID, used for traceability purposes.</p>
+        description: |-
+          A UUID, used for traceability purposes.
 
-          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+          Must conform to the regular expressio:
+          
+          <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
         required: true
         style: simple
         schema:
@@ -200,7 +209,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse400'
                 - example:
                     code: BAD_REQUEST
               examples:
@@ -215,7 +224,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404A'
                 - example:
                     code: MATCHING_FAILED
               examples:
@@ -229,12 +238,15 @@ paths:
       tags:
       - organisations
       summary: Get links to Corporation Tax and number of employees details for a matched organisation
-      description: >
-        <p>This endpoint takes a matchId and returns matched organisation details.</p>
+      description: |-
+        This endpoint takes a matchId and returns matched organisation details.
 
-        <p>The endpoint also provides links to get Corporation Tax and number of employees details for a matched organisation.</p>
+        The endpoint also provides links to get Corporation Tax and number of employees details for a matched organisation.
 
-        <p>You will get a subset of the JSON response shown below based on your assigned scopes.</p>
+        You will get a subset of the JSON response shown below based on your assigned scopes.
+        
+        See also [fraud prevention](https://developer.service.hmrc.gov.uk/guides/fraud-prevention/).
+
       operationId: GetlinkstoCorporationTaxandnumberofemployeesdetailsforamatchedorganisation
       parameters:
       - name: matchId
@@ -247,10 +259,12 @@ paths:
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       - name: CorrelationId
         in: header
-        description: >-
-          <p>A UUID, used for traceability purposes.</p>
+        description: |-
+          A UUID, used for traceability purposes.
 
-          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+          Must conform to the regular expression:
+          
+          <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
         required: true
         style: simple
         schema:
@@ -302,7 +316,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404B'
                 - example:
                     code: NOT_FOUND
               examples:
@@ -316,12 +330,15 @@ paths:
       tags:
       - organisations
       summary: Get links to Self Assessment and number of employees details for a matched organisation
-      description: >
-        <p>This endpoint takes a matchId and returns matched organisation details.</p>
+      description: |-
+        This endpoint takes a matchId and returns matched organisation details.
 
-        <p>The endpoint also provides links to get Self Assessment and number of employees details for a matched organisation.</p>
+        The endpoint also provides links to get Self Assessment and number of employees details for a matched organisation.
 
-        <p>You will get a subset of the JSON response shown below based on your assigned scopes.</p>
+        You will get a subset of the JSON response shown below based on your assigned scopes.
+        
+        See also [fraud prevention](https://developer.service.hmrc.gov.uk/guides/fraud-prevention/).
+
       operationId: GetlinkstoSelfAssessmentandnumberofemployeesdetailsforamatchedorganisation
       parameters:
       - name: matchId
@@ -334,10 +351,12 @@ paths:
           example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
       - name: CorrelationId
         in: header
-        description: >-
-          <p>A UUID, used for traceability purposes.</p>
+        description: |-
+          A UUID, used for traceability purposes.
 
-          <p>Must conform to the regular expression <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code></p>
+          Must conform to the regular expression:
+          
+          <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
         required: true
         style: simple
         schema:
@@ -391,7 +410,7 @@ paths:
             application/json:
               schema:
                 allOf:
-                - $ref: '#/components/schemas/errorResponse'
+                - $ref: '#/components/schemas/errorResponse404B'
                 - example:
                     code: NOT_FOUND
               examples:
@@ -415,7 +434,7 @@ components:
           scopes:
             assigned : depending on your assigned scopes you will see the json keys your scopes allow.
   schemas:
-    errorResponse:
+    errorResponse400:
       title: errorResponse
       required:
       - code
@@ -423,6 +442,25 @@ components:
       properties:
         code:
           type: string
+          description: Bad request
+    errorResponse404A:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: Matching failed
+    errorResponse404B:
+      title: errorResponse
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          description: Not found
     Address:
       title: Address
       required:
