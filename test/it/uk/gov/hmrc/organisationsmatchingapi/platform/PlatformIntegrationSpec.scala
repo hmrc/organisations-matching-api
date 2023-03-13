@@ -101,7 +101,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
     }
 
     "provide oas documentation" in new Setup {
-      val result: Future[Result] = documentationController.raml("1.0", "application.yaml")(request)
+      val result: Future[Result] = documentationController.specification("1.0", "application.yaml")(request)
 
       status(result) shouldBe 200
       bodyOf(await(result)) should startWith("openapi: 3.0.3")

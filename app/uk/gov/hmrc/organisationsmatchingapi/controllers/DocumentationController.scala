@@ -57,8 +57,4 @@ class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets
                    ): Action[AnyContent] =
     assets.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
 
-  def raml(version: String, file: String) =
-    {
-      assets.at(s"/public/api/conf/$version", file)
-    }
 }
