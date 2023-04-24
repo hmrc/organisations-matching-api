@@ -19,7 +19,8 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{SaKnownFacts, SaOrganisationsMatchingRequest}
 import util.IfHelpers
 
@@ -29,7 +30,7 @@ class SaOrganisationsMatchingRequestSpec extends AnyWordSpec with Matchers with 
     "Read and write" in {
       val saKnownFacts    = SaKnownFacts("test", "Individual", "test", "test", "test")
       val address         = IfAddress(Some("test"), None, None, None, Some("test"))
-      val saDetails       = IfSaTaxPayerNameAddress(Some("test"), None, Some(address))
+      val saDetails       = IfSaTaxpayerNameAddress(Some("test"), None, Some(address))
       val taxpayerDetails = Some(Seq(saDetails))
       val saIfData        = IfSaTaxpayerDetails(Some("test"), Some("Individual"), taxpayerDetails)
       val request         = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)

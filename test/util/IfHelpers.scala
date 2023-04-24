@@ -16,7 +16,9 @@
 
 package util
 
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
 
 trait IfHelpers {
 
@@ -52,38 +54,38 @@ trait IfHelpers {
   )
 
   val saTaxpayerDetails: IfSaTaxpayerDetails = IfSaTaxpayerDetails(
-    utr = Some( "1234567890"),
-    taxpayerType = Some( "Individual"),
-    taxpayerDetails = Some( Seq (
-      IfSaTaxPayerNameAddress (
-        name = Some( "John Smith II" ),
-        addressType = Some( "Base" ),
-        address = Some( IfAddress (
-          line1 = Some( "Alfie House" ),
-          line2 = Some( "Main Street" ),
-          line3 = Some( "Birmingham" ),
-          line4 = Some( "West midlands" ),
-          postcode = Some( "B14 6JH" )
+    utr = Some("1234567890"),
+    taxpayerType = Some("Individual"),
+    taxpayerDetails = Some(Seq(
+      IfSaTaxpayerNameAddress(
+        name = Some("John Smith II"),
+        addressType = Some("Base"),
+        address = Some(IfAddress(
+          line1 = Some("Alfie House"),
+          line2 = Some("Main Street"),
+          line3 = Some("Birmingham"),
+          line4 = Some("West midlands"),
+          postcode = Some("B14 6JH")
         ))),
-      IfSaTaxPayerNameAddress (
-        name = Some( "Joanne Smith" ),
-        addressType = Some( "Correspondence"),
-        address = Some( IfAddress (
-          line1 = Some( "Alice House" ),
-          line2 = Some( "Main Street" ),
-          line3 = Some( "Manchester" ),
+      IfSaTaxpayerNameAddress(
+        name = Some("Joanne Smith"),
+        addressType = Some("Correspondence"),
+        address = Some(IfAddress(
+          line1 = Some("Alice House"),
+          line2 = Some("Main Street"),
+          line3 = Some("Manchester"),
           line4 = None,
-          postcode = Some( "MC1 4AA" )
+          postcode = Some("MC1 4AA")
         ))),
-      IfSaTaxPayerNameAddress (
-        name = Some( "Daffy Duck" ),
-        addressType = Some( "Correspondence"),
-        address = Some( IfAddress (
-          line1 = Some( "1 Main Street" ),
-          line2 = Some( "Disneyland" ),
-          line3 = Some( "Liverpool" ),
+      IfSaTaxpayerNameAddress(
+        name = Some("Daffy Duck"),
+        addressType = Some("Correspondence"),
+        address = Some(IfAddress(
+          line1 = Some("1 Main Street"),
+          line2 = Some("Disneyland"),
+          line3 = Some("Liverpool"),
           line4 = None,
-          postcode = Some( "MC1 4AA" )
+          postcode = Some("MC1 4AA")
         )))
     ))
   )

@@ -21,7 +21,7 @@ import akka.stream.Materializer
 import akka.util.ByteString
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.inject.guice.GuiceableModule
-import play.api.libs.json.{JsValue, Json}
+import play.api.libs.json.{JsValue, Json, Writes}
 import play.api.mvc.Result
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -64,4 +64,11 @@ trait UnitSpec extends AnyWordSpec {
   def bodyOf(resultF: Future[Result])(implicit mat: Materializer): Future[String] =
     resultF.map(bodyOf)
 
+  def errorResponse(code: String, message: String) =
+    Json.obj("code" -> code, "message" -> message)
+
+  case class FailedResponse(code: String, message: String)
+  object FailedResponse {
+    implicit val writes: Writes[FailedResponse] = Json.writes[FailedResponse]
+  }
 }

@@ -6,3 +6,5 @@ addSbtPlugin("uk.gov.hmrc" % "sbt-auto-build" % "3.9.0")
 addSbtPlugin("uk.gov.hmrc" % "sbt-distributables" % "2.2.0")
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.16" exclude("org.slf4j", "slf4j-simple"))
 addSbtPlugin("org.scoverage"     % "sbt-scoverage"      % "1.9.3")
+
+dependencyOverrides += "org.scala-lang.modules" %% "scala-xml" % "2.1.0"

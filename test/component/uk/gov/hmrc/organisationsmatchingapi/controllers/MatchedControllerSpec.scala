@@ -21,8 +21,8 @@ import component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs.{AuthStu
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 
 import java.util.UUID
 import scala.concurrent.Await.result
@@ -35,6 +35,8 @@ class MatchedControllerSpec extends BaseSpec  {
   val ctMatch: CtMatch = CtMatch(ctRequest, matchId, utr = Some("testutr"))
   val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
   val saMatch: SaMatch = SaMatch(saRequest, matchId, utr = Some("testutr"))
+  val vatRequest = VatMatchingRequest("testvrn", "organisation", "line1", "postcode")
+  val vatMatch = VatMatch(matchId, Some("testvrn"))
 
   Feature("cotax") {
     Scenario("a valid request is made for an existing match") {
@@ -141,7 +143,7 @@ class MatchedControllerSpec extends BaseSpec  {
 
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
-        "message" -> "Malformed CorrelationId"
+        "message" -> s"Malformed CorrelationId ${correlationIdHeaderMalformed._2}"
       )
     }
 
@@ -288,7 +290,7 @@ class MatchedControllerSpec extends BaseSpec  {
 
       Json.parse(response.body) shouldBe Json.obj(
         "code"    -> "INVALID_REQUEST",
-        "message" -> "Malformed CorrelationId"
+        "message" -> s"Malformed CorrelationId ${correlationIdHeaderMalformed._2}"
       )
     }
 
@@ -328,6 +330,122 @@ class MatchedControllerSpec extends BaseSpec  {
     }
   }
 
+  Feature("vat") {
+    Scenario("a valid request is made for an existing match") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      And("A valid match exist")
+      result(mongoRepository.cache(matchId.toString, vatMatch), timeout)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe OK
+      Json.parse(response.body) shouldBe Json.parse(
+        s"""{
+          |  "_links": {
+          |    "self": {
+          |      "href": "/organisations/matching/vat/$matchId"
+          |    },
+          |    "getVat": {
+          |      "href": "/organisations/details/vat?matchId=$matchId",
+          |      "title": "Get an organisation's VAT details"
+          |    }
+          |  },
+          |  "vrn": "testvrn"
+          |}""".stripMargin
+      )
+    }
+
+    Scenario("a request is made with a missing match id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat/")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe NOT_FOUND
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
+    }
+
+    Scenario("a request is made with a missing correlation id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat/$matchId")
+        .headers(requestHeadersInvalid(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "CorrelationId is required"
+      )
+    }
+
+    Scenario("a request is made with a malformed correlation id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat/$matchId")
+        .headers(requestHeadersMalformed(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> s"Malformed CorrelationId ${correlationIdHeaderMalformed._2}"
+      )
+    }
+
+    Scenario("not authorized") {
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code shouldBe UNAUTHORIZED
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
+    }
+
+    Scenario("a request is made with a malformed match id") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat/foo")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "matchId format is invalid"
+      )
+    }
+  }
+
   Feature("matched organisation") {
     Scenario("a valid request is made for an existing match id") {
       Given("A valid privileged Auth bearer token")
@@ -341,14 +459,11 @@ class MatchedControllerSpec extends BaseSpec  {
       response.code shouldBe OK
 
       Json.parse(response.body) shouldBe Json.parse(
-        s"""{
-           |  "matchId": "$matchId",
-           |  "utr": "testutr"
-           |}""".stripMargin
+        s"""{ "matchId": "$matchId", "utr": "testutr" }"""
       )
     }
 
-    Scenario("a valid request is made for an match id that does not exist") {
+    Scenario("a valid request is made for a match id that does not exist") {
       Given("A valid privileged Auth bearer token")
 
       And("A valid match does not exist")
@@ -381,4 +496,56 @@ class MatchedControllerSpec extends BaseSpec  {
       )
     }
   }
+
+  Feature("matched organisation vat") {
+    Scenario("a valid request is made for an existing match id") {
+      Given("A valid privileged Auth bearer token")
+
+      And("A valid match exist")
+      result(mongoRepository.cache(matchId.toString, vatMatch), timeout)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/vat/$matchId").headers(acceptHeaderP1).asString
+
+      response.code shouldBe OK
+
+      Json.parse(response.body) shouldBe Json.parse(
+        s"""{ "matchId": "$matchId", "vrn": "${vatMatch.vrn.mkString}" }"""
+      )
+    }
+
+    Scenario("a valid request is made for a match id that does not exist") {
+      Given("A valid privileged Auth bearer token")
+
+      And("A valid match does not exist")
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/vat/$matchId").asString
+
+      response.code shouldBe NOT_FOUND
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "NOT_FOUND",
+        "message" -> "The resource can not be found"
+      )
+    }
+
+    Scenario("a valid request is made for an invalid match id") {
+      Given("A valid privileged Auth bearer token")
+
+      And("A valid match exist")
+      result(mongoRepository.cache(matchId.toString, saMatch), timeout)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/vat/foo").asString
+
+      response.code shouldBe BAD_REQUEST
+
+      Json.parse(response.body) shouldBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "matchId format is invalid"
+      )
+    }
+  }
+
 }

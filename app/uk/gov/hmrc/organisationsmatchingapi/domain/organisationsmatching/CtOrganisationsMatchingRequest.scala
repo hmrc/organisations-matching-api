@@ -17,10 +17,9 @@
 package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.IfCorpTaxCompanyDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
 
-case class CtOrganisationsMatchingRequest(knownFacts: CtKnownFacts,
-                                          ifData    : IfCorpTaxCompanyDetails)
+case class CtOrganisationsMatchingRequest(knownFacts: CtKnownFacts, ifData: IfCorpTaxCompanyDetails)
 
 object CtOrganisationsMatchingRequest {
   implicit val formatCtOrganisationsMatchingRequest = Json.format[CtOrganisationsMatchingRequest]

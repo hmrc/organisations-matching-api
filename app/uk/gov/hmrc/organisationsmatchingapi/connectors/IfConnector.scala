@@ -17,17 +17,19 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 import play.api.mvc.RequestHeader
+import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfCorpTaxCompanyDetails, IfSaTaxpayerDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
-import uk.gov.hmrc.http.HttpReads.Implicits._
 
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class IfConnector @Inject()(
@@ -53,11 +55,9 @@ class IfConnector @Inject()(
     request: RequestHeader,
     ec: ExecutionContext): Future[IfSaTaxpayerDetails] = {
 
-    val SAUrl =
-      s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
+    val SAUrl = s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    callSa(SAUrl, matchId)
-
+    callIF[IfSaTaxpayerDetails](SAUrl, matchId)
   }
 
   def fetchCorporationTax(matchId: String, crn: String)(
@@ -65,70 +65,77 @@ class IfConnector @Inject()(
     request: RequestHeader,
     ec: ExecutionContext): Future[IfCorpTaxCompanyDetails] = {
 
-    val CTUrl =
-      s"$baseUrl/organisations/corporation-tax/$crn/company/details"
+    val CTUrl = s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
-    callCt(CTUrl, matchId)
+    callIF[IfCorpTaxCompanyDetails](CTUrl, matchId)
   }
 
-  private def extractCorrelationId(requestHeader: RequestHeader) = validateCorrelationId(requestHeader).toString
+  def fetchVat(matchId: String, vrn: String)(
+    implicit hc: HeaderCarrier,
+    request: RequestHeader,
+    ec: ExecutionContext): Future[IfVatCustomerInformation] = {
+    val vatUrl = s"$baseUrl/vat/customer/vrn/$vrn/information"
 
-  def setHeaders(requestHeader: RequestHeader) = Seq(
+    callIF[IfVatCustomerInformation](vatUrl, matchId)
+  }
+
+  private def extractCorrelationId(requestHeader: RequestHeader): String = validateCorrelationId(requestHeader).toString
+
+  private def setHeaders(requestHeader: RequestHeader): Seq[(String, String)] = Seq(
     HeaderNames.authorisation -> s"Bearer $integrationFrameworkBearerToken",
-    "Environment"             -> integrationFrameworkEnvironment,
-    "CorrelationId"           -> extractCorrelationId(requestHeader)
+    "Environment" -> integrationFrameworkEnvironment,
+    "CorrelationId" -> extractCorrelationId(requestHeader)
   )
 
-  private def callSa(url: String, matchId: String)
-                    (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover[IfSaTaxpayerDetails](http.GET[IfSaTaxpayerDetails](url, headers = setHeaders(request)) map { response =>
-      auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, Json.toJson(response).toString)
-      response
-    }, extractCorrelationId(request), matchId, request, url)
+  private def callIF[R: Format : Manifest](url: String, matchId: String)
+                                          (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
+    recover[R](
+      http.GET[R](url, headers = setHeaders(request)).map(auditResponse(url, matchId)),
+      extractCorrelationId(request),
+      matchId,
+      request,
+      url
+    )
+  }
 
-  private def callCt(url: String, matchId: String)
-                    (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) =
-    recover[IfCorpTaxCompanyDetails](http.GET[IfCorpTaxCompanyDetails](url, headers = setHeaders(request))map { response =>
-      auditHelper.auditIfApiResponse(extractCorrelationId(request), matchId, request, url, Json.toJson(response).toString)
-      response
-    }, extractCorrelationId(request), matchId, request, url)
+  private def auditResponse[R: Format](url: String, matchId: String)(response: R)
+                                      (implicit hc: HeaderCarrier, request: RequestHeader): R = {
+    val responseStr = Json.toJson(response).toString
+    val correlationId = extractCorrelationId(request)
+    auditHelper.auditIfApiResponse(correlationId, matchId, request, url, responseStr)
+    response
+  }
 
   private def recover[T](x: Future[T],
-                      correlationId: String,
-                      matchId: String,
-                      request: RequestHeader,
-                      requestUrl: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
+                         correlationId: String,
+                         matchId: String,
+                         request: RequestHeader,
+                         requestUrl: String)
+                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
 
-    case validationError: JsValidationException => {
+    case validationError: JsValidationException =>
       logger.warn("Integration Framework JsValidationException encountered")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
-    }
-    case Upstream4xxResponse(msg, 404, _, _) => {
+    case Upstream4xxResponse(msg, 404, _, _) =>
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       logger.warn("Integration Framework NotFoundException encountered")
       Future.failed(new MatchingException)
-    }
-    case Upstream5xxResponse(msg, code, _, _) => {
+    case Upstream5xxResponse(msg, code, _, _) =>
       logger.warn(s"Integration Framework Upstream5xxResponse encountered: $code")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
       Future.failed(new InternalServerException("Something went wrong."))
-    }
-    case Upstream4xxResponse(msg, 429, _, _) => {
+    case Upstream4xxResponse(msg, 429, _, _) =>
       logger.warn(s"Integration Framework Rate limited: $msg")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"IF Rate limited: $msg")
       Future.failed(new TooManyRequestException(msg))
-    }
-    case Upstream4xxResponse(msg, code, _, _) => {
+    case Upstream4xxResponse(msg, code, _, _) =>
       logger.warn(s"Integration Framework Upstream4xxResponse encountered: $code")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
-    }
-    case e: Exception => {
+    case e: Exception =>
       logger.warn(s"Integration Framework Exception encountered")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, e.getMessage)
       Future.failed(new InternalServerException("Something went wrong."))
-    }
   }
 }

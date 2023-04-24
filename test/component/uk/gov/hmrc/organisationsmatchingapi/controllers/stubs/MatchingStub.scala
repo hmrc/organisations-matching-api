@@ -21,34 +21,44 @@ import play.api.http.Status
 
 object MatchingStub extends MockHost(9658) {
 
-  def willReturnCtMatch(
-    correlationId: String): Unit =
+  def willReturnCtMatch(correlationId: String): Unit =
     mock.register(
-      post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
+      post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=[a-z0-9-]*&correlationId=$correlationId"))
         .willReturn(aResponse()
           .withStatus(Status.OK)
-          .withBody(s""""match"""")))
+          .withBody(""""match"""")))
 
-  def willReturnCtMatchNotFound(
-                       correlationId: String): Unit =
+  def willReturnCtMatchNotFound(correlationId: String): Unit =
     mock.register(
-      post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
+      post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=[a-z0-9-]*&correlationId=$correlationId"))
         .willReturn(aResponse()
           .withStatus(Status.NOT_FOUND)))
 
-  def willReturnSaMatch(
-                         correlationId: String): Unit =
+  def willReturnSaMatch(correlationId: String): Unit =
     mock.register(
-      post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
+      post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=[a-z0-9-]*&correlationId=$correlationId"))
         .willReturn(aResponse()
           .withStatus(Status.OK)
-          .withBody(s""""match"""")))
+          .withBody(""""match"""")))
 
-  def willReturnSaMatchNotFound(
-                                 correlationId: String): Unit =
+  def willReturnSaMatchNotFound(correlationId: String): Unit =
     mock.register(
-      post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=[a-z0-9-]*&correlationId=${correlationId}"))
+      post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=[a-z0-9-]*&correlationId=$correlationId"))
         .willReturn(aResponse()
           .withStatus(Status.NOT_FOUND)))
+
+  def willReturnVatMatch(correlationId: String): Unit =
+    mock.register(
+      post(urlMatching(s"/organisations-matching/perform-match/vat\\?matchId=[a-z0-9-]*&correlationId=$correlationId"))
+        .willReturn(
+          aResponse().withStatus(Status.OK).withBody(""""match"""")
+        )
+    )
+
+  def willReturnVatMatchNotFound(correlationId: String): Unit =
+    mock.register(
+      post(urlMatching(s"/organisations-matching/perform-match/vat\\?matchId=[a-z0-9-]*&correlationId=$correlationId"))
+        .willReturn(aResponse().withStatus(Status.NOT_FOUND))
+    )
 
 }

@@ -27,7 +27,7 @@ import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.Mockito
 import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, InsertResult}
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
@@ -38,17 +38,18 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures {
 
-    val mockCacheConfig: CacheConfiguration = mock[CacheConfiguration]
-    val mockMatchRepo: MatchRepository = mock[MatchRepository]
-    val matchId: UUID = UUID.fromString("69f0da0d-4e50-4161-badc-fa39f769bed3")
-    val cacheService = new CacheService(mockMatchRepo, mockCacheConfig)
-    val ctRequest: CtMatchingRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
-    val ctMatch: CtMatch = CtMatch(ctRequest, matchId)
-    val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
-    val saMatch: SaMatch = SaMatch(saRequest, matchId)
+  val mockCacheConfig: CacheConfiguration = mock[CacheConfiguration]
+  val mockMatchRepo: MatchRepository = mock[MatchRepository]
+  val matchId: UUID = UUID.fromString("69f0da0d-4e50-4161-badc-fa39f769bed3")
+  val cacheService = new CacheService(mockMatchRepo, mockCacheConfig)
+  val ctRequest: CtMatchingRequest = CtMatchingRequest("crn", "name", "line1", "postcode")
+  val ctMatch: CtMatch = CtMatch(ctRequest, matchId)
+  val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
+  val saMatch: SaMatch = SaMatch(saRequest, matchId)
+  val vatMatch: VatMatch = VatMatch(matchId, Some("somevrn"))
 
   "getByMatchId" should {
-    "Retrieve CT match details from cache service" in  {
+    "Retrieve CT match details from cache service" in {
       Mockito.reset(mockMatchRepo)
 
       given(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
@@ -103,6 +104,18 @@ class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite w
         cacheService.cacheCtUtr(ctMatch, ctUtr)
       }
       verify(mockMatchRepo, times(1)).cache(any(), eqTo(expected))(any())
+    }
+  }
+
+  "cacheVatVrn" should {
+    "save VRN to the cache" in {
+      Mockito.reset(mockMatchRepo)
+
+      given(mockMatchRepo.cache(any(), any())(any()))
+        .willReturn(Future.successful(InsertResult.InsertSucceeded))
+
+      await(cacheService.cacheVatVrn(vatMatch))
+      verify(mockMatchRepo, times(1)).cache(any(), eqTo(vatMatch))(any())
     }
   }
 

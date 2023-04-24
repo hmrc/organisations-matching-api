@@ -42,4 +42,14 @@ class UuidValidatorSpec extends AnyWordSpec with Matchers with ScalaCheckPropert
     UuidValidator.validate(invalidUuid) shouldBe false
   }
 
+  "Return UUID from String for a valid one" in {
+    forAll { uuid: UUID =>
+      UuidValidator.validated(uuid.toString) shouldBe Some(uuid)
+    }
+  }
+
+  "Return None for an invalid UUID String" in {
+    UuidValidator.validated(invalidUuid) shouldBe None
+  }
+
 }

@@ -31,7 +31,8 @@ import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
-import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.VatMatchingRequest
+import uk.gov.hmrc.organisationsmatchingapi.services.{MatchingService, ScopesHelper, ScopesService}
 import util.SpecBase
 
 import java.util.UUID
@@ -42,7 +43,6 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
   private implicit val ec: ExecutionContext = scala.concurrent.ExecutionContext.Implicits.global
 
   private val mockAuthConnector = mock[AuthConnector]
-  private val mockCacheService = mock[CacheService]
   private val mockAuditHelper = mock[AuditHelper]
   private val mockScopesService = mock[ScopesService]
   private val scopesHelper = new ScopesHelper(mockScopesService)
@@ -56,7 +56,6 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
     mockScopesService,
     scopesHelper,
     mockBodyParser,
-    mockCacheService,
     mockMatchingService
   )(mockAuditHelper, ec)
 
@@ -67,6 +66,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
 
   given(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
   given(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+  given(mockMatchingService.matchVat(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
 
   given(mockScopesService.getInternalEndpoints(any())).willReturn(Seq())
   given(mockScopesService.getExternalEndpoints(any())).willReturn(Seq())
@@ -91,6 +91,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
       val result = controller.matchOrganisationCt()(fakeRequest)
       status(result) shouldBe Status.OK
     }
+
     "return 404 when request does not match" in {
 
       given(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
@@ -112,19 +113,14 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
 
       status(result) shouldBe Status.NOT_FOUND
 
-      contentAsJson(result) shouldBe Json.parse(
-        """
-          |{
-          |    "code":"MATCHING_FAILED",
-          |    "message":"There is no match for the information provided"
-          |}""".stripMargin)
+      contentAsJson(result) shouldBe errorResponse("MATCHING_FAILED", "There is no match for the information provided")
     }
 
     "return 400 when request is invalid" in {
       val result = controller.matchOrganisationCt()(
         FakeRequest()
           .withHeaders(("CorrelationId", UUID.randomUUID().toString))
-          .withBody(Json.parse("{}")))
+          .withBody(Json.obj()))
 
       status(result) shouldBe Status.BAD_REQUEST
     }
@@ -172,12 +168,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
       )
 
       status(result) shouldBe Status.NOT_FOUND
-      contentAsJson(result) shouldBe Json.parse(
-        """
-          |{
-          |    "code":"MATCHING_FAILED",
-          |    "message":"There is no match for the information provided"
-          |}""".stripMargin)
+      contentAsJson(result) shouldBe errorResponse("MATCHING_FAILED", "There is no match for the information provided")
     }
 
     "return 400 when request is invalid" in {
@@ -185,10 +176,40 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
       val result = controller.matchOrganisationSa()(
         FakeRequest()
           .withHeaders(("CorrelationId", UUID.randomUUID().toString))
-          .withBody(Json.parse("{}"))
+          .withBody(Json.obj())
       )
 
       status(result) shouldBe Status.BAD_REQUEST
+    }
+  }
+
+  "POST matchOrganisationVat" should {
+    val requestContent = VatMatchingRequest("testvrn", "organisationName", "line1", "postcode")
+    val fakeRequest = FakeRequest("POST", "/")
+      .withHeaders(("CorrelationId", UUID.randomUUID().toString))
+      .withBody(Json.toJson(requestContent))
+
+    "return 200" in {
+      val response = controller.matchOrganisationVat()(fakeRequest)
+      status(response) shouldBe Status.OK
+    }
+
+    "return 404 when the matching fails" in {
+      given(mockMatchingService.matchVat(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
+      val response = controller.matchOrganisationVat()(fakeRequest)
+      status(response) shouldBe Status.NOT_FOUND
+      contentAsJson(response) shouldBe errorResponse("MATCHING_FAILED", "There is no match for the information provided")
+    }
+
+    "return 400 when the request is missing invalid fields" in {
+      val fakeRequest = FakeRequest("POST", "/")
+        .withHeaders(("CorrelationId", UUID.randomUUID().toString))
+        .withBody(Json.obj())
+      val response = controller.matchOrganisationVat()(fakeRequest)
+      println(status(response))
+      contentAsJson(response) shouldBe errorResponse(
+        "INVALID_REQUEST", "Missing required field(s): [/organisationName, /postcode, /vrn, /addressLine1]"
+      )
     }
   }
 }

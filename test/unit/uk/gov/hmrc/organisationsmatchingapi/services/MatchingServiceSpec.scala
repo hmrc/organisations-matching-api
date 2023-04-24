@@ -22,17 +22,23 @@ import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
-import play.api.libs.json.JsString
+import play.api.libs.json.{JsString, Json}
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.cache.InsertResult
 import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation, IfVatCustomerInformationSimplified}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.VatMatch
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{VatKnownFacts, VatOrganisationsMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import util.SpecBase
+import org.mockito.ArgumentMatchers.{eq => eqTo}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -51,6 +57,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
   )
 
   val utr = "0123456789"
+  val matchId = UUID.randomUUID()
 
   implicit val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/")
   implicit val hc: HeaderCarrier = HeaderCarrierConverter.fromRequest(fakeRequest)
@@ -113,7 +120,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     val saTaxpayerDetails = IfSaTaxpayerDetails(
       utr = Some(utr),
       taxpayerType = Some("Aa"),
-      taxpayerDetails = Some(Seq(IfSaTaxPayerNameAddress(
+      taxpayerDetails = Some(Seq(IfSaTaxpayerNameAddress(
         name = Some("name"),
         addressType = Some("type"),
         address = Some(IfAddress(
@@ -156,5 +163,29 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     }
   }
 
-
+  "MatchVat" when {
+    val request = VatMatchingRequest("vrn", "orgName", "line1", "postcode")
+    val ifResponse = IfVatCustomerInformation(
+      IfVatApprovedInformation(
+        IfVatCustomerDetails(Some("orgName")),
+        IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("postcode"))))
+      )
+    )
+    "matching return a match" in {
+      given(mockIfConnector.fetchVat(eqTo(matchId.toString), eqTo(request.vrn))(any(), any(), any()))
+        .willReturn(Future.successful(ifResponse))
+      val orgsMatchingRequest = VatOrganisationsMatchingRequest(
+        VatKnownFacts(request.vrn, request.organisationName, request.addressLine1, request.postcode),
+        IfVatCustomerInformationSimplified(
+          request.vrn,
+          ifResponse.approvedInformation.customerDetails.organisationName.get,
+          ifResponse.approvedInformation.PPOB.address.flatMap(_.line1),
+          ifResponse.approvedInformation.PPOB.address.flatMap(_.postCode)
+        )
+      )
+      given(mockMatchingConnector.matchCycleVat(eqTo(matchId), eqTo(UUID.randomUUID()), eqTo(orgsMatchingRequest))(any(), any(), any()))
+        .willReturn(Future.successful(Json.toJson("test")))
+      given(mockCacheService.cacheVatVrn(VatMatch(matchId, Some(request.vrn))))
+    }
+  }
 }

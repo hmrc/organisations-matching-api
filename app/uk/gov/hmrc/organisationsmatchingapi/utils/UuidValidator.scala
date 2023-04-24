@@ -16,7 +16,10 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.utils
 
+import java.util.UUID
+
 object UuidValidator {
   val uuidPattern = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-5][0-9a-fA-F]{3}-[089abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$"
   def validate(uuid: String): Boolean = uuid.matches(uuidPattern)
+  def validated(uuidStr: String): Option[UUID] = Option.when(uuidStr.matches(uuidPattern))(UUID.fromString(uuidStr))
 }

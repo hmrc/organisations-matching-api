@@ -47,8 +47,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
   implicit lazy val materializer: Materializer = fakeApplication.materializer
 
   trait Setup extends ScopesConfig {
-    val sampleCorrelationId       = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-    val sampleCorrelationIdHeader: (String, String) = "CorrelationId" -> sampleCorrelationId
+    val sampleCorrelationIdHeader: (String, String) = "CorrelationId" -> UUID.randomUUID().toString
     val badCorrelationIdHeader: (String, String) = "CorrelationId" -> "foo"
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/").withHeaders(sampleCorrelationIdHeader)
     val fakeRequestMalformed: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/").withHeaders(badCorrelationIdHeader)
@@ -59,7 +58,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
     implicit val auditHelper: AuditHelper = mock[AuditHelper]
     val matchedService: MatchedService = mock[MatchedService]
-    val matchId: UUID = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+    val matchId: UUID = UUID.randomUUID()
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
 
@@ -81,7 +80,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
     val ctMatch = new CtMatch(matchRequestCt, utr = Some("test"))
     val saMatch = new SaMatch(matchRequestSa, utr = Some("test"))
     val utrMatch = new UtrMatch(matchId, "test")
-
+    val vatMatch = new VatMatch(matchId, Some("testvrn"))
 
     val controller = new MatchedController(
       mockAuthConnector,
@@ -142,7 +141,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationCt(matchId.toString)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        jsonBodyOf(result) shouldBe Json.parse(s"""{"code":"NOT_FOUND", "message":"The resource can not be found"}""")
+        jsonBodyOf(result) shouldBe errorResponse("NOT_FOUND", "The resource can not be found")
       }
     }
 
@@ -153,14 +152,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationCt(matchId.toString)(fakeRequestMalformed))
         status(result) shouldBe BAD_REQUEST
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INVALID_REQUEST",
-            |  "message": "Malformed CorrelationId"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INVALID_REQUEST", "Malformed CorrelationId foo")
       }
     }
 
@@ -171,14 +163,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationCt(matchId.toString)(FakeRequest()))
         status(result) shouldBe BAD_REQUEST
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INVALID_REQUEST",
-            |  "message": "CorrelationId is required"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INVALID_REQUEST", "CorrelationId is required")
       }
     }
 
@@ -189,14 +174,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationCt(matchId.toString)(fakeRequest))
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INTERNAL_SERVER_ERROR",
-            |  "message": "Something went wrong"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INTERNAL_SERVER_ERROR", "Something went wrong")
       }
     }
   }
@@ -247,7 +225,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationSa(matchId.toString)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        jsonBodyOf(result) shouldBe Json.parse(s"""{"code":"NOT_FOUND", "message":"The resource can not be found"}""")
+        jsonBodyOf(result) shouldBe errorResponse("NOT_FOUND", "The resource can not be found")
       }
     }
 
@@ -258,14 +236,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationSa(matchId.toString)(fakeRequestMalformed))
         status(result) shouldBe BAD_REQUEST
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INVALID_REQUEST",
-            |  "message": "Malformed CorrelationId"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INVALID_REQUEST", "Malformed CorrelationId foo")
       }
     }
 
@@ -276,14 +247,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationSa(matchId.toString)(FakeRequest()))
         status(result) shouldBe BAD_REQUEST
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INVALID_REQUEST",
-            |  "message": "CorrelationId is required"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INVALID_REQUEST", "CorrelationId is required")
       }
     }
 
@@ -294,14 +258,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisationSa(matchId.toString)(fakeRequest))
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INTERNAL_SERVER_ERROR",
-            |  "message": "Something went wrong"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INTERNAL_SERVER_ERROR", "Something went wrong")
       }
     }
   }
@@ -315,10 +272,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         status(result) shouldBe OK
 
         jsonBodyOf(result) shouldBe Json.parse(
-          s"""{
-             |  "matchId": "57072660-1df9-4aeb-b4ea-cd2d7f96e430",
-             |  "utr": "test"
-             |}""".stripMargin
+          s"""{ "matchId": "$matchId", "utr": "test" }"""
         )
       }
     }
@@ -331,9 +285,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisation(matchId.toString)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}"""
-        )
+        jsonBodyOf(result) shouldBe errorResponse("MATCHING_FAILED", "There is no match for the information provided")
       }
     }
 
@@ -345,9 +297,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisation(matchId.toString)(fakeRequest))
         status(result) shouldBe NOT_FOUND
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          s"""{"code":"NOT_FOUND","message":"The resource can not be found"}"""
-        )
+        jsonBodyOf(result) shouldBe errorResponse("NOT_FOUND", "The resource can not be found")
       }
     }
 
@@ -359,15 +309,40 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         val result: Result = await(controller.matchedOrganisation(matchId.toString)(fakeRequest))
         status(result) shouldBe INTERNAL_SERVER_ERROR
 
-        jsonBodyOf(result) shouldBe Json.parse(
-          """
-            |{
-            |  "code": "INTERNAL_SERVER_ERROR",
-            |  "message": "Something went wrong"
-            |}
-            |""".stripMargin
-        )
+        jsonBodyOf(result) shouldBe errorResponse("INTERNAL_SERVER_ERROR", "Something went wrong")
       }
+    }
+  }
+
+  "getMatchedVat" should {
+    "return vrn on a successful match" in new Setup {
+      given(matchedService.fetchMatchedOrganisationVatRecord(matchId)).willReturn(Future.successful(vatMatch))
+
+      val result = await(controller.matchedOrganisationVat(matchId)(fakeRequest))
+      status(result) shouldBe OK
+      jsonBodyOf(result) shouldBe Json.parse(
+        s"""
+           |{
+           |  "_links": {
+           |    "self": {"href":"/organisations/matching/vat/$matchId"}
+           |  },
+           |  "vrn":"testvrn"
+           |}
+           |""".stripMargin
+      )
+    }
+
+    "return MATCHING_FAILED with 404 when a matching error is thrown" in new Setup {
+      given(matchedService.fetchMatchedOrganisationVatRecord(matchId))
+        .willReturn(Future.failed(new MatchingException))
+
+      val result = await(controller.matchedOrganisationVat(matchId)(fakeRequest))
+
+      status(result) shouldBe NOT_FOUND
+      jsonBodyOf(result) shouldBe errorResponse(
+        "MATCHING_FAILED",
+        "There is no match for the information provided"
+      )
     }
   }
 
