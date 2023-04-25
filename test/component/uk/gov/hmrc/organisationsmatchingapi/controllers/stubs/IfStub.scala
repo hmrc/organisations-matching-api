@@ -19,7 +19,9 @@ package component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfCorpTaxCompanyDetails, IfSaTaxpayerDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
 
 object IfStub extends MockHost(8443) {
 
@@ -39,7 +41,7 @@ object IfStub extends MockHost(8443) {
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))
 
-  def searchCorpTaxCompanyDetailsCustomResponse(crn: String, status:Int, response: JsValue): Unit =
+  def searchCorpTaxCompanyDetailsCustomResponse(crn: String, status: Int, response: JsValue): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
@@ -59,9 +61,21 @@ object IfStub extends MockHost(8443) {
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))
 
-  def searchSaCompanyDetailsCustomResponse(utr: String, status:Int, response: JsValue): Unit =
+  def searchSaCompanyDetailsCustomResponse(utr: String, status: Int, response: JsValue): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
 
+  def searchVatInformation(vrn: String, data: IfVatCustomerInformation): Unit =
+    mock.register(
+      get(urlPathEqualTo(s"/vat/customer/vrn/$vrn/information"))
+        .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(data).toString()))
+    )
+
+  def searchVatInformationNotFound(vrn: String): Unit = {
+    mock.register(
+      get(urlPathEqualTo(s"/vat/customer/vrn/$vrn/information"))
+        .willReturn(aResponse().withStatus(Status.NOT_FOUND))
+    )
+  }
 }

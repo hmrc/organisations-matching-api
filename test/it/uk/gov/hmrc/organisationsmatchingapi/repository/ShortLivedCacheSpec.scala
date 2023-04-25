@@ -93,7 +93,7 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
 
   private def retrieveRawCachedValue(id: String) = {
     await(shortLivedCache.collection.find(Filters.equal("id", toBson(id)))
-      .headOption
+      .headOption()
       .map {
         case Some(entry) => entry.data.value
         case None => None

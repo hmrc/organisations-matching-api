@@ -17,19 +17,23 @@
 package component.uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs.{AuthStub, BaseSpec, IfStub, MatchingStub}
+import org.scalatest.concurrent.ScalaFutures.convertScalaFuture
 import play.api.http.Status
-import play.api.libs.json.Json
+import play.api.libs.json.{JsObject, Json}
 import scalaj.http.{Http, HttpResponse}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.{IfAddress, IfCorpTaxCompanyDetails, IfSaTaxPayerNameAddress, IfSaTaxpayerDetails}
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 
 import java.util.concurrent.TimeUnit
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 
 
-class MatchingControllerSpec extends BaseSpec  {
+class MatchingControllerSpec extends BaseSpec {
 
   val scopes = List("read:organisations-matching-ho")
   val ctRequest: CtMatchingRequest = CtMatchingRequest("0213456789", "name", "line1", "NE11NE")
@@ -37,6 +41,10 @@ class MatchingControllerSpec extends BaseSpec  {
 
   val saRequest: SaMatchingRequest = SaMatchingRequest("0213456789", "A", "name", "line1", "NE11NE")
   val saRequestString: String = Json.prettyPrint(Json.toJson(saRequest))
+
+  val vatRequest: VatMatchingRequest = VatMatchingRequest("01234567", "name", "line1", "NE11NE")
+  val vatRequestJson: JsObject = Json.toJson(vatRequest).as[JsObject]
+  val vatRequestString: String = Json.prettyPrint(vatRequestJson)
 
   val ifCorpTax: IfCorpTaxCompanyDetails = IfCorpTaxCompanyDetails(
     utr = Some("0123456789"),
@@ -48,7 +56,7 @@ class MatchingControllerSpec extends BaseSpec  {
   val ifSa: IfSaTaxpayerDetails = IfSaTaxpayerDetails(
     utr = Some("0123456789"),
     taxpayerType = Some("Individual"),
-    taxpayerDetails = Some(Seq(IfSaTaxPayerNameAddress(
+    taxpayerDetails = Some(Seq(IfSaTaxpayerNameAddress(
       name = Some("Billy Billyson"),
       addressType = Some("Base"),
       address = Some(IfAddress(
@@ -59,6 +67,13 @@ class MatchingControllerSpec extends BaseSpec  {
         postcode = Some("ABC DEF")
       )))
     )))
+
+  val ifVat = IfVatCustomerInformation(
+    IfVatApprovedInformation(
+      IfVatCustomerDetails(Some("name")),
+      IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("NE1 1NE"))))
+    )
+  )
 
   Feature("corporation-tax endpoint") {
 
@@ -130,8 +145,8 @@ class MatchingControllerSpec extends BaseSpec  {
       val responseJson = Json.parse(response.body)
 
       responseJson mustBe Json.parse(
-        s"""{ "code": "INVALID_REQUEST",
-           | "message" : "/address/addressLine1 is required" }""".stripMargin)
+        """{ "code": "INVALID_REQUEST", "message" : "Missing required field(s): [/address/addressLine1]" }"""
+      )
     }
 
     Scenario("Bad request with malformed CRN") {
@@ -186,7 +201,6 @@ class MatchingControllerSpec extends BaseSpec  {
       responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""".stripMargin)
     }
 
-
     Scenario("Valid POST request but match not found") {
 
       Given("A valid privileged Auth bearer token")
@@ -226,7 +240,7 @@ class MatchingControllerSpec extends BaseSpec  {
       response.code mustBe Status.BAD_REQUEST
 
       Json.parse(response.body) mustBe Json.obj(
-        "code"    -> "INVALID_REQUEST",
+        "code" -> "INVALID_REQUEST",
         "message" -> "CorrelationId is required"
       )
     }
@@ -245,8 +259,8 @@ class MatchingControllerSpec extends BaseSpec  {
       response.code mustBe Status.BAD_REQUEST
 
       Json.parse(response.body) mustBe Json.obj(
-        "code"    -> "INVALID_REQUEST",
-        "message" -> "Malformed CorrelationId"
+        "code" -> "INVALID_REQUEST",
+        "message" -> s"Malformed CorrelationId ${correlationIdHeaderMalformed._2}"
       )
     }
 
@@ -266,7 +280,7 @@ class MatchingControllerSpec extends BaseSpec  {
       Then("the response status should be 401 (unauthorized)")
       response.code mustBe Status.UNAUTHORIZED
       Json.parse(response.body) mustBe Json.obj(
-        "code"    -> "UNAUTHORIZED",
+        "code" -> "UNAUTHORIZED",
         "message" -> "Bearer token is missing or not authorized"
       )
     }
@@ -374,7 +388,7 @@ class MatchingControllerSpec extends BaseSpec  {
           | "taxPayerName": "name",
           | "address": {
           |    "postcode": "NE11NE"
-        |     }
+          |     }
           | }""".stripMargin
 
       val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
@@ -389,8 +403,7 @@ class MatchingControllerSpec extends BaseSpec  {
       val responseJson = Json.parse(response.body)
 
       responseJson mustBe Json.parse(
-        s"""{ "code": "INVALID_REQUEST",
-           | "message" : "/address/addressLine1 is required" }""".stripMargin)
+        s"""{ "code": "INVALID_REQUEST", "message" : "Missing required field(s): [/address/addressLine1]" }""")
     }
 
     Scenario("A missing correlation id") {
@@ -407,7 +420,7 @@ class MatchingControllerSpec extends BaseSpec  {
       response.code mustBe Status.BAD_REQUEST
 
       Json.parse(response.body) mustBe Json.obj(
-        "code"    -> "INVALID_REQUEST",
+        "code" -> "INVALID_REQUEST",
         "message" -> "CorrelationId is required"
       )
     }
@@ -426,8 +439,8 @@ class MatchingControllerSpec extends BaseSpec  {
       response.code mustBe Status.BAD_REQUEST
 
       Json.parse(response.body) mustBe Json.obj(
-        "code"    -> "INVALID_REQUEST",
-        "message" -> "Malformed CorrelationId"
+        "code" -> "INVALID_REQUEST",
+        "message" -> s"Malformed CorrelationId ${correlationIdHeaderMalformed._2}"
       )
     }
 
@@ -445,9 +458,199 @@ class MatchingControllerSpec extends BaseSpec  {
       Then("the response status should be 401 (unauthorized)")
       response.code mustBe Status.UNAUTHORIZED
       Json.parse(response.body) mustBe Json.obj(
-        "code"    -> "UNAUTHORIZED",
+        "code" -> "UNAUTHORIZED",
         "message" -> "Bearer token is missing or not authorized"
       )
     }
+  }
+
+  Feature("vat endpoint") {
+    Scenario("Valid POST request") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data found in IF")
+      IfStub.searchVatInformation(vatRequest.vrn, ifVat)
+
+      Given("A successful match")
+      MatchingStub.willReturnVatMatch(correlationIdHeader._2)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/vat")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(vatRequestString)
+        .asString
+
+      Then("The response status should be 200 (Ok)")
+      response.code mustBe Status.OK
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      val matchId = (responseJson \ "matchId").get.as[String]
+
+      responseJson mustBe Json.parse(
+        s"""{
+           |  "_links" : {
+           |    "getVatMatch" : {
+           |      "href" : "/organisations/matching/vat/$matchId",
+           |      "title" : "Get links to VAT for a matched organisation"
+           |    },
+           |    "self" : {
+           |      "href" : "/organisations/matching/vat"
+           |    }
+           |  },
+           |  "matchId" : "$matchId"
+           |}""".stripMargin)
+
+
+      val cachedData: Option[VatMatch] = mongoRepository.fetchAndGetEntry[VatMatch](matchId).futureValue
+      cachedData.isEmpty mustBe false
+    }
+
+    Scenario("Bad request with missing vrn") {
+      missingFieldScenario("vrn")
+    }
+
+    Scenario("Bad request with missing organisationName") {
+      missingFieldScenario("organisationName")
+    }
+
+    Scenario("Bad request with missing addressLine1") {
+      missingFieldScenario("addressLine1")
+    }
+
+    Scenario("Bad request with missing postcode") {
+      missingFieldScenario("postcode")
+    }
+
+    Scenario("Valid POST request but IF data not found") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data not found in IF")
+      IfStub.searchVatInformationNotFound(vatRequest.vrn)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/vat")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(vatRequestString)
+        .asString
+
+      Then("The response status should be 404 (Not Found)")
+      response.code mustBe Status.NOT_FOUND
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(
+        s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}"""
+      )
+    }
+
+    Scenario("Valid POST request but match not found") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      Given("Data found in IF")
+      IfStub.searchVatInformation(vatRequest.vrn, ifVat)
+
+      Given("An unsuccessful match")
+      MatchingStub.willReturnVatMatchNotFound(correlationIdHeader._2)
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/vat")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(vatRequestString)
+        .asString
+
+      Then("The response status should be 404 (Not Found)")
+      response.code mustBe Status.NOT_FOUND
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(s"""{"code":"MATCHING_FAILED","message":"There is no match for the information provided"}""")
+    }
+
+    Scenario("A missing correlation id") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat")
+        .headers(requestHeadersInvalid(acceptHeaderP1))
+        .postData(vatRequestString)
+        .asString
+
+      response.code mustBe Status.BAD_REQUEST
+
+      Json.parse(response.body) mustBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> "CorrelationId is required"
+      )
+    }
+
+    Scenario("a request is made with a malformed correlation id") {
+
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat")
+        .headers(requestHeadersMalformed(acceptHeaderP1))
+        .postData(vatRequestString)
+        .asString
+
+      response.code mustBe Status.BAD_REQUEST
+
+      Json.parse(response.body) mustBe Json.obj(
+        "code" -> "INVALID_REQUEST",
+        "message" -> s"Malformed CorrelationId ${correlationIdHeaderMalformed._2}"
+      )
+    }
+
+    Scenario("not authorized") {
+
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/vat")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(vatRequestString)
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code mustBe Status.UNAUTHORIZED
+      Json.parse(response.body) mustBe Json.obj(
+        "code" -> "UNAUTHORIZED",
+        "message" -> "Bearer token is missing or not authorized"
+      )
+    }
+
+    def missingFieldScenario(fieldName: String) = {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      val requestWithoutField = vatRequestJson - fieldName
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/vat")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(Json.prettyPrint(requestWithoutField))
+        .asString
+
+      Then("The response status should be 400 (Bad request)")
+      response.code mustBe Status.BAD_REQUEST
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(
+        s"""{ "code": "INVALID_REQUEST", "message" : "Missing required field(s): [/$fieldName]" }"""
+      )
+    }
+
   }
 }

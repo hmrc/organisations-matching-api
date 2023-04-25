@@ -23,9 +23,9 @@ import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, MessagesControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, MatchIdResponse, SaMatchingRequest}
+import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, MatchIdResponse, SaMatchingRequest, VatMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils._
-import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService, ScopesHelper, ScopesService}
+import uk.gov.hmrc.organisationsmatchingapi.services.{MatchingService, ScopesHelper, ScopesService}
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
@@ -38,7 +38,6 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
                                    scopeService: ScopesService,
                                    scopesHelper: ScopesHelper,
                                    bodyParsers: PlayBodyParsers,
-                                   cacheService: CacheService,
                                    matchingService: MatchingService)
                                   (implicit auditHelper: AuditHelper,
                                   ec: ExecutionContext) extends BaseApiController(mcc, cc)
@@ -75,25 +74,51 @@ class MatchingController @Inject()(val authConnector: AuthConnector,
     val matchId = UUID.randomUUID()
     val self =  "/organisations/matching/self-assessment"
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
-      withValidJson[SaMatchingRequest] { matchRequest => {
+      withValidJson[SaMatchingRequest] { matchRequest =>
         val correlationId = validateCorrelationId(request)
-          matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map { _ => {
-            val selfLink = HalLink("self", self)
-            val data = toJson(MatchIdResponse(matchId))
-            val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink)
+        matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map { _ =>
+          val selfLink = HalLink("self", self)
+          val data = toJson(MatchIdResponse(matchId))
+          val response = Json.toJson(state(data) ++ scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink)
 
-            auditHelper.auditApiResponse(
-              correlationId.toString,
-              matchId.toString,
-              authScopes.mkString(","),
-              request,
-              selfLink.toString,
-              Some(response))
+          auditHelper.auditApiResponse(
+            correlationId.toString,
+            matchId.toString,
+            authScopes.mkString(","),
+            request,
+            selfLink.toString,
+            Some(response))
 
-            Ok(response)
-          }
+          Ok(response)
         }
-      }}
+      }
+    } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
+  }
+
+  def matchOrganisationVat(): Action[JsValue] = Action.async(bodyParsers.json) { implicit request =>
+    val matchId = UUID.randomUUID()
+    val self = "/organisations/matching/vat"
+    authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
+      withValidJson[VatMatchingRequest] { matchRequest =>
+        val correlationId = validateCorrelationId(request)
+        matchingService.matchVat(matchId, correlationId, matchRequest).map { _ =>
+          val selfLink = HalLink("self", self)
+          val halLinks = scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getVatMatch")))
+          val data = toJson(MatchIdResponse(matchId))
+          val response = Json.toJson(state(data) ++ halLinks ++ selfLink)
+
+          auditHelper.auditApiResponse(
+            correlationId.toString,
+            matchId.toString,
+            authScopes.mkString(","),
+            request,
+            selfLink.toString,
+            Some(response)
+          )
+
+          Ok(response)
+        }
+      }
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
   }
 }

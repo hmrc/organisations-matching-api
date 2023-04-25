@@ -33,7 +33,10 @@ import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework._
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util.UnitSpec
@@ -76,9 +79,10 @@ class IfConnectorSpec
   trait Setup {
     val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
     val sampleCorrelationId = "188e9400-b636-4a3b-80ba-230a8c72b92a"
-    val sampleCorrelationIdHeader: (String, String) = ("CorrelationId" -> sampleCorrelationId)
+    val sampleCorrelationIdHeader: (String, String) = "CorrelationId" -> sampleCorrelationId
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val request = FakeRequest().withHeaders(sampleCorrelationIdHeader)
 
     val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
     val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]
@@ -152,12 +156,7 @@ class IfConnectorSpec
           )
       )
 
-      val result: IfCorpTaxCompanyDetails = await(
-        underTest
-          .fetchCorporationTax(matchId, crn)(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec))
+      val result: IfCorpTaxCompanyDetails = await(underTest.fetchCorporationTax(matchId, crn))
 
       verify(underTest.auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())
@@ -180,13 +179,7 @@ class IfConnectorSpec
           .willReturn(aResponse().withStatus(500)))
 
       intercept[InternalServerException] {
-        await(
-          underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678")(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec
-          )
-        )
+        await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
 
       verify(underTest.auditHelper,
@@ -203,13 +196,7 @@ class IfConnectorSpec
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
 
       intercept[InternalServerException] {
-        await(
-          underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678")(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec
-          )
-        )
+        await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
 
       verify(underTest.auditHelper,
@@ -225,16 +212,10 @@ class IfConnectorSpec
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
 
       intercept[MatchingException] {
-        await(
-          underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678")(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec
-          )
-        )
+        await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
-      verify(underTest.auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1))
+        .auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
   }
 
@@ -243,7 +224,7 @@ class IfConnectorSpec
 
     "return data on successful request" in new Setup {
 
-      val taxpayerJohnNameAddress: IfSaTaxPayerNameAddress = IfSaTaxPayerNameAddress(
+      val taxpayerJohnNameAddress: IfSaTaxpayerNameAddress = IfSaTaxpayerNameAddress(
         Some("John Smith II"),
         Some("Base"),
         Some(IfAddress(
@@ -255,7 +236,7 @@ class IfConnectorSpec
         ))
       )
 
-      val taxpayerJoanneNameAddress: IfSaTaxPayerNameAddress = IfSaTaxPayerNameAddress(
+      val taxpayerJoanneNameAddress: IfSaTaxpayerNameAddress = IfSaTaxpayerNameAddress(
         Some("Joanne Smith"),
         Some("Correspondence"),
         Some(IfAddress(
@@ -285,15 +266,11 @@ class IfConnectorSpec
             )).toString())))
 
       val result: IfSaTaxpayerDetails = await(
-        underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")(
-          hc,
-          FakeRequest().withHeaders(sampleCorrelationIdHeader),
-          ec
-        )
+        underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")
       )
 
-      verify(underTest.auditHelper,
-        times(1)).auditIfApiResponse(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1))
+        .auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
       result shouldBe IfSaTaxpayerDetails(
         Some(utr),
@@ -312,13 +289,7 @@ class IfConnectorSpec
           .willReturn(aResponse().withStatus(500)))
 
       intercept[InternalServerException] {
-        await(
-          underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec
-          )
-        )
+        await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
 
       verify(underTest.auditHelper,
@@ -335,17 +306,11 @@ class IfConnectorSpec
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
 
       intercept[InternalServerException] {
-        await(
-          underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec
-          )
-        )
+        await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
 
-      verify(underTest.auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+      verify(underTest.auditHelper, times(1))
+        .auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
@@ -357,16 +322,92 @@ class IfConnectorSpec
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
 
       intercept[MatchingException] {
-        await(
-          underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")(
-            hc,
-            FakeRequest().withHeaders(sampleCorrelationIdHeader),
-            ec
-          )
-        )
+        await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
       verify(underTest.auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
+  }
+
+  "fetch VAT" should {
+    val vrn = "123456789"
+    val vatUrl = s"/vat/customer/vrn/$vrn/information"
+
+    "return data on successful request" in new Setup {
+      Mockito.reset(underTest.auditHelper)
+
+      val ifResponse = IfVatCustomerInformation(
+        IfVatApprovedInformation(
+          IfVatCustomerDetails(Some("orgName")),
+          IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("postcode"))))
+        )
+      )
+
+      stubFor(
+        get(urlPathMatching(vatUrl))
+          .withHeader(
+            HeaderNames.authorisation,
+            equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
+          .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
+          .withHeader("CorrelationId", equalTo(sampleCorrelationId))
+          .willReturn(aResponse()
+            .withStatus(200)
+            .withBody(Json.toJson(ifResponse).toString())
+          )
+      )
+
+      val result: IfVatCustomerInformation = await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
+
+      verify(underTest.auditHelper, times(1))
+        .auditIfApiResponse(any(), any(), any(), any(), any())(any())
+
+      result shouldBe ifResponse
+    }
+
+    "fail with InternalServerException when IF returns 500" in new Setup {
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(vatUrl))
+          .willReturn(aResponse().withStatus(500)))
+
+      intercept[InternalServerException] {
+        await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
+      }
+
+      verify(underTest.auditHelper, times(1))
+        .auditIfApiFailure(any(), any(), any(), any(), any())(any())
+
+    }
+
+    "fail with InternalServerException when IF returns a bad request" in new Setup {
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(vatUrl))
+          .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
+
+      intercept[InternalServerException] {
+        await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
+      }
+
+      verify(underTest.auditHelper,
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+    }
+
+    "fail with MatchingException when IF returns a NOT_FOUND" in new Setup {
+      Mockito.reset(underTest.auditHelper)
+
+      stubFor(
+        get(urlPathMatching(vatUrl))
+          .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
+
+      intercept[MatchingException] {
+        await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
+      }
+      verify(underTest.auditHelper,
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+    }
+
   }
 }

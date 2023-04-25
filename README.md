@@ -15,9 +15,9 @@ Please ensure you reference the OGD Data Item matrix to ensure the right data it
 
 Ensure mongodb and service manager (for auth wizard and organisations-matching microservice) are running.
 
-```sm --start OVHO -r```
+```sm2 --start ORGANISATIONS_ALL -r```
 
-```sm --stop ORGANISATIONS_MATCHING_API```
+```sm2 --stop ORGANISATIONS_MATCHING_API```
 
 The service runs on port 9657 with:
 

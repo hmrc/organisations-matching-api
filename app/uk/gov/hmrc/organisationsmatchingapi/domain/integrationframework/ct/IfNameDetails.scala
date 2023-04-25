@@ -14,23 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.utils
+package uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct
 
-import play.api.mvc.PathBindable
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads.maxLength
+import play.api.libs.json.{Format, JsPath, Json}
 
-import java.util.UUID
+case class IfNameDetails(name1: Option[String], name2: Option[String])
 
-class MatchUuidPathBinder extends PathBindable[UUID] {
+object IfNameDetails {
 
-  private val parameterName = "matchId"
+  private val reads = (
+    (JsPath \ "name1").readNullable[String](maxLength(100)) and
+      (JsPath \ "name2").readNullable[String](maxLength(100))
+    )(IfNameDetails.apply _)
 
-  override def bind(key: String, value: String): Either[String, UUID] = {
-    if(value.isEmpty)
-      Left(s"$parameterName is required")
-    else
-      UuidValidator.validated(value).toRight(s"$parameterName format is invalid")
-  }
+  private val writes = Json.writes[IfNameDetails]
 
-  override def unbind(key: String, uuid: UUID) = s"$key=${uuid.toString}"
+  implicit val format: Format[IfNameDetails] = Format(reads, writes)
 
 }

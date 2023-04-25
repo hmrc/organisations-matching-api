@@ -21,7 +21,7 @@ import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Decrypter, Encrypter, Protected}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Protected}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
@@ -56,10 +56,10 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
         expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)))
 ) {
 
-  implicit lazy val crypto: Encrypter with Decrypter = new ApplicationCrypto(
-    configuration.underlying).JsonCrypto
+  implicit lazy val crypto: Encrypter with Decrypter =
+    new ApplicationCrypto(configuration.underlying).JsonCrypto
 
-  def cache[T](id: String, value: T)(implicit formats: Format[T]): Future[InsertResult] = {
+  def cache[T: Format](id: String, value: T): Future[InsertResult] = {
 
     val jsonEncryptor           = new JsonEncryptor[T]()
     val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
@@ -75,20 +75,19 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
 
     collection
       .insertOne(entry)
-      .toFuture
+      .toFuture()
       .map(_ => InsertSucceeded)
       .recover {
         case Duplicate(_) => AlreadyExists
       }
   }
 
-  def fetchAndGetEntry[T](id: String)(
-    implicit formats: Format[T]): Future[Option[T]] = {
+  def fetchAndGetEntry[T: Format](id: String): Future[Option[T]] = {
     val decryptor = new JsonDecryptor[T]()
 
     collection
       .find(Filters.equal("id", toBson(id)))
-      .headOption
+      .headOption()
       .map {
         case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
         case None => None

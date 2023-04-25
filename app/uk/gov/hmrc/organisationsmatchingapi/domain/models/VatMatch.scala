@@ -14,23 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.organisationsmatchingapi.utils
+package uk.gov.hmrc.organisationsmatchingapi.domain.models
 
-import play.api.mvc.PathBindable
+import play.api.libs.json.{Json, OFormat}
 
 import java.util.UUID
 
-class MatchUuidPathBinder extends PathBindable[UUID] {
+case class VatMatch(matchId: UUID, vrn: Option[String])
 
-  private val parameterName = "matchId"
-
-  override def bind(key: String, value: String): Either[String, UUID] = {
-    if(value.isEmpty)
-      Left(s"$parameterName is required")
-    else
-      UuidValidator.validated(value).toRight(s"$parameterName format is invalid")
-  }
-
-  override def unbind(key: String, uuid: UUID) = s"$key=${uuid.toString}"
-
+object VatMatch {
+  implicit val vatMatchFormat: OFormat[VatMatch] = Json.format[VatMatch]
 }

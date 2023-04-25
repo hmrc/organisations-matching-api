@@ -105,7 +105,7 @@ class RequestHeaderUtilsSpec extends AnyWordSpec with Matchers {
 
       val exception = intercept[BadRequestException] { validateCorrelationId(requestHeader) }
 
-      exception.message shouldBe "Malformed CorrelationId"
+      exception.message shouldBe "Malformed CorrelationId IncorrectFormat"
     }
 
     "validateCorrelationId throws exception when CorrelationId header is missing" in {

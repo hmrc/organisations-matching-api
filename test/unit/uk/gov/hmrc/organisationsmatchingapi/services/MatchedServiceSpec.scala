@@ -22,7 +22,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.BDDMockito.`given`
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch, UtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch, UtrMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchedService}
 
@@ -34,7 +34,7 @@ class MatchedServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
   private val cacheService   = mock[CacheService]
   private val matchedService = new MatchedService(cacheService)
-  private val matchId        = UUID.fromString("57072660-1df9-4aeb-b4ea-cd2d7f96e430")
+  private val matchId        = UUID.randomUUID()
 
   private val matchRequestCt = new CtMatchingRequest(
     "crn",
@@ -54,6 +54,7 @@ class MatchedServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
   private val ctMatch  = new CtMatch(matchRequestCt, utr = Some("test"))
   private val saMatch  = new SaMatch(matchRequestSa, utr = Some("test"))
   private val utrMatch = new UtrMatch(matchId, "test")
+  private val vatMatch = new VatMatch(matchId, Some("testvrn"))
 
   "fetchCt" should {
     "return cache entry" in {
@@ -85,6 +86,27 @@ class MatchedServiceSpec extends AnyWordSpec with Matchers with MockitoSugar {
 
       intercept[MatchNotFoundException] {
         await(matchedService.fetchSa(matchId))
+      }
+    }
+  }
+
+  "fetchVatRecord" should {
+    "return cache entry" in {
+      given(cacheService.fetch[VatMatch](eqTo(matchId))(any())).willReturn(successful(Some(vatMatch)))
+      await(matchedService.fetchMatchedOrganisationVatRecord(matchId)) shouldBe vatMatch
+    }
+
+    "return not found for unknown matchId" in {
+      given(cacheService.fetch[VatMatch](eqTo(matchId))(any())).willReturn(successful(None))
+      intercept[MatchNotFoundException] {
+        await(matchedService.fetchMatchedOrganisationVatRecord(matchId))
+      }
+    }
+
+    "return not found for an existing matchId generated for SA or CT" in {
+      given(cacheService.fetch[VatMatch](eqTo(matchId))(any())).willReturn(successful(Some(vatMatch.copy(vrn = None))))
+      intercept[MatchNotFoundException] {
+        await(matchedService.fetchMatchedOrganisationVatRecord(matchId))
       }
     }
   }

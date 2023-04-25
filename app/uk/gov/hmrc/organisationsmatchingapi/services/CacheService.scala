@@ -21,7 +21,7 @@ import play.api.libs.json.Format
 import java.util.UUID
 import javax.inject.Inject
 import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, InsertResult}
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -32,18 +32,15 @@ class CacheService @Inject()(
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 
-  def cacheCtUtr(ctMatch: CtMatch, utr: String): Future[InsertResult] = {
+  def cacheCtUtr(ctMatch: CtMatch, utr: String): Future[InsertResult] =
     matchRepository.cache(ctMatch.matchId.toString, ctMatch.copy(utr = Some(utr)))
-  }
 
-  def cacheSaUtr(saMatch: SaMatch, utr: String): Future[InsertResult] = {
+  def cacheSaUtr(saMatch: SaMatch, utr: String): Future[InsertResult] =
     matchRepository.cache(saMatch.matchId.toString, saMatch.copy(utr = Some(utr)))
-  }
 
-  def fetch[T: Format](matchId: UUID): Future[Option[T]] = {
-    matchRepository.fetchAndGetEntry(matchId.toString) flatMap  {
-      result =>
-        Future.successful(result)
-    }
-  }
+  def cacheVatVrn(vatMatch: VatMatch): Future[InsertResult] =
+    matchRepository.cache(vatMatch.matchId.toString, vatMatch)
+
+  def fetch[T: Format](matchId: UUID): Future[Option[T]] =
+    matchRepository.fetchAndGetEntry(matchId.toString).flatMap(Future.successful)
 }

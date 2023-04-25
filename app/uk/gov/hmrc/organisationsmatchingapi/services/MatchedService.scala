@@ -17,7 +17,7 @@
 package uk.gov.hmrc.organisationsmatchingapi.services
 
 import com.google.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch, UtrMatch}
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, MatchNotFoundException, SaMatch, UtrMatch, VatMatch}
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
@@ -27,19 +27,29 @@ class MatchedService @Inject()(cacheService: CacheService) {
   def fetchCt(matchId: UUID)(implicit ec: ExecutionContext): Future[CtMatch] =
     cacheService.fetch[CtMatch](matchId) flatMap {
       case Some(entry) => Future.successful(entry)
-      case _           => Future.failed(new MatchNotFoundException)
+      case _ => Future.failed(new MatchNotFoundException)
     }
 
   def fetchSa(matchId: UUID)(implicit ec: ExecutionContext): Future[SaMatch] =
     cacheService.fetch[SaMatch](matchId) flatMap {
       case Some(entry) => Future.successful(entry)
-      case _           => Future.failed(new MatchNotFoundException)
+      case _ => Future.failed(new MatchNotFoundException)
     }
 
   def fetchMatchedOrganisationRecord(matchId: UUID)
                                     (implicit ec: ExecutionContext): Future[UtrMatch] =
     cacheService.fetch[UtrMatch](matchId) flatMap {
       case Some(utrMatch) => Future.successful(UtrMatch(utrMatch.matchId, utrMatch.utr))
-      case _              => Future.failed(new MatchNotFoundException)
+      case _ => Future.failed(new MatchNotFoundException)
     }
+
+  def fetchMatchedOrganisationVatRecord(matchId: UUID)
+                                       (implicit ec: ExecutionContext): Future[VatMatch] =
+    cacheService
+      .fetch[VatMatch](matchId)
+      .flatMap {
+        // empty vrn for an existing record means this matchId is not for vat
+        case Some(vatMatch) if vatMatch.vrn.isDefined => Future.successful(vatMatch)
+        case _ => Future.failed(new MatchNotFoundException)
+      }
 }
