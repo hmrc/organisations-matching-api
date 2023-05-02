@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "description": "Company's VRN and known facts",
+  "required": [
+    "vrn",
+    "organisationName",
+    "addressLine1",
+    "postcode"
+  ],
+  "properties": {
+    "vrn": {
+      "type": "string",
+      "description": "VAT registration number (VRN). ",
+      "pattern": "^[0-9]{1,9}$",
+      "example": "123456789"
+    },
+    "organisationName": {
+      "type": "string",
+      "description": "Organisation name",
+      "example": "Example Company Ltd"
+    },
+    "addressLine1": {
+      "type": "string",
+      "description": "The organisation's address line 1",
+      "example": "123 Long Road"
+    },
+    "postcode": {
+      "type": "string",
+      "description": "The organisation's postcode",
+      "example": "AB12 3CD"
+    }
+  }
+}

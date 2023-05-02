@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "description": "VAT Details Response",
+  "required": [
+    "vrn",
+    "_links"
+  ],
+  "properties": {
+    "vrn": {
+      "type": "string",
+      "description": "VAT registration number (VRN). ",
+      "pattern": "^[0-9]{1,9}$",
+      "example": "123456789"
+    },
+    "_links": {
+      "type": "object",
+      "description": "A list of links for possible actions related to this endpoint.",
+      "required": [
+        "self",
+        "getVatDetails"
+      ],
+      "properties": {
+        "self": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for this endpoint.",
+          "required": [
+            "href"
+          ],
+          "properties": {
+            "href": {
+              "type": "string",
+              "description": "The URL of the endpoint.",
+              "example": "/organisations/matching/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            }
+          }
+        },
+        "getVatDetails": {
+          "type": "object",
+          "description": "The URI for the endpoint to get VAT details for the matched organisation.",
+          "required": [
+            "href",
+            "title"
+          ],
+          "properties": {
+            "href": {
+              "type": "string",
+              "description": "The URL of the endpoint.",
+              "example": "/organisations/details/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            },
+            "title": {
+              "type": "string",
+              "description": "Get an organisation's VAT details"
+            }
+          }
+        }
+      }
+    }
+  }
+}

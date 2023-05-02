@@ -1,0 +1,58 @@
+{
+  "type": "object",
+  "description": "VAT Matching Response",
+  "required": [
+    "_links",
+    "matchId"
+  ],
+  "properties": {
+    "_links": {
+      "type": "object",
+      "description": "A list of links for possible actions related to this endpoint.",
+      "required": [
+        "getVatMatch",
+        "self"
+      ],
+      "properties": {
+        "getVatMatch": {
+          "type": "object",
+          "description": "The Uniform Resource Identifier (URI) for the endpoint that provides links to get VAT details for the matched organisation.",
+          "required": [
+            "href",
+            "title"
+          ],
+          "properties": {
+            "href": {
+              "type": "string",
+              "description": "The URL of the endpoint.",
+              "example": "/organisations/matching/vat/57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+            },
+            "title": {
+              "type": "string",
+              "description": "Get links to VAT details for a matched organisation"
+            }
+          }
+        },
+        "self": {
+          "type": "object",
+          "description": "The URI for this endpoint.",
+          "required": [
+            "href"
+          ],
+          "properties": {
+            "href": {
+              "type": "string",
+              "description": "The URL for this endpoint.",
+              "example": "/organisations/matching/vat"
+            }
+          }
+        }
+      }
+    },
+    "matchId": {
+      "type": "string",
+      "description": "A short-lived universally unique identifier (UUID), typically valid for 5 hours.",
+      "example": "57072660-1df9-4aeb-b4ea-cd2d7f96e430"
+    }
+  }
+}
