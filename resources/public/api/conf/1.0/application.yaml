@@ -196,7 +196,7 @@ paths:
         description: |-
           A UUID, used for traceability purposes.
 
-          Must conform to the regular expressio:
+          Must conform to the regular expression:
           
           <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
         required: true
@@ -276,6 +276,109 @@ paths:
                 - $ref: '#/components/schemas/errorResponse404A'
                 - example:
                     code: MATCHING_FAILED
+              examples:
+                Forbidden:
+                  description: The organisation's details provided did not match with HMRC's records
+                  value:
+                    code: MATCHING_FAILED
+      deprecated: false
+  /organisations/matching/vat:
+    post:
+      tags:
+        - organisations
+      summary: Match VAT details for an organisation
+      description: |-
+        Use this endpoint to match VAT details about an organisation against HMRC’s records.
+
+        Details include VAT Registration Number (VRN), organisation name, address line 1, and postcode.
+
+        On a successful match, a matchId is returned. The matchId can be used in later calls.
+        
+        See also [fraud prevention](https://developer.service.hmrc.gov.uk/guides/fraud-prevention/).
+
+      operationId: MatchVatDetailsForAnOrganisation
+      parameters:
+        - name: CorrelationId
+          in: header
+          description: |-
+            A UUID, used for traceability purposes.
+            
+            Must conform to the regular expression:
+            
+            <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
+          required: true
+          style: simple
+          schema:
+            type: string
+            example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+      requestBody:
+        description: ''
+        content:
+          application/json:
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/OrganisationsMatchingVatRequest'
+                - example:
+                    vrn: '123456789'
+                    organisationName: Example Company Ltd
+                    addressLine1: 123 Long Road
+                    postcode: AB12 3CD
+            example:
+              vrn: '123456789'
+              organisationName: Example Company Ltd
+              addressLine1: 123 Long Road
+              postcode: AB12 3CD
+        required: true
+      responses:
+        '200':
+          description: Returns a matchId which can be used to make calls to details endpoints
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/OrganisationsMatchingVatResponse'
+                  - example:
+                      _links:
+                        getVatMatch:
+                          href: /organisations/matching/vat/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                          title: Get links to VAT details for a matched organisation
+                        self:
+                          href: /organisations/matching/vat
+                      matchId: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+              example:
+                _links:
+                  getVatMatch:
+                    href: /organisations/matching/vat/57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Get links to VAT details for a matched organisation
+                  self:
+                    href: /organisations/matching/vat
+                matchId: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        '400':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse400'
+                  - example:
+                      code: BAD_REQUEST
+              examples:
+                BadRequest:
+                  description: The request body does not conform to the schema
+                  value:
+                    code: BAD_REQUEST
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/errorResponse404A'
+                  - example:
+                      code: MATCHING_FAILED
               examples:
                 Forbidden:
                   description: The organisation's details provided did not match with HMRC's records
@@ -468,6 +571,84 @@ paths:
                   value:
                     code: NOT_FOUND
       deprecated: false
+  /organisations/matching/vat/{matchId}:
+    get:
+      tags:
+      - organisations
+      summary: Get links to VAT details for a matched organisation
+      description: |-
+        This endpoint takes a matchId and returns a matched organisation's vrn.
+
+        The endpoint also provides links to get VAT details for a matched organisation.
+
+        You will get a subset of the JSON response shown below based on your assigned scopes.
+        
+        See also [fraud prevention](https://developer.service.hmrc.gov.uk/guides/fraud-prevention/).
+
+      operationId: GetLinksToVatDetailsForAMatchedOrganisation
+      parameters:
+      - name: matchId
+        in: path
+        description: A short-lived universally unique identifier (UUID), typically valid for 5 hours. Generated through the Organisations Matching API.
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      - name: CorrelationId
+        in: header
+        description: |-
+          A UUID, used for traceability purposes.
+
+          Must conform to the regular expression:
+          
+          <code class="code--slim">^[0-9a-fA-F]{8}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{4}[-][0-9a-fA-F]{12}$</code>
+        required: true
+        style: simple
+        schema:
+          type: string
+          example: 58072660-1df9-4deb-b4ca-cd2d7f96e480
+      responses:
+        '200':
+          description: The Organisation's VAT details
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/OrganisationsMatchingVatResponse'
+                - example:
+                    vrn: '123456789'
+                    _links:
+                      self:
+                        href: organisations/matching/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                      getVatDetails:
+                        href: organisations/details/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                        title: Get an organisation's VAT details
+              example:
+                vrn: '123456789'
+                _links:
+                  self:
+                    href: organisations/matching/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                  getVatDetails:
+                    href: organisations/details/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+                    title: Get an organisation's VAT details
+        '404':
+          description: ''
+          headers: {}
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/errorResponse404B'
+                - example:
+                    code: NOT_FOUND
+              examples:
+                NotFound:
+                  description: Not Found
+                  value:
+                    code: NOT_FOUND
+      deprecated: false
 components:
   securitySchemes:
     userRestricted:
@@ -617,6 +798,21 @@ components:
           type: string
           description: Get links to Self Assessment and number of employees details for a matched organisation
       description: The Uniform Resource Identifier (URI) for the endpoint that provides links to get Self Assessment details for the matched organisation.
+    GetVatDetails:
+      title: GetVatDetails
+      required:
+        - href
+        - title
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/details/vat?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+        title:
+          type: string
+          description: Find the VAT details for an organisation
+      description: The URI for the endpoint to get VAT details.
     Links:
       title: Links
       required:
@@ -690,6 +886,22 @@ components:
           allOf:
           - $ref: '#/components/schemas/GetEmployeeCount'
           - description: The URI for the endpoint to get number of employees data.
+      description: A list of links for possible actions related to this endpoint.
+    LinksVat:
+      title: LinksVat
+      required:
+        - self
+        - getVatDetails
+      type: object
+      properties:
+        self:
+          allOf:
+            - $ref: '#/components/schemas/SelfVat'
+            - description: The Uniform Resource Identifier (URI) for the endpoint to get the vat data.
+        getVatDetails:
+          allOf:
+            - $ref: '#/components/schemas/GetVatDetails'
+            - description: The URI for the endpoint to get VAT details for the matched organisation.
       description: A list of links for possible actions related to this endpoint.
     OrganisationsMatchingCorporationTaxrequest:
       title: OrganisationsMatchingCorporationTaxrequest
@@ -827,6 +1039,48 @@ components:
           allOf:
           - $ref: '#/components/schemas/Links3'
           - description: A list of links for possible actions related to this endpoint.
+    OrganisationsMatchingVatRequest:
+      title: OrganisationsMatchingVatRequest
+      required:
+        - vrn
+        - organisationName
+        - addressLine1
+        - postcode
+      type: object
+      properties:
+        vrn:
+          pattern: ^[0-9]{9}$
+          type: string
+          description: The organisations's VAT registration number
+          example: '123456789'
+        organisationName:
+          type: string
+          description: The name of the organisation
+          example: Example Company Ltd
+        addressLine1:
+          type: string
+          description: The organisation's address line 1
+          example: 123 Long Road
+        postcode:
+          type: string
+          description: The organisation's postcode
+          example: AB12 3CD
+    OrganisationsMatchingVatResponse:
+      title: OrganisationsMatchingVatResponse
+      required:
+        - _links
+        - matchId
+      type: object
+      properties:
+        _links:
+          allOf:
+            - $ref: '#/components/schemas/LinksVat'
+            - description: A list of links for possible actions related to this endpoint.
+        matchId:
+          type: string
+          description: A short-lived universally unique identifier (UUID), typically valid for 5 hours.
+          example: 57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: VAT Matching Response
     Self:
       title: Self
       required:
@@ -860,6 +1114,17 @@ components:
           description: The URL of the endpoint.
           example: /organisations/matching/self-assessment/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
       description: The Uniform Resource Identifier (URI) for the endpoint to get the self-assessment data.
+    SelfVat:
+      title: SelfVat
+      required:
+      - href
+      type: object
+      properties:
+        href:
+          type: string
+          description: The URL of the endpoint.
+          example: /organisations/matching/vat/?matchId=57072660-1df9-4aeb-b4ea-cd2d7f96e430
+      description: The Uniform Resource Identifier (URI) for the endpoint to get VAT data.
     TaxPayerType:
       title: TaxPayerType
       enum:
