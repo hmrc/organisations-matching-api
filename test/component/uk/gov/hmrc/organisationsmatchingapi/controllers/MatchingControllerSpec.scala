@@ -42,7 +42,7 @@ class MatchingControllerSpec extends BaseSpec {
   val saRequest: SaMatchingRequest = SaMatchingRequest("0213456789", "A", "name", "line1", "NE11NE")
   val saRequestString: String = Json.prettyPrint(Json.toJson(saRequest))
 
-  val vatRequest: VatMatchingRequest = VatMatchingRequest("01234567", "name", "line1", "NE11NE")
+  val vatRequest: VatMatchingRequest = VatMatchingRequest("123456789", "name", "line1", "NE11NE")
   val vatRequestJson: JsObject = Json.toJson(vatRequest).as[JsObject]
   val vatRequestString: String = Json.prettyPrint(vatRequestJson)
 
@@ -506,6 +506,29 @@ class MatchingControllerSpec extends BaseSpec {
 
       val cachedData: Option[VatMatch] = mongoRepository.fetchAndGetEntry[VatMatch](matchId).futureValue
       cachedData.isEmpty mustBe false
+    }
+
+    Scenario("Bad request with invalid vrn") {
+      Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      val requestWithoutField = (vatRequestJson - "vrn") ++ Json.obj("vrn" -> Json.toJson("123"))
+
+      val response: HttpResponse[String] = Http(s"$serviceUrl/vat")
+        .headers(requestHeaders(acceptHeaderP1))
+        .postData(Json.prettyPrint(requestWithoutField))
+        .asString
+
+      Then("The response status should be 400 (Bad request)")
+      response.code mustBe Status.BAD_REQUEST
+
+      And("The response should have a valid payload")
+      val responseJson = Json.parse(response.body)
+
+      responseJson mustBe Json.parse(
+        s"""{ "code": "INVALID_REQUEST", "message" : "VRN must be 9-character numeric" }"""
+      )
+
     }
 
     Scenario("Bad request with missing vrn") {
