@@ -1051,7 +1051,7 @@ components:
         vrn:
           pattern: ^[0-9]{9}$
           type: string
-          description: The organisations's VAT registration number
+          description: The organisation's VAT registration number
           example: '123456789'
         organisationName:
           type: string

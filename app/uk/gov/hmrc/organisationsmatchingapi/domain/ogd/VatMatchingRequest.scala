@@ -16,10 +16,19 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.functional.syntax._
+import play.api.libs.json.Reads._
+import play.api.libs.json._
 
 case class VatMatchingRequest(vrn: String, organisationName: String, addressLine1: String, postcode: String)
 
 object VatMatchingRequest {
-  implicit val vatMatchingRequestFormat: OFormat[VatMatchingRequest] = Json.format[VatMatchingRequest]
+  private val reads: Reads[VatMatchingRequest] = (
+    (JsPath \ "vrn").read[String](pattern("^[0-9]{9}$".r, "VRN must be 9-character numeric")) and
+      (JsPath \ "organisationName").read[String] and
+      (JsPath \ "addressLine1").read[String] and
+      (JsPath \ "postcode").read[String]
+  )(VatMatchingRequest.apply _)
+  private val writes: Writes[VatMatchingRequest] = Json.writes[VatMatchingRequest]
+  implicit val vatMatchingRequestFormat: Format[VatMatchingRequest] = Format(reads, writes)
 }

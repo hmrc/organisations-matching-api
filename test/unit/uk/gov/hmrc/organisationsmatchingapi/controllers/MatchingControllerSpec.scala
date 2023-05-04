@@ -184,7 +184,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
   }
 
   "POST matchOrganisationVat" should {
-    val requestContent = VatMatchingRequest("testvrn", "organisationName", "line1", "postcode")
+    val requestContent = VatMatchingRequest("123456789", "organisationName", "line1", "postcode")
     val fakeRequest = FakeRequest("POST", "/")
       .withHeaders(("CorrelationId", UUID.randomUUID().toString))
       .withBody(Json.toJson(requestContent))
