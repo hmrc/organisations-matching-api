@@ -89,10 +89,8 @@ abstract class BaseApiController @Inject()(mcc: MessagesControllerComponents, cc
     case e: IllegalArgumentException =>
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInvalidRequest(e.getMessage).toHttpResponse
-    case e: InternalServerException =>
-      auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorInternalServer("Something went wrong").toHttpResponse
     case e =>
+      logger.error("Unexpected exception", e)
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
       ErrorInternalServer("Something went wrong").toHttpResponse
   }
