@@ -134,7 +134,7 @@ class IfConnector @Inject()(
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
     case e: Exception =>
-      logger.warn(s"Integration Framework Exception encountered")
+      logger.error(s"Integration Framework Exception encountered",e)
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, e.getMessage)
       Future.failed(new InternalServerException("Something went wrong."))
   }

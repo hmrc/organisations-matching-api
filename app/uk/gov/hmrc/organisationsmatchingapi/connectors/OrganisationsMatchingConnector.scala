@@ -97,7 +97,7 @@ class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, msg)
       Future.failed(new InternalServerException("Something went wrong."))
     case e: Exception =>
-      logger.warn(s"Organisations Matching Exception encountered")
+      logger.error(s"Organisations Matching Exception encountered", e)
       auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, e.getMessage)
       Future.failed(new InternalServerException("Something went wrong."))
   }
