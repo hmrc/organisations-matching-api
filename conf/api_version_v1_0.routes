@@ -4,5 +4,5 @@ GET   /corporation-tax/:matchId  uk.gov.hmrc.organisationsmatchingapi.controller
 POST  /self-assessment           uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationSa
 GET   /self-assessment/:matchId  uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController.matchedOrganisationSa(matchId: java.lang.String)
 
-POST  /vat                       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationVat
-GET   /vat/:matchId              uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController.matchedOrganisationVat(matchId: java.util.UUID)
+# POST  /vat                       uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController.matchOrganisationVat
+# GET   /vat/:matchId              uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController.matchedOrganisationVat(matchId: java.util.UUID)
