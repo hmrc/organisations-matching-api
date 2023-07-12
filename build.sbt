@@ -1,6 +1,5 @@
 import play.sbt.routes.RoutesKeys
 import sbt.Tests.{Group, SubProcess}
-import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin.publishingSettings
 
 val appName = "organisations-matching-api"
 
@@ -65,7 +64,6 @@ lazy val microservice = Project(appName, file("."))
     parallelExecution in ComponentTest := false
   )
 
-  .settings(publishingSettings: _*)
   .settings(scoverageSettings: _*)
 
   .settings(resolvers ++= Seq(
