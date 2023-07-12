@@ -89,7 +89,7 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
       .map(endpoint =>
         HalLink(
           rel = endpoint.name,
-          href = endpoint.link.replaceAllLiterally("<matchId>", s"$matchId"),
+          href = endpoint.link.replace("<matchId>", s"$matchId"),
           title = Some(endpoint.title)))
       .toSeq
 }
