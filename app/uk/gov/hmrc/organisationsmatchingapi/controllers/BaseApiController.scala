@@ -17,12 +17,13 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.Logger
+import play.api.i18n.Lang
 import play.api.libs.json._
 import play.api.mvc._
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthorisationException, AuthorisedFunctions, Enrolment, InsufficientEnrolments}
-import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, InternalServerException, TooManyRequestException}
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier, TooManyRequestException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models._
 import uk.gov.hmrc.organisationsmatchingapi.utils.UuidValidator
@@ -38,7 +39,7 @@ abstract class BaseApiController @Inject()(mcc: MessagesControllerComponents, cc
 
   protected val logger: Logger = play.api.Logger(this.getClass)
 
-  protected implicit val lang = mcc.langs.availables.head
+  protected implicit val lang: Lang = mcc.langs.availables.head
 
   protected override implicit def hc(implicit rh: RequestHeader): HeaderCarrier =
     HeaderCarrierConverter.fromRequest(rh)
@@ -92,7 +93,7 @@ abstract class BaseApiController @Inject()(mcc: MessagesControllerComponents, cc
     case e =>
       logger.error("Unexpected exception", e)
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
-      ErrorInternalServer("Something went wrong").toHttpResponse
+      ErrorInternalServer().toHttpResponse
   }
 
 }

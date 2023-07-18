@@ -68,7 +68,9 @@ class IfConnectorSpec
       "cache.enabled"  -> false,
       "microservice.services.integration-framework.host" -> "127.0.0.1",
       "microservice.services.integration-framework.port" -> "11122",
-      "microservice.services.integration-framework.authorization-token" -> integrationFrameworkAuthorizationToken,
+      "microservice.services.integration-framework.authorization-token.ct" -> integrationFrameworkAuthorizationToken,
+      "microservice.services.integration-framework.authorization-token.sa" -> integrationFrameworkAuthorizationToken,
+      "microservice.services.integration-framework.authorization-token.vat" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.environment" -> integrationFrameworkEnvironment
     )
     .build()
