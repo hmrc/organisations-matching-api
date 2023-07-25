@@ -464,7 +464,7 @@ class MatchingControllerSpec extends BaseSpec {
     }
   }
 
-  ignore("vat endpoint") {
+  Feature("vat endpoint") {
     Scenario("Valid POST request") {
 
       Given("A valid privileged Auth bearer token")
