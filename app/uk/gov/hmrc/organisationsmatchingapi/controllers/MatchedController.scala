@@ -50,7 +50,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
       withValidUuid(matchId, "matchId") { matchIdUuid =>
         matchedService.fetchCt(matchIdUuid) map { cacheData =>
 
-          val exclude = Some(List("getSelfAssessmentDetails", "getVat"))
+          val exclude = Some(List("getSelfAssessmentDetails", "getVatDetails"))
           val selfLink = HalLink("self", self)
           val links = scopesHelper.getHalLinks(matchIdUuid, exclude, authScopes, None, true) ++ selfLink
           val response = Json.toJson(state(CtMatch.convert(cacheData)) ++ links)
@@ -72,7 +72,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
       withValidUuid(matchId, "matchId") { matchIdUuuid =>
         matchedService.fetchSa(matchIdUuuid) map { cacheData =>
 
-          val exclude = Some(List("getCorporationTaxDetails", "getVat"))
+          val exclude = Some(List("getCorporationTaxDetails", "getVatDetails"))
           val selfLink = HalLink("self", self)
           val links = scopesHelper.getHalLinks(matchIdUuuid, exclude, authScopes, None, true) ++ selfLink
           val response = Json.toJson(state(SaMatch.convert(cacheData)) ++ links)
@@ -95,7 +95,7 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
         .map { vatMatch =>
           val self = s"/organisations/matching/vat/$matchId"
           val selfLink = HalLink("self", self)
-          val links = scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getVat")), true) ++ selfLink
+          val links = scopesHelper.getHalLinks(matchId, None, authScopes, Some(List("getVatDetails")), true) ++ selfLink
           val response = Json.toJson(state(VatMatchingResponse(vatMatch.vrn.mkString)) ++ links)
 
           auditHelper.auditApiResponse(
