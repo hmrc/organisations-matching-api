@@ -363,12 +363,12 @@ paths:
                 allOf:
                   - $ref: '#/components/schemas/errorResponse400'
                   - example:
-                      code: BAD_REQUEST
+                      code: INVALID_REQUEST
               examples:
                 BadRequest:
                   description: The request body does not conform to the schema
                   value:
-                    code: BAD_REQUEST
+                    code: INVALID_REQUEST
         '404':
           description: ''
           headers: {}
