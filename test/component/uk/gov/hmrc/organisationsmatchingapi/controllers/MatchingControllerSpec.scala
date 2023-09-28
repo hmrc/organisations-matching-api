@@ -494,7 +494,7 @@ class MatchingControllerSpec extends BaseSpec {
            |  "_links" : {
            |    "getVatMatch" : {
            |      "href" : "/organisations/matching/vat/$matchId",
-           |      "title" : "Get links to VAT for a matched organisation"
+           |      "title" : "Get links to VAT details for a matched organisation"
            |    },
            |    "self" : {
            |      "href" : "/organisations/matching/vat"
