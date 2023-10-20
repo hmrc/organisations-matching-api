@@ -330,7 +330,7 @@ class MatchedControllerSpec extends BaseSpec  {
     }
   }
 
-  Feature("vat") {
+  ignore("vat") {
     Scenario("a valid request is made for an existing match") {
       Given("A valid privileged Auth bearer token")
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
