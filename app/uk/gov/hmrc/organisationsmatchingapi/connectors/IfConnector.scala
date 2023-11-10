@@ -29,8 +29,10 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class IfConnector @Inject()(
                              servicesConfig: ServicesConfig,
@@ -53,6 +55,26 @@ class IfConnector @Inject()(
   private val integrationFrameworkEnvironment = servicesConfig.getString(
     "microservice.services.integration-framework.environment"
   )
+
+  private def testVatAuthentication() = {
+    Try {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      http.GET[IfVatCustomerInformation](
+          s"$baseUrl/vat/customer/vrn/123456789/information",
+          Seq.empty,
+          Seq(
+            HeaderNames.authorisation -> s"Bearer ${BearerTokens.vat}",
+            "Environment" -> integrationFrameworkEnvironment,
+            "CorrelationId" -> UUID.randomUUID().toString
+          )
+        )
+        .map(_ => logger.info("TestVatAuthentication: IF API#1363 returned 200"))
+        .recover(t => logger.error(s"TestVatAuthentication: IF API#1363 returned error", t))
+    }.failed.map(t => logger.error("TestVatAuthentication: Failed to call IF API#1363", t))
+  }
+
+  testVatAuthentication()
 
   def fetchSelfAssessment(matchId: String, utr: String)(
     implicit hc: HeaderCarrier,
