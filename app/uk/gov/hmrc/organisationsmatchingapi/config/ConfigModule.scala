@@ -20,6 +20,7 @@ import com.google.inject.AbstractModule
 import play.api.{Configuration, Environment}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.http.HttpClient
+import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.play.bootstrap.auth.DefaultAuthConnector
 import uk.gov.hmrc.play.bootstrap.http.DefaultHttpClient
 
@@ -27,6 +28,6 @@ class ConfigModule(environment: Environment, configuration: Configuration) exten
   override def configure(): Unit = {
     bind(classOf[HttpClient]).to(classOf[DefaultHttpClient])
     bind(classOf[AuthConnector]).to(classOf[DefaultAuthConnector])
-
+    bind(classOf[IfConnector]).asEagerSingleton()
   }
 }
