@@ -14,7 +14,7 @@ lazy val scoverageSettings = {
       ".*DocumentationController*;" +
       "uk.gov.hmrc.organisationsmatchingapi.handlers;" +
       ".*definition*;",
-    ScoverageKeys.coverageMinimum := 80,
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true
   )
