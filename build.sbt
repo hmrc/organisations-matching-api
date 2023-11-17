@@ -32,42 +32,34 @@ def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
   }
 
 TwirlKeys.templateImports := Seq.empty
-RoutesKeys.routesImport := Seq(
-  "uk.gov.hmrc.organisationsmatchingapi.Binders._"
-)
+RoutesKeys.routesImport := Seq("uk.gov.hmrc.organisationsmatchingapi.Binders._")
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
   .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
-    majorVersion                     := 0,
-    scalaVersion                     := "2.13.8",
-    libraryDependencies              ++= AppDependencies.compile ++ AppDependencies.test(),
+    majorVersion := 0,
+    scalaVersion := "2.13.8",
+    libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
     scalacOptions += "-Wconf:src=routes/.*:s",
-    testOptions in Test := Seq(Tests.Filter(unitFilter))
+    Test / testOptions := Seq(Tests.Filter(unitFilter))
   )
   .configs(IntegrationTest)
   .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
   .settings(
-    Keys.fork in IntegrationTest := true,
-    unmanagedSourceDirectories in IntegrationTest := (baseDirectory in IntegrationTest)(
-      base => Seq(base / "test")).value,
-    testOptions in IntegrationTest := Seq(Tests.Filter(intTestFilter))
+    IntegrationTest / Keys.fork := true,
+    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value,
+    IntegrationTest / testOptions := Seq(Tests.Filter(intTestFilter))
   )
-
   .configs(ComponentTest)
   .settings(inConfig(ComponentTest)(Defaults.testSettings): _*)
   .settings(
-    testOptions in ComponentTest := Seq(Tests.Filter(componentFilter)),
-    unmanagedSourceDirectories in ComponentTest := (baseDirectory in ComponentTest)(base => Seq(base / "test")).value,
-    testGrouping in ComponentTest := oneForkedJvmPerTest((definedTests in ComponentTest).value),
-    parallelExecution in ComponentTest := false
+    ComponentTest / testOptions := Seq(Tests.Filter(componentFilter)),
+    ComponentTest / unmanagedSourceDirectories := (ComponentTest / baseDirectory)(base => Seq(base / "test")).value,
+    ComponentTest / testGrouping := oneForkedJvmPerTest((ComponentTest / definedTests).value),
+    ComponentTest / parallelExecution := false
   )
-
   .settings(scoverageSettings: _*)
-
-  .settings(resolvers ++= Seq(
-    Resolver.jcenterRepo
-  ))
-  .settings(unmanagedResourceDirectories in Compile += baseDirectory.value / "resources")
+  .settings(resolvers ++= Seq(Resolver.jcenterRepo))
+  .settings(Compile / unmanagedResourceDirectories += baseDirectory.value / "resources")
   .settings(PlayKeys.playDefaultPort := 9657)
