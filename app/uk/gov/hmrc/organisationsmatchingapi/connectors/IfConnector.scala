@@ -29,8 +29,10 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
+import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class IfConnector @Inject()(
                              servicesConfig: ServicesConfig,
@@ -53,6 +55,27 @@ class IfConnector @Inject()(
   private val integrationFrameworkEnvironment = servicesConfig.getString(
     "microservice.services.integration-framework.environment"
   )
+
+  private def testAuthentication[A: HttpReads](path: String, apiName: String, bearerToken: String) = {
+    Try {
+      import scala.concurrent.ExecutionContext.Implicits.global
+      implicit val hc: HeaderCarrier = HeaderCarrier()
+      http.GET[A](
+          s"$baseUrl$path",
+          Seq.empty,
+          Seq(
+            HeaderNames.authorisation -> s"Bearer $bearerToken",
+            "Environment" -> integrationFrameworkEnvironment,
+            "CorrelationId" -> UUID.randomUUID().toString
+          )
+        )
+        .map(_ => logger.info(s"TestAuthentication: $apiName returned 200"))
+        .recover(t => logger.error(s"TestAuthentication: $apiName returned error", t))
+    }.failed.map(t => logger.error(s"TestAuthentication: Failed to call $apiName", t))
+  }
+
+  testAuthentication[IfVatCustomerInformation]("/vat/customer/vrn/123456789/information", "IF API#1363", BearerTokens.vat)
+  testAuthentication[IfCorpTaxCompanyDetails]("/organisations/corporation-tax/12345678/company/details", "IF API#1707", BearerTokens.ct)
 
   def fetchSelfAssessment(matchId: String, utr: String)(
     implicit hc: HeaderCarrier,
