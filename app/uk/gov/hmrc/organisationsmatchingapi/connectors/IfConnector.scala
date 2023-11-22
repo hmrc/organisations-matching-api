@@ -57,6 +57,7 @@ class IfConnector @Inject()(
   )
 
   private def testAuthentication[A: HttpReads](path: String, apiName: String, bearerToken: String) = {
+    val correlationId = UUID.randomUUID().toString
     Try {
       import scala.concurrent.ExecutionContext.Implicits.global
       implicit val hc: HeaderCarrier = HeaderCarrier()
@@ -66,15 +67,15 @@ class IfConnector @Inject()(
           Seq(
             HeaderNames.authorisation -> s"Bearer $bearerToken",
             "Environment" -> integrationFrameworkEnvironment,
-            "CorrelationId" -> UUID.randomUUID().toString
+            "CorrelationId" -> correlationId
           )
         )
-        .map(_ => logger.info(s"TestAuthentication: $apiName returned 200"))
-        .recover(t => logger.error(s"TestAuthentication: $apiName returned error", t))
-    }.failed.map(t => logger.error(s"TestAuthentication: Failed to call $apiName", t))
+        .map(_ => logger.info(s"TestAuthentication: $apiName returned 200 - CorrelationID: $correlationId"))
+        .recover(t => logger.error(s"TestAuthentication: $apiName returned error - CorrelationID: $correlationId", t))
+    }.failed.map(t => logger.error(s"TestAuthentication: Failed to call $apiName - CorrelationID: $correlationId", t))
   }
 
-  testAuthentication[IfVatCustomerInformation]("/vat/customer/vrn/123456789/information", "IF API#1363", BearerTokens.vat)
+  testAuthentication[IfVatCustomerInformation]("/vat/customer/vrn/314171048/information", "IF API#1363", BearerTokens.vat)
   testAuthentication[IfCorpTaxCompanyDetails]("/organisations/corporation-tax/12345678/company/details", "IF API#1707", BearerTokens.ct)
 
   def fetchSelfAssessment(matchId: String, utr: String)(
