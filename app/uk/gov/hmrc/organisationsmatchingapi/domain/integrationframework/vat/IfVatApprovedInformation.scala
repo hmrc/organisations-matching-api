@@ -18,7 +18,7 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat
 
 import play.api.libs.json.{Format, Json}
 
-case class IfVatApprovedInformation(customerDetails: IfVatCustomerDetails, PPOB: IfPPOB)
+case class IfVatApprovedInformation(customerDetails: IfVatCustomerDetails, PPOB: IfPPOB, correspondenceContactDetails: Option[IfVatCorrespondenceContactDetails] = None)
 
 object IfVatApprovedInformation {
   implicit val approvedInformationFormat: Format[IfVatApprovedInformation] = Json.format[IfVatApprovedInformation]

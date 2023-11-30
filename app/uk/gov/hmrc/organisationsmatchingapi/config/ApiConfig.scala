@@ -20,7 +20,7 @@ import com.typesafe.config.Config
 import play.api.ConfigLoader
 import uk.gov.hmrc.organisationsmatchingapi.services.PathTree
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters.{CollectionHasAsScala, SetHasAsScala}
 
 case class ApiConfig(scopes: List[ScopeConfig],
                      internalEndpoints: List[InternalEndpointConfig],
