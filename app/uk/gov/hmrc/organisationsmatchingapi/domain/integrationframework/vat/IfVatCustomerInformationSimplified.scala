@@ -16,19 +16,22 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
 
 case class IfVatCustomerInformationSimplified(vrn: String, organisationName: String, addressLine1: Option[String], postcode: Option[String])
 
 object IfVatCustomerInformationSimplified {
-  implicit val ifVatCustomerInformationSimplifiedFormat: OFormat[IfVatCustomerInformationSimplified] =
+  implicit val ifVatCustomerInformationSimplifiedFormat: Format[IfVatCustomerInformationSimplified] =
     Json.format[IfVatCustomerInformationSimplified]
 
-  def fromOriginalIfData(vrn: String, data: IfVatCustomerInformation): Either[Exception, IfVatCustomerInformationSimplified] = {
+  def fromOriginalIfData(vrn: String, data: IfCorpTaxCompanyDetails): Either[Exception, IfVatCustomerInformationSimplified] = {
     for {
-      organisationName <- data.approvedInformation.customerDetails.organisationName.toRight(missingIfData("organisationName"))
-      address <- data.approvedInformation.PPOB.address.toRight(missingIfData("address"))
-    } yield IfVatCustomerInformationSimplified(vrn, organisationName, address.line1, address.postCode)
+      registeredDetails <- data.registeredDetails.toRight(missingIfData("registeredDetails"))
+      name1 <- registeredDetails.name.flatMap(_.name1).toRight(missingIfData("name1"))
+      name2 = registeredDetails.name.flatMap(_.name2)
+      address <- registeredDetails.address.toRight(missingIfData("address"))
+    } yield IfVatCustomerInformationSimplified(vrn, s"$name1${name2.map(" " + _).mkString}", address.line1, address.postcode)
   }
 
   private def missingIfData(field: String): Exception = new Exception(s"Missing IF data $field")

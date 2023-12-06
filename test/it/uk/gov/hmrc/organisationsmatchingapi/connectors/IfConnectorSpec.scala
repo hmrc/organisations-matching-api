@@ -36,7 +36,6 @@ import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import util.UnitSpec
@@ -68,9 +67,7 @@ class IfConnectorSpec
       "cache.enabled"  -> false,
       "microservice.services.integration-framework.host" -> "127.0.0.1",
       "microservice.services.integration-framework.port" -> "11122",
-      "microservice.services.integration-framework.authorization-token.ct" -> integrationFrameworkAuthorizationToken,
-      "microservice.services.integration-framework.authorization-token.sa" -> integrationFrameworkAuthorizationToken,
-      "microservice.services.integration-framework.authorization-token.vat" -> integrationFrameworkAuthorizationToken,
+      "microservice.services.integration-framework.authorization-token" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.environment" -> integrationFrameworkEnvironment
     )
     .build()
@@ -139,7 +136,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
+        get(urlPathMatching(s"/organisations/corporation-tax/crn/$crn/company/details"))
           .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
           .withHeader("Environment", equalTo(integrationFrameworkEnvironment))
           .withHeader("CorrelationId", equalTo(sampleCorrelationId))
@@ -177,7 +174,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
+        get(urlPathMatching(s"/organisations/corporation-tax/crn/$crn/company/details"))
           .willReturn(aResponse().withStatus(500)))
 
       intercept[InternalServerException] {
@@ -194,7 +191,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
+        get(urlPathMatching(s"/organisations/corporation-tax/crn/$crn/company/details"))
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
 
       intercept[InternalServerException] {
@@ -210,7 +207,7 @@ class IfConnectorSpec
       Mockito.reset(underTest.auditHelper)
 
       stubFor(
-        get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
+        get(urlPathMatching(s"/organisations/corporation-tax/crn/$crn/company/details"))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
 
       intercept[MatchingException] {
@@ -333,16 +330,21 @@ class IfConnectorSpec
 
   "fetch VAT" should {
     val vrn = "123456789"
-    val vatUrl = s"/vat/customer/vrn/$vrn/information"
+    val vatUrl = s"/organisations/corporation-tax/vrn/$vrn/company/details"
 
     "return data on successful request" in new Setup {
       Mockito.reset(underTest.auditHelper)
 
-      val ifResponse = IfVatCustomerInformation(
-        IfVatApprovedInformation(
-          IfVatCustomerDetails(Some("orgName")),
-          IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("postcode"))))
-        )
+      val ifResponse = IfCorpTaxCompanyDetails(
+        utr = None,
+        crn = None,
+        registeredDetails = Some(
+          IfNameAndAddressDetails(
+            name = Some(IfNameDetails(Some("orgName"), None)),
+            address = Some(IfAddress(Some("line1"), None, None, None, Some("postcode")))
+          )
+        ),
+        communicationDetails = None
       )
 
       stubFor(
@@ -358,7 +360,7 @@ class IfConnectorSpec
           )
       )
 
-      val result: IfVatCustomerInformation = await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
+      val result: IfCorpTaxCompanyDetails = await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
 
       verify(underTest.auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())

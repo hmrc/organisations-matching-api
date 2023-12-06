@@ -23,7 +23,6 @@ import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
@@ -41,14 +40,9 @@ class IfConnector @Inject()(
 
   private val baseUrl = servicesConfig.baseUrl("integration-framework")
 
-  private object BearerTokens {
-    val sa = getIFToken("sa")
-    val ct = getIFToken("ct")
-    val vat = getIFToken("vat")
+  private lazy val IFToken: String =
+    servicesConfig.getString(s"microservice.services.integration-framework.authorization-token")
 
-    private def getIFToken(key: String): String =
-      servicesConfig.getString(s"microservice.services.integration-framework.authorization-token.$key")
-  }
 
   private val integrationFrameworkEnvironment = servicesConfig.getString(
     "microservice.services.integration-framework.environment"
@@ -61,7 +55,7 @@ class IfConnector @Inject()(
 
     val SAUrl = s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
-    callIF[IfSaTaxpayerDetails](SAUrl, matchId, BearerTokens.sa)
+    callIF[IfSaTaxpayerDetails](SAUrl, matchId)
   }
 
   def fetchCorporationTax(matchId: String, crn: String)(
@@ -69,18 +63,18 @@ class IfConnector @Inject()(
     request: RequestHeader,
     ec: ExecutionContext): Future[IfCorpTaxCompanyDetails] = {
 
-    val CTUrl = s"$baseUrl/organisations/corporation-tax/$crn/company/details"
+    val CTUrl = s"$baseUrl/organisations/corporation-tax/crn/$crn/company/details"
 
-    callIF[IfCorpTaxCompanyDetails](CTUrl, matchId, BearerTokens.ct)
+    callIF[IfCorpTaxCompanyDetails](CTUrl, matchId)
   }
 
   def fetchVat(matchId: String, vrn: String)(
     implicit hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext): Future[IfVatCustomerInformation] = {
-    val vatUrl = s"$baseUrl/vat/customer/vrn/$vrn/information"
+    ec: ExecutionContext): Future[IfCorpTaxCompanyDetails] = {
+    val vatUrl = s"$baseUrl/organisations/corporation-tax/vrn/$vrn/company/details"
 
-    callIF[IfVatCustomerInformation](vatUrl, matchId, BearerTokens.vat)
+    callIF[IfCorpTaxCompanyDetails](vatUrl, matchId)
   }
 
   private def extractCorrelationId(requestHeader: RequestHeader): String = validateCorrelationId(requestHeader).toString
@@ -91,10 +85,10 @@ class IfConnector @Inject()(
     "CorrelationId" -> extractCorrelationId(requestHeader)
   )
 
-  private def callIF[R: Format : Manifest](url: String, matchId: String, bearerToken: String)
+  private def callIF[R: Format : Manifest](url: String, matchId: String)
                                           (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
     recover[R](
-      http.GET[R](url, headers = setHeaders(request, bearerToken)).map(auditResponse(url, matchId)),
+      http.GET[R](url, headers = setHeaders(request, IFToken)).map(auditResponse(url, matchId)),
       extractCorrelationId(request),
       matchId,
       request,

@@ -21,29 +21,28 @@ import play.api.http.Status
 import play.api.libs.json.{JsValue, Json}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
 
 object IfStub extends MockHost(8443) {
 
 
   def searchCorpTaxCompanyDetails(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
     mock.register(
-      get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
+      get(urlPathEqualTo(s"/organisations/corporation-tax/crn/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(ifCorpTaxCompanyDetails).toString())))
 
   def searchCorpTaxCompanyDetailsNotFound(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
     mock.register(
-      get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
+      get(urlPathEqualTo(s"/organisations/corporation-tax/crn/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.NOT_FOUND).withBody("NO_DATA_FOUND")))
 
   def searchCorpTaxCompanyDetailsRateLimited(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
     mock.register(
-      get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
+      get(urlPathEqualTo(s"/organisations/corporation-tax/crn/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))
 
   def searchCorpTaxCompanyDetailsCustomResponse(crn: String, status: Int, response: JsValue): Unit =
     mock.register(
-      get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
+      get(urlPathEqualTo(s"/organisations/corporation-tax/crn/$crn/company/details"))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
 
   def searchSaCompanyDetails(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails): Unit =
@@ -66,15 +65,15 @@ object IfStub extends MockHost(8443) {
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(status).withBody(Json.toJson(response.toString()).toString())))
 
-  def searchVatInformation(vrn: String, data: IfVatCustomerInformation): Unit =
+  def searchVatInformation(vrn: String, data: IfCorpTaxCompanyDetails): Unit =
     mock.register(
-      get(urlPathEqualTo(s"/vat/customer/vrn/$vrn/information"))
+      get(urlPathEqualTo(s"/organisations/corporation-tax/vrn/$vrn/company/details"))
         .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(data).toString()))
     )
 
   def searchVatInformationNotFound(vrn: String): Unit = {
     mock.register(
-      get(urlPathEqualTo(s"/vat/customer/vrn/$vrn/information"))
+      get(urlPathEqualTo(s"/organisations/corporation-tax/vrn/$vrn/company/details"))
         .willReturn(aResponse().withStatus(Status.NOT_FOUND))
     )
   }

@@ -22,9 +22,8 @@ import play.api.http.Status
 import play.api.libs.json.{JsObject, Json}
 import scalaj.http.{Http, HttpResponse}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 
 import java.util.concurrent.TimeUnit
@@ -68,11 +67,14 @@ class MatchingControllerSpec extends BaseSpec {
       )))
     )))
 
-  val ifVat = IfVatCustomerInformation(
-    IfVatApprovedInformation(
-      IfVatCustomerDetails(Some("name")),
-      IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("NE1 1NE"))))
-    )
+  val ifVat = IfCorpTaxCompanyDetails(
+    utr = None,
+    crn = None,
+    registeredDetails = Some(IfNameAndAddressDetails(
+      name = Some(IfNameDetails(Some("name"), None)),
+      address = Some(IfAddress(Some("line1"), None, None, None, Some("NE1 1NE")))
+    )),
+    communicationDetails = None
   )
 
   Feature("corporation-tax endpoint") {

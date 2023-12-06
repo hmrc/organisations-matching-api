@@ -44,7 +44,7 @@ class AuditHelperSpec  extends AsyncWordSpec with Matchers with MockitoSugar {
   val ifResponse = "bar"
   val crn = "12345678"
   val scopes = "test"
-  val ifUrl = s"host/organisations/corporation-tax/$crn/company/details"
+  val ifUrl = s"host/organisations/corporation-tax/crn/$crn/company/details"
   val matchingUrlCt = s"/organisations-matching/perform-match/cotax?matchId=${matchId}&correlationId=${correlationId}"
   val matchingUrlSa = s"/organisations-matching/perform-match/self-assessment?matchId=${matchId}&correlationId=${correlationId}"
   val matchingResponse: JsValue = Json.toJson("match")

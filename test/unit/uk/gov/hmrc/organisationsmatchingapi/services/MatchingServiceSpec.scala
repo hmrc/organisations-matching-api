@@ -31,7 +31,6 @@ import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, Organisatio
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation, IfVatCustomerInformationSimplified}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.VatMatch
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{VatKnownFacts, VatOrganisationsMatchingRequest}
@@ -39,6 +38,7 @@ import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingServ
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import util.SpecBase
 import org.mockito.ArgumentMatchers.{eq => eqTo}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformationSimplified
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -165,11 +165,16 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
 
   "MatchVat" when {
     val request = VatMatchingRequest("vrn", "orgName", "line1", "postcode")
-    val ifResponse = IfVatCustomerInformation(
-      IfVatApprovedInformation(
-        IfVatCustomerDetails(Some("orgName")),
-        IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("postcode"))))
-      )
+    val ifResponse = IfCorpTaxCompanyDetails(
+      utr = None,
+      crn = None,
+      registeredDetails = Some(
+        IfNameAndAddressDetails(
+          name = Some(IfNameDetails(Some("orgName"), None)),
+          address = Some(IfAddress(Some("line1"), None, None, None, Some("postcode")))
+        )
+      ),
+      communicationDetails = None
     )
     "matching return a match" in {
       given(mockIfConnector.fetchVat(eqTo(matchId.toString), eqTo(request.vrn))(any(), any(), any()))
@@ -178,9 +183,9 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
         VatKnownFacts(request.vrn, request.organisationName, request.addressLine1, request.postcode),
         IfVatCustomerInformationSimplified(
           request.vrn,
-          ifResponse.approvedInformation.customerDetails.organisationName.get,
-          ifResponse.approvedInformation.PPOB.address.flatMap(_.line1),
-          ifResponse.approvedInformation.PPOB.address.flatMap(_.postCode)
+          ifResponse.registeredDetails.get.name.get.name1.get,
+          ifResponse.registeredDetails.flatMap(_.address.flatMap(_.line1)),
+          ifResponse.registeredDetails.flatMap(_.address.flatMap(_.postcode))
         )
       )
       given(mockMatchingConnector.matchCycleVat(eqTo(matchId), eqTo(UUID.randomUUID()), eqTo(orgsMatchingRequest))(any(), any(), any()))
