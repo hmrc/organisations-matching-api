@@ -120,21 +120,21 @@ class IfConnector @Inject()(
       logger.warn("Integration Framework JsValidationException encountered")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
       Future.failed(new InternalServerException("Something went wrong."))
-    case Upstream4xxResponse(msg, 404, _, _) =>
+    case UpstreamErrorResponse(msg, 404, _, _) =>
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       logger.warn("Integration Framework NotFoundException encountered")
       Future.failed(new MatchingException)
-    case Upstream5xxResponse(msg, code, _, _) =>
-      logger.warn(s"Integration Framework Upstream5xxResponse encountered: $code")
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
+    case UpstreamErrorResponse.Upstream5xxResponse(m) =>
+      logger.warn(s"Integration Framework Upstream5xxResponse encountered: ${m.statusCode}")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: ${m.message}")
       Future.failed(new InternalServerException("Something went wrong."))
-    case Upstream4xxResponse(msg, 429, _, _) =>
+    case UpstreamErrorResponse(msg, 429, _, _) =>
       logger.warn(s"Integration Framework Rate limited: $msg")
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"IF Rate limited: $msg")
       Future.failed(new TooManyRequestException(msg))
-    case Upstream4xxResponse(msg, code, _, _) =>
-      logger.warn(s"Integration Framework Upstream4xxResponse encountered: $code")
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
+    case UpstreamErrorResponse.Upstream4xxResponse(m) =>
+      logger.warn(s"Integration Framework Upstream4xxResponse encountered: ${m.statusCode}")
+      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, m.message)
       Future.failed(new InternalServerException("Something went wrong."))
     case e: Exception =>
       logger.error(s"Integration Framework Exception encountered", e)
