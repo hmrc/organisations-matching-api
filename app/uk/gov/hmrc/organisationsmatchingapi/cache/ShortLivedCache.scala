@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
+import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
+
 @Singleton
 class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
                       configuration: Configuration,
@@ -73,24 +75,28 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
       )
     )
 
-    collection
-      .insertOne(entry)
-      .toFuture()
-      .map(_ => InsertSucceeded)
-      .recover {
-        case Duplicate(_) => AlreadyExists
-      }
+    preservingMdc {
+      collection
+        .insertOne(entry)
+        .toFuture()
+        .map(_ => InsertSucceeded)
+        .recover {
+          case Duplicate(_) => AlreadyExists
+        }
+    }
   }
 
   def fetchAndGetEntry[T: Format](id: String): Future[Option[T]] = {
     val decryptor = new JsonDecryptor[T]()
 
-    collection
-      .find(Filters.equal("id", toBson(id)))
-      .headOption()
-      .map {
-        case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
-        case None => None
-      }
+    preservingMdc {
+      collection
+        .find(Filters.equal("id", toBson(id)))
+        .headOption()
+        .map {
+          case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
+          case None => None
+        }
+    }
   }
 }
