@@ -3,6 +3,8 @@ import sbt.Tests.{Group, SubProcess}
 
 val appName = "organisations-matching-api"
 
+lazy val ItTest = config("it") extend Test
+
 lazy val scoverageSettings = {
   import scoverage.ScoverageKeys
   Seq(
@@ -36,21 +38,20 @@ RoutesKeys.routesImport := Seq("uk.gov.hmrc.organisationsmatchingapi.Binders._")
 
 lazy val microservice = Project(appName, file("."))
   .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
-  .disablePlugins(JUnitXmlReportPlugin) //Required to prevent https://github.com/scalatest/scalatest/issues/1427
   .settings(
     onLoadMessage := "",
     majorVersion := 0,
-    scalaVersion := "2.13.8",
+    scalaVersion := "2.13.12",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
     scalacOptions += "-Wconf:src=routes/.*:s",
     Test / testOptions := Seq(Tests.Filter(unitFilter))
   )
-  .configs(IntegrationTest)
-  .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)
+  .configs(ItTest)
+  .settings(inConfig(ItTest)(Defaults.testSettings): _*)
   .settings(
-    IntegrationTest / Keys.fork := true,
-    IntegrationTest / unmanagedSourceDirectories := (IntegrationTest / baseDirectory)(base => Seq(base / "test")).value,
-    IntegrationTest / testOptions := Seq(Tests.Filter(intTestFilter))
+    ItTest / Keys.fork := true,
+    ItTest / unmanagedSourceDirectories := (ItTest / baseDirectory)(base => Seq(base / "test")).value,
+    ItTest / testOptions := Seq(Tests.Filter(intTestFilter))
   )
   .configs(ComponentTest)
   .settings(inConfig(ComponentTest)(Defaults.testSettings): _*)
