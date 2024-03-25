@@ -35,7 +35,8 @@ import javax.inject.Inject
 import scala.concurrent.Future.successful
 import scala.concurrent.{ExecutionContext, Future}
 
-abstract class BaseApiController @Inject()(mcc: MessagesControllerComponents, cc: ControllerComponents) extends BackendController(cc) with AuthorisedFunctions {
+abstract class BaseApiController @Inject() (mcc: MessagesControllerComponents, cc: ControllerComponents)
+    extends BackendController(cc) with AuthorisedFunctions {
 
   protected val logger: Logger = play.api.Logger(this.getClass)
 
@@ -50,24 +51,33 @@ abstract class BaseApiController @Inject()(mcc: MessagesControllerComponents, cc
       .map(f)
       .getOrElse(successful(ErrorInvalidRequest(s"$uuidName format is invalid").toHttpResponse))
 
-  def withValidJson[T](f: T => Future[Result])(implicit request: Request[JsValue],
-                                               r: Reads[T]): Future[Result] =
+  def withValidJson[T](f: T => Future[Result])(implicit request: Request[JsValue], r: Reads[T]): Future[Result] =
     request.body.validate[T] match {
       case JsSuccess(t, _) => f(t)
       case JsError(errors) =>
-        val missingFields = errors.filter(_._2.exists(_.message =="error.path.missing")).map(_._1.toString())
-        if(missingFields.nonEmpty) {
-          Future.failed(new BadRequestException(s"Missing required field(s): ${missingFields.mkString("[", ", ", "]")}"))
+        val missingFields = errors.filter(_._2.exists(_.message == "error.path.missing")).map(_._1.toString())
+        if (missingFields.nonEmpty) {
+          Future.failed(
+            new BadRequestException(s"Missing required field(s): ${missingFields.mkString("[", ", ", "]")}")
+          )
         } else {
           Future.failed(new BadRequestException(mcc.messagesApi(errors.head._2.head.message, errors.head._1)))
         }
     }
 
-  private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(
-    implicit request: RequestHeader,
-    auditHelper: AuditHelper): PartialFunction[Throwable, Result] = {
+  private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(implicit
+    request: RequestHeader,
+    auditHelper: AuditHelper
+  ): PartialFunction[Throwable, Result] = {
     case _: MatchNotFoundException =>
-      auditHelper.auditApiResponse(correlationId.getOrElse("-"), matchId, "", request, url, Some(Json.toJson("Not Found")))
+      auditHelper.auditApiResponse(
+        correlationId.getOrElse("-"),
+        matchId,
+        "",
+        request,
+        url,
+        Some(Json.toJson("Not Found"))
+      )
       ErrorNotFound.toHttpResponse
     case e: InvalidBodyException =>
       auditHelper.auditApiFailure(correlationId, matchId, request, url, e.getMessage)
@@ -103,11 +113,12 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
-  def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(
-    implicit hc: HeaderCarrier,
+  def authenticate(endpointScopes: Iterable[String], matchId: String)(f: Iterable[String] => Future[Result])(implicit
+    hc: HeaderCarrier,
     request: RequestHeader,
     auditHelper: AuditHelper,
-    ec: ExecutionContext): Future[Result] = {
+    ec: ExecutionContext
+  ): Future[Result] = {
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
     authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { scopes =>

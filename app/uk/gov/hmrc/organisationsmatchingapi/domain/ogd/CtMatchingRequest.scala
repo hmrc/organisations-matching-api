@@ -20,10 +20,12 @@ import play.api.libs.json.{Format, JsPath}
 import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads.pattern
 
-case class CtMatchingRequest(companyRegistrationNumber: String,
-                             employerName: String,
-                             addressLine1: String,
-                             postcode: String)
+case class CtMatchingRequest(
+  companyRegistrationNumber: String,
+  employerName: String,
+  addressLine1: String,
+  postcode: String
+)
 
 object CtMatchingRequest {
 
@@ -32,15 +34,15 @@ object CtMatchingRequest {
   implicit val ctMatchingformat: Format[CtMatchingRequest] = Format(
     (
       (JsPath \ "companyRegistrationNumber").read[String](pattern(crnPattern, "error.crn")) and
-      (JsPath \ "employerName").read[String] and
-      (JsPath \ "address" \ "addressLine1").read[String] and
-      (JsPath \ "address" \ "postcode").read[String]
+        (JsPath \ "employerName").read[String] and
+        (JsPath \ "address" \ "addressLine1").read[String] and
+        (JsPath \ "address" \ "postcode").read[String]
     )(CtMatchingRequest.apply _),
     (
       (JsPath \ "companyRegistrationNumber").write[String] and
-      (JsPath \ "employerName").write[String] and
-      (JsPath \ "address" \ "addressLine1").write[String] and
-      (JsPath \ "address" \ "postcode").write[String]
+        (JsPath \ "employerName").write[String] and
+        (JsPath \ "address" \ "addressLine1").write[String] and
+        (JsPath \ "address" \ "postcode").write[String]
     )(unlift(CtMatchingRequest.unapply))
   )
 }

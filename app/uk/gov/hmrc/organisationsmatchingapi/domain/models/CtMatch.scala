@@ -23,16 +23,16 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingRequest, CtMatchingResponse}
 
 case class CtMatch(
-                    request: CtMatchingRequest,
-                    matchId: UUID = randomUUID(),
-                    createdAt: LocalDateTime = LocalDateTime.now(),
-                    utr: Option[String] = None
-                  )
+  request: CtMatchingRequest,
+  matchId: UUID = randomUUID(),
+  createdAt: LocalDateTime = LocalDateTime.now(),
+  utr: Option[String] = None
+)
 
 object CtMatch {
   implicit val formats = Json.format[CtMatch]
 
-  def convert(cacheData: CtMatch) = {
+  def convert(cacheData: CtMatch) =
     Json.toJson(
       CtMatchingResponse(
         cacheData.request.companyRegistrationNumber,
@@ -43,5 +43,4 @@ object CtMatch {
         )
       )
     )
-  }
 }

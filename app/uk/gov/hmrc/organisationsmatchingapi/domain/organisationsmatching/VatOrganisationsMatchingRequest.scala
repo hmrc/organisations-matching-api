@@ -22,5 +22,6 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVa
 case class VatOrganisationsMatchingRequest(matchData: VatKnownFacts, ifMatchData: IfVatCustomerInformationSimplified)
 
 object VatOrganisationsMatchingRequest {
-  implicit val vatOrgsMatchingRequestFormat: OFormat[VatOrganisationsMatchingRequest] = Json.format[VatOrganisationsMatchingRequest]
+  implicit val vatOrgsMatchingRequestFormat: OFormat[VatOrganisationsMatchingRequest] =
+    Json.format[VatOrganisationsMatchingRequest]
 }

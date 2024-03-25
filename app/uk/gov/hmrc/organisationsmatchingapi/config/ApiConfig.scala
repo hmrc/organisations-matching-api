@@ -22,9 +22,11 @@ import uk.gov.hmrc.organisationsmatchingapi.services.PathTree
 
 import scala.jdk.CollectionConverters._
 
-case class ApiConfig(scopes: List[ScopeConfig],
-                     internalEndpoints: List[InternalEndpointConfig],
-                     externalEndpoints: List[ExternalEndpointConfig]) {
+case class ApiConfig(
+  scopes: List[ScopeConfig],
+  internalEndpoints: List[InternalEndpointConfig],
+  externalEndpoints: List[ExternalEndpointConfig]
+) {
 
   def getScope(scope: String): Option[ScopeConfig] =
     scopes.find(c => c.name == scope)
@@ -32,15 +34,12 @@ case class ApiConfig(scopes: List[ScopeConfig],
   def getInternalEndpoint(endpoint: String): Option[InternalEndpointConfig] =
     internalEndpoints.find(e => e.name == endpoint)
 
-  def getExternalEndpoint(endpoint:String): Option[ExternalEndpointConfig] =
+  def getExternalEndpoint(endpoint: String): Option[ExternalEndpointConfig] =
     externalEndpoints.find(e => e.name == endpoint)
 
 }
 
-case class ScopeConfig(name: String,
-                       fields: List[String],
-                       endpoints: List[String],
-                       filters: List[String])
+case class ScopeConfig(name: String, fields: List[String], endpoints: List[String], filters: List[String])
 
 trait EndpointConfig {
   val name: String
@@ -48,16 +47,20 @@ trait EndpointConfig {
   val title: String
 }
 
-case class InternalEndpointConfig(override val name: String,
-                                  override val link: String,
-                                  override val title: String,
-                                  fields: Map[String, String],
-                                  filters: Map[String, String]) extends EndpointConfig
+case class InternalEndpointConfig(
+  override val name: String,
+  override val link: String,
+  override val title: String,
+  fields: Map[String, String],
+  filters: Map[String, String]
+) extends EndpointConfig
 
-case class ExternalEndpointConfig(override val name: String,
-                                  override val link: String,
-                                  override val title: String,
-                                  key: String) extends EndpointConfig
+case class ExternalEndpointConfig(
+  override val name: String,
+  override val link: String,
+  override val title: String,
+  key: String
+) extends EndpointConfig
 
 object ApiConfig {
 
@@ -66,8 +69,8 @@ object ApiConfig {
 
       val config = rootConfig.getConfig(path)
 
-      def parseConfig(path: String): Option[PathTree] = {
-        if(config.hasPath(path)) {
+      def parseConfig(path: String): Option[PathTree] =
+        if (config.hasPath(path)) {
           val keys: List[String] = config
             .getConfig(path)
             .entrySet()
@@ -75,9 +78,7 @@ object ApiConfig {
             .map(x => x.getKey.replace("\"", ""))
             .toList
           Some(PathTree(keys, "\\."))
-        }
-        else None
-      }
+        } else None
 
       def getStringList(key: String): List[String] = if (config.hasPath(key))
         config.getStringList(key).asScala.toList
@@ -85,35 +86,58 @@ object ApiConfig {
 
       val intEndpointsOpt = parseConfig("endpoints.internal")
       val internalEndpointConfig: List[InternalEndpointConfig] =
-        intEndpointsOpt.map(intEndpoints => intEndpoints.listChildren.map(endpointName =>
-          InternalEndpointConfig(
-            name = endpointName,
-            link = config.getString(s"endpoints.internal.$endpointName.endpoint"),
-            title = config.getString(s"endpoints.internal.$endpointName.title"),
-            fields = getStringList(s"endpoints.internal.$endpointName.fields")
-              .map(field => (field, config.getString(s"fields.$field"))).toMap,
-            filters =  getStringList(s"endpoints.internal.$endpointName.filters")
-              .map(filter => (filter, config.getString(s"filters.$filter"))).toMap,
-          )).toList).getOrElse(List())
+        intEndpointsOpt
+          .map(intEndpoints =>
+            intEndpoints.listChildren
+              .map(endpointName =>
+                InternalEndpointConfig(
+                  name = endpointName,
+                  link = config.getString(s"endpoints.internal.$endpointName.endpoint"),
+                  title = config.getString(s"endpoints.internal.$endpointName.title"),
+                  fields = getStringList(s"endpoints.internal.$endpointName.fields")
+                    .map(field => (field, config.getString(s"fields.$field")))
+                    .toMap,
+                  filters = getStringList(s"endpoints.internal.$endpointName.filters")
+                    .map(filter => (filter, config.getString(s"filters.$filter")))
+                    .toMap
+                )
+              )
+              .toList
+          )
+          .getOrElse(List())
 
       val extEndpointsOpt = parseConfig("endpoints.external")
       val externalEndpointConfig: List[ExternalEndpointConfig] =
-        extEndpointsOpt.map(extEndpoints => extEndpoints.listChildren.map(key =>
-          ExternalEndpointConfig(
-            name = key,
-            key = config.getString(s"endpoints.external.$key.key"),
-            link = config.getString(s"endpoints.external.$key.endpoint"),
-            title = config.getString(s"endpoints.external.$key.title")
-          )).toList).getOrElse(List())
+        extEndpointsOpt
+          .map(extEndpoints =>
+            extEndpoints.listChildren
+              .map(key =>
+                ExternalEndpointConfig(
+                  name = key,
+                  key = config.getString(s"endpoints.external.$key.key"),
+                  link = config.getString(s"endpoints.external.$key.endpoint"),
+                  title = config.getString(s"endpoints.external.$key.title")
+                )
+              )
+              .toList
+          )
+          .getOrElse(List())
 
       val scopesOpt = parseConfig("scopes")
-      val scopeConfig = scopesOpt.map(scopes => scopes.listChildren
-        .map(key => ScopeConfig(
-          name = key,
-          fields = getStringList(s"""scopes."$key".fields"""),
-          endpoints = getStringList(s"""scopes."$key".endpoints"""),
-          filters = getStringList(s"""scopes."$key".filters""")))
-        .toList).getOrElse(List())
+      val scopeConfig = scopesOpt
+        .map(scopes =>
+          scopes.listChildren
+            .map(key =>
+              ScopeConfig(
+                name = key,
+                fields = getStringList(s"""scopes."$key".fields"""),
+                endpoints = getStringList(s"""scopes."$key".endpoints"""),
+                filters = getStringList(s"""scopes."$key".filters""")
+              )
+            )
+            .toList
+        )
+        .getOrElse(List())
 
       ApiConfig(
         scopes = scopeConfig,

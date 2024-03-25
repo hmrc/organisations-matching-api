@@ -27,7 +27,7 @@ object IfNameDetails {
   private val reads = (
     (JsPath \ "name1").readNullable[String](maxLength(100)) and
       (JsPath \ "name2").readNullable[String](maxLength(100))
-    )(IfNameDetails.apply _)
+  )(IfNameDetails.apply _)
 
   private val writes = Json.writes[IfNameDetails]
 

@@ -36,27 +36,24 @@ import scala.concurrent.{ExecutionContext, Future}
 
 case class SensitiveT[T](override val decryptedValue: T) extends Sensitive[T]
 @Singleton
-class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
-                      configuration: Configuration,
-                      mongo: MongoComponent)(implicit ec: ExecutionContext
-                     ) extends PlayMongoRepository[Entry](
-  mongoComponent = mongo,
-  collectionName = cacheConfig.colName,
-  domainFormat   = Entry.format,
-  replaceIndexes = true,
-  indexes        = Seq(
-    IndexModel(
-      ascending("id"),
-      IndexOptions().name("_id").
-        unique(true).
-        background(false).
-        sparse(true)),
-    IndexModel(
-      ascending("modifiedDetails.lastUpdated"),
-      IndexOptions().name("lastUpdatedIndex").
-        background(false).
-        expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)))
-) {
+class ShortLivedCache @Inject() (
+  val cacheConfig: CacheConfiguration,
+  configuration: Configuration,
+  mongo: MongoComponent
+)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[Entry](
+      mongoComponent = mongo,
+      collectionName = cacheConfig.colName,
+      domainFormat = Entry.format,
+      replaceIndexes = true,
+      indexes = Seq(
+        IndexModel(ascending("id"), IndexOptions().name("_id").unique(true).background(false).sparse(true)),
+        IndexModel(
+          ascending("modifiedDetails.lastUpdated"),
+          IndexOptions().name("lastUpdatedIndex").background(false).expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)
+        )
+      )
+    ) {
 
   implicit lazy val crypto: Encrypter with Decrypter =
     new ApplicationCrypto(configuration.underlying).JsonCrypto
@@ -80,8 +77,8 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
         .insertOne(entry)
         .toFuture()
         .map(_ => InsertSucceeded)
-        .recover {
-          case Duplicate(_) => AlreadyExists
+        .recover { case Duplicate(_) =>
+          AlreadyExists
         }
     }
   }
@@ -95,7 +92,7 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
         .headOption()
         .map {
           case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
-          case None => None
+          case None        => None
         }
     }
   }

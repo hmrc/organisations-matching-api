@@ -18,10 +18,7 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import play.api.libs.json.Json
 
-case class CtKnownFacts(crn: String,
-                        name: String,
-                        line1: String,
-                        postcode: String)
+case class CtKnownFacts(crn: String, name: String, line1: String, postcode: String)
 
 object CtKnownFacts {
   implicit val formats = Json.format[CtKnownFacts]

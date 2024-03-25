@@ -22,9 +22,11 @@ import play.api.libs.json.Reads.pattern
 
 import scala.util.matching.Regex
 
-case class IfSaTaxpayerDetails(utr: Option[String],
-                               taxpayerType: Option[String],
-                               taxpayerDetails: Option[Seq[IfSaTaxpayerNameAddress]])
+case class IfSaTaxpayerDetails(
+  utr: Option[String],
+  taxpayerType: Option[String],
+  taxpayerDetails: Option[Seq[IfSaTaxpayerNameAddress]]
+)
 
 object IfSaTaxpayerDetails {
 
@@ -35,7 +37,7 @@ object IfSaTaxpayerDetails {
     (JsPath \ "utr").readNullable[String](pattern(utrPattern, "UTR is in the incorrect Format")) and
       (JsPath \ "taxpayerType").readNullable[String](pattern(taxpayerTypePattern, "Taxpayer type is not valid")) and
       (JsPath \ "taxpayerDetails").readNullable[Seq[IfSaTaxpayerNameAddress]]
-    )(IfSaTaxpayerDetails.apply _)
+  )(IfSaTaxpayerDetails.apply _)
 
   private val writes = Json.writes[IfSaTaxpayerDetails]
 

@@ -19,11 +19,13 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 import play.api.libs.json.{Format, JsPath}
 import play.api.libs.functional.syntax._
 
-case class SaMatchingRequest(selfAssessmentUniqueTaxPayerRef: String,
-                             taxPayerType: String,
-                             taxPayerName: String,
-                             addressLine1: String,
-                             postcode: String)
+case class SaMatchingRequest(
+  selfAssessmentUniqueTaxPayerRef: String,
+  taxPayerType: String,
+  taxPayerName: String,
+  addressLine1: String,
+  postcode: String
+)
 
 object SaMatchingRequest {
 
@@ -34,13 +36,13 @@ object SaMatchingRequest {
         (JsPath \ "taxPayerName").read[String] and
         (JsPath \ "address" \ "addressLine1").read[String] and
         (JsPath \ "address" \ "postcode").read[String]
-      ) (SaMatchingRequest.apply _),
+    )(SaMatchingRequest.apply _),
     (
       (JsPath \ "selfAssessmentUniqueTaxPayerRef").write[String] and
-      (JsPath \ "taxPayerType").write[String] and
-      (JsPath \ "taxPayerName").write[String] and
-      (JsPath \ "address" \ "addressLine1").write[String] and
-      (JsPath \ "address" \ "postcode").write[String]
+        (JsPath \ "taxPayerType").write[String] and
+        (JsPath \ "taxPayerName").write[String] and
+        (JsPath \ "address" \ "addressLine1").write[String] and
+        (JsPath \ "address" \ "postcode").write[String]
     )(unlift(SaMatchingRequest.unapply))
   )
 
