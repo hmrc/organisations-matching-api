@@ -32,10 +32,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IfConnector @Inject()(
-                             servicesConfig: ServicesConfig,
-                             http: HttpClient,
-                             val auditHelper: AuditHelper) {
+class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, val auditHelper: AuditHelper) {
 
   private val logger = Logger(classOf[IfConnector].getName)
 
@@ -54,30 +51,33 @@ class IfConnector @Inject()(
     "microservice.services.integration-framework.environment"
   )
 
-  def fetchSelfAssessment(matchId: String, utr: String)(
-    implicit hc: HeaderCarrier,
+  def fetchSelfAssessment(matchId: String, utr: String)(implicit
+    hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext): Future[IfSaTaxpayerDetails] = {
+    ec: ExecutionContext
+  ): Future[IfSaTaxpayerDetails] = {
 
     val SAUrl = s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
 
     callIF[IfSaTaxpayerDetails](SAUrl, matchId, BearerTokens.sa)
   }
 
-  def fetchCorporationTax(matchId: String, crn: String)(
-    implicit hc: HeaderCarrier,
+  def fetchCorporationTax(matchId: String, crn: String)(implicit
+    hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext): Future[IfCorpTaxCompanyDetails] = {
+    ec: ExecutionContext
+  ): Future[IfCorpTaxCompanyDetails] = {
 
     val CTUrl = s"$baseUrl/organisations/corporation-tax/$crn/company/details"
 
     callIF[IfCorpTaxCompanyDetails](CTUrl, matchId, BearerTokens.ct)
   }
 
-  def fetchVat(matchId: String, vrn: String)(
-    implicit hc: HeaderCarrier,
+  def fetchVat(matchId: String, vrn: String)(implicit
+    hc: HeaderCarrier,
     request: RequestHeader,
-    ec: ExecutionContext): Future[IfVatCustomerInformation] = {
+    ec: ExecutionContext
+  ): Future[IfVatCustomerInformation] = {
     val vatUrl = s"$baseUrl/vat/customer/vrn/$vrn/information"
 
     callIF[IfVatCustomerInformation](vatUrl, matchId, BearerTokens.vat)
@@ -87,12 +87,15 @@ class IfConnector @Inject()(
 
   private def setHeaders(requestHeader: RequestHeader, bearerToken: String): Seq[(String, String)] = Seq(
     HeaderNames.authorisation -> s"Bearer $bearerToken",
-    "Environment" -> integrationFrameworkEnvironment,
-    "CorrelationId" -> extractCorrelationId(requestHeader)
+    "Environment"             -> integrationFrameworkEnvironment,
+    "CorrelationId"           -> extractCorrelationId(requestHeader)
   )
 
-  private def callIF[R: Format : Manifest](url: String, matchId: String, bearerToken: String)
-                                          (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext) = {
+  private def callIF[R: Format: Manifest](url: String, matchId: String, bearerToken: String)(implicit
+    hc: HeaderCarrier,
+    request: RequestHeader,
+    ec: ExecutionContext
+  ) =
     recover[R](
       http.GET[R](url, headers = setHeaders(request, bearerToken)).map(auditResponse(url, matchId)),
       extractCorrelationId(request),
@@ -100,25 +103,32 @@ class IfConnector @Inject()(
       request,
       url
     )
-  }
 
-  private def auditResponse[R: Format](url: String, matchId: String)(response: R)
-                                      (implicit hc: HeaderCarrier, request: RequestHeader): R = {
+  private def auditResponse[R: Format](url: String, matchId: String)(
+    response: R
+  )(implicit hc: HeaderCarrier, request: RequestHeader): R = {
     val responseStr = Json.toJson(response).toString
     val correlationId = extractCorrelationId(request)
     auditHelper.auditIfApiResponse(correlationId, matchId, request, url, responseStr)
     response
   }
 
-  private def recover[T](x: Future[T],
-                         correlationId: String,
-                         matchId: String,
-                         request: RequestHeader,
-                         requestUrl: String)
-                        (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
+  private def recover[T](
+    x: Future[T],
+    correlationId: String,
+    matchId: String,
+    request: RequestHeader,
+    requestUrl: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
     case validationError: JsValidationException =>
       logger.warn("Integration Framework JsValidationException encountered")
-      auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, s"Error parsing IF response: ${validationError.errors}")
+      auditHelper.auditIfApiFailure(
+        correlationId,
+        matchId,
+        request,
+        requestUrl,
+        s"Error parsing IF response: ${validationError.errors}"
+      )
       Future.failed(new InternalServerException("Something went wrong."))
     case UpstreamErrorResponse(msg, 404, _, _) =>
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)

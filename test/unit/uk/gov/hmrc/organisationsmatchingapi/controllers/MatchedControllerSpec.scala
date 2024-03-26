@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers

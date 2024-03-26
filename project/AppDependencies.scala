@@ -5,33 +5,28 @@ import sbt._
 object AppDependencies {
 
   val hmrc = "uk.gov.hmrc"
-  val hmrcMongo = "uk.gov.hmrc.mongo"
-  val mongoVersion = "0.73.0"
-  val bootstrapVersion = "7.23.0"
+  val playVersion = "play-30"
+  val hmrcMongoVersion = "1.7.0"
+  var bootstrapVersion = "8.4.0"
 
   val compile: Seq[ModuleID] = Seq(
     ws,
-    hmrcMongo  %% "hmrc-mongo-play-28"         % mongoVersion,
-    hmrc       %% "bootstrap-backend-play-28"  % bootstrapVersion,
-    hmrc       %% "play-hmrc-api"              % "7.1.0-play-28",
-    hmrc       %% "play-hal"                   % "3.4.0-play-28",
-    hmrc       %% "json-encryption"            % "5.1.0-play-28"
+    s"$hmrc.mongo" %% s"hmrc-mongo-$playVersion"    % hmrcMongoVersion,
+    "uk.gov.hmrc"  %% s"play-hmrc-api-$playVersion" % "8.0.0",
+    hmrc           %% s"play-hal-$playVersion"      % "4.0.0",
+    hmrc           %% s"crypto-json-$playVersion"   % "7.6.0"
   )
 
   def test(scope: String = "test, it, component") = Seq(
-    hmrc                           %% "bootstrap-test-play-28"   % bootstrapVersion    % scope,
-    hmrcMongo                      %% "hmrc-mongo-test-play-28"  % "0.73.0"            % scope,
+    hmrc                           %% s"bootstrap-test-$playVersion" % bootstrapVersion % scope,
+    s"$hmrc.mongo"                 %% s"hmrc-mongo-test-$playVersion" % hmrcMongoVersion % scope,
     "org.scalatestplus"            %% "mockito-3-4"              % "3.2.7.0"           % scope,
-    "org.scalatestplus"            %% "scalacheck-1-15"          % "3.2.10.0"          % scope,
-    "org.scalatest"                %% "scalatest"                % "3.2.9"             % scope,
-    "com.typesafe.play"            %% "play-test"                % PlayVersion.current % scope,
-    "com.vladsch.flexmark"         %  "flexmark-all"             % "0.36.8"            % scope,
-    "org.scalatestplus.play"       %% "scalatestplus-play"       % "4.0.3"             % scope,
-    "org.pegdown"                  %  "pegdown"                  % "1.6.0"             % scope,
-    "com.github.tomakehurst"       %  "wiremock-jre8"            % "2.27.2"            % scope,
-    "org.mockito"                  %  "mockito-core"             % "3.8.0"             % scope,
-    "org.scalaj"                   %% "scalaj-http"              % "2.4.2"             % scope,
-    "com.fasterxml.jackson.module" %% "jackson-module-scala"     % "2.12.2"            % scope
+    "org.scalatestplus"            %% "scalacheck-1-17"          % "3.2.16.0"          % scope,
+    "org.scalatest"                %% "scalatest"                % "3.2.15"            % scope,
+    "org.playframework"            %% "play-test"                % PlayVersion.current % scope,
+    "org.scalatestplus.play"       %% "scalatestplus-play"       % "7.0.0"             % scope,
+    "org.wiremock"                 % "wiremock-standalone"       % "3.0.4"             % scope,
+    "org.scalaj"                   %% "scalaj-http"              % "2.4.2"             % scope
   )
 
 }

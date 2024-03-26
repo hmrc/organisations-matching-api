@@ -33,15 +33,15 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class MatchedController @Inject()(val authConnector: AuthConnector,
-                                  cc: ControllerComponents,
-                                  mcc: MessagesControllerComponents,
-                                  scopeService: ScopesService,
-                                  scopesHelper: ScopesHelper,
-                                  matchedService: MatchedService)
-                                 (implicit auditHelper: AuditHelper,
-                                  ec: ExecutionContext) extends BaseApiController(mcc, cc)
-  with PrivilegedAuthentication {
+class MatchedController @Inject() (
+  val authConnector: AuthConnector,
+  cc: ControllerComponents,
+  mcc: MessagesControllerComponents,
+  scopeService: ScopesService,
+  scopesHelper: ScopesHelper,
+  matchedService: MatchedService
+)(implicit auditHelper: AuditHelper, ec: ExecutionContext)
+    extends BaseApiController(mcc, cc) with PrivilegedAuthentication {
 
   def matchedOrganisationCt(matchId: String): Action[AnyContent] = Action.async { implicit request =>
     val self = s"/organisations/matching/corporation-tax/$matchId"
@@ -49,14 +49,18 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
       val correlationId = validateCorrelationId(request)
       withValidUuid(matchId, "matchId") { matchIdUuid =>
         matchedService.fetchCt(matchIdUuid) map { cacheData =>
-
           val exclude = Some(List("getSelfAssessmentDetails", "getVatDetails"))
           val selfLink = HalLink("self", self)
           val links = scopesHelper.getHalLinks(matchIdUuid, exclude, authScopes, None, true) ++ selfLink
           val response = Json.toJson(state(CtMatch.convert(cacheData)) ++ links)
 
           auditHelper.auditApiResponse(
-            correlationId.toString, matchId, authScopes.mkString(","), request, selfLink.toString, Some(response)
+            correlationId.toString,
+            matchId,
+            authScopes.mkString(","),
+            request,
+            selfLink.toString,
+            Some(response)
           )
 
           Ok(response)
@@ -71,14 +75,18 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
       val correlationId = validateCorrelationId(request)
       withValidUuid(matchId, "matchId") { matchIdUuuid =>
         matchedService.fetchSa(matchIdUuuid) map { cacheData =>
-
           val exclude = Some(List("getCorporationTaxDetails", "getVatDetails"))
           val selfLink = HalLink("self", self)
           val links = scopesHelper.getHalLinks(matchIdUuuid, exclude, authScopes, None, true) ++ selfLink
           val response = Json.toJson(state(SaMatch.convert(cacheData)) ++ links)
 
           auditHelper.auditApiResponse(
-            correlationId.toString, matchId, authScopes.mkString(","), request, selfLink.toString, Some(response)
+            correlationId.toString,
+            matchId,
+            authScopes.mkString(","),
+            request,
+            selfLink.toString,
+            Some(response)
           )
 
           Ok(response)
@@ -99,7 +107,12 @@ class MatchedController @Inject()(val authConnector: AuthConnector,
           val response = Json.toJson(state(VatMatchingResponse(vatMatch.vrn.mkString)) ++ links)
 
           auditHelper.auditApiResponse(
-            correlationId.toString, matchId.toString, authScopes.mkString(","), request, selfLink.toString, Some(response)
+            correlationId.toString,
+            matchId.toString,
+            authScopes.mkString(","),
+            request,
+            selfLink.toString,
+            Some(response)
           )
           Ok(response)
         }

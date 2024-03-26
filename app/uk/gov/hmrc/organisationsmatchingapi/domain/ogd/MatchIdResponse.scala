@@ -20,12 +20,10 @@ import java.util.UUID
 
 import play.api.libs.json.{Format, Json}
 
-case class MatchIdResponse( matchId: UUID )
+case class MatchIdResponse(matchId: UUID)
 
 object MatchIdResponse {
 
   implicit val matchIdformat: Format[MatchIdResponse] = Json.format[MatchIdResponse]
 
 }
-
-

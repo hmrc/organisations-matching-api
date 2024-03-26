@@ -20,11 +20,13 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.Reads._
 import play.api.libs.json.{Format, JsPath, Json}
 
-case class IfAddress(line1: Option[String],
-                     line2: Option[String],
-                     line3: Option[String],
-                     line4: Option[String],
-                     postcode: Option[String])
+case class IfAddress(
+  line1: Option[String],
+  line2: Option[String],
+  line3: Option[String],
+  line4: Option[String],
+  postcode: Option[String]
+)
 
 object IfAddress {
 
@@ -34,7 +36,7 @@ object IfAddress {
       (JsPath \ "line3").readNullable[String](maxLength(100)) and
       (JsPath \ "line4").readNullable[String](maxLength(100)) and
       (JsPath \ "postcode").readNullable[String](maxLength(10))
-    )(IfAddress.apply _)
+  )(IfAddress.apply _)
 
   private val writes = Json.writes[IfAddress]
 

@@ -24,25 +24,30 @@ import play.api.hal.{HalLink, HalResource}
 import play.api.libs.json.JsValue
 import uk.gov.hmrc.organisationsmatchingapi.config.EndpointConfig
 
-class ScopesHelper @Inject()(scopesService: ScopesService) {
+class ScopesHelper @Inject() (scopesService: ScopesService) {
 
-  /**
-    * @param scopes The list of scopes associated with the user
-    * @param endpoints The endpoint that the user has called
-    * @return A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
+  /** @param scopes
+    *   The list of scopes associated with the user
+    * @param endpoints
+    *   The endpoint that the user has called
+    * @return
+    *   A google fields-style query string with the fields determined by the provided endpoint(s) and scopes
     */
   def getQueryStringFor(scopes: Iterable[String], endpoints: List[String]): String = {
     val filters = scopesService.getValidFilters(scopes, endpoints)
     s"${PathTree(scopesService.getIfDataPaths(scopes, endpoints)).toString}${if (filters.nonEmpty)
-      s"&filter=${filters.mkString("&filter=")}"
-    else ""}"
+        s"&filter=${filters.mkString("&filter=")}"
+      else ""}"
   }
 
-  /**
-    * @param endpoint The endpoint that the user has called
-    * @param scopes The list of scopes associated with the user
-    * @param data The data to be returned from the endpoint
-    * @return A HalResource containing data, and a list of valid links determined by the provided scopes
+  /** @param endpoint
+    *   The endpoint that the user has called
+    * @param scopes
+    *   The list of scopes associated with the user
+    * @param data
+    *   The data to be returned from the endpoint
+    * @return
+    *   A HalResource containing data, and a list of valid links determined by the provided scopes
     */
   def getHalResponse(endpoint: String, scopes: List[String], data: Option[JsValue]): HalResource = {
 
@@ -62,34 +67,41 @@ class ScopesHelper @Inject()(scopesService: ScopesService) {
     state(data) ++ linksSeq(hateoasLinks)
   }
 
-  def getHalLinks(matchId: UUID,
-                  excludeList: Option[List[String]],
-                  scopes: Iterable[String],
-                  allowedList: Option[List[String]],
-                  excludeInternal: Boolean = false): HalResource = {
+  def getHalLinks(
+    matchId: UUID,
+    excludeList: Option[List[String]],
+    scopes: Iterable[String],
+    allowedList: Option[List[String]],
+    excludeInternal: Boolean = false
+  ): HalResource = {
 
     val links = excludeInternal match {
-      case true  => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
-      case false => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getInternalEndpoints(scopes)) ++
-        getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
+      case true => getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
+      case false =>
+        getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getInternalEndpoints(scopes)) ++
+          getAllHalLinks(matchId, excludeList, allowedList, () => scopesService.getExternalEndpoints(scopes))
     }
 
     linksSeq(links)
   }
 
   private def getAllHalLinks(
-                              matchId: UUID,
-                              excludeList: Option[List[String]],
-                              allowedList: Option[List[String]],
-                              getEndpoints: () => Iterable[EndpointConfig]): Seq[HalLink] =
+    matchId: UUID,
+    excludeList: Option[List[String]],
+    allowedList: Option[List[String]],
+    getEndpoints: () => Iterable[EndpointConfig]
+  ): Seq[HalLink] =
     getEndpoints()
       .filter(c =>
         !excludeList.getOrElse(List()).contains(c.name) &&
-          allowedList.getOrElse(getEndpoints().map(e => e.name).toList).contains(c.name))
+          allowedList.getOrElse(getEndpoints().map(e => e.name).toList).contains(c.name)
+      )
       .map(endpoint =>
         HalLink(
           rel = endpoint.name,
           href = endpoint.link.replace("<matchId>", s"$matchId"),
-          title = Some(endpoint.title)))
+          title = Some(endpoint.title)
+        )
+      )
       .toSeq
 }

@@ -20,51 +20,48 @@ import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
-import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Protected}
+import uk.gov.hmrc.crypto.json.JsonEncryption
+import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Sensitive}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.organisationsmatchingapi.cache.InsertResult.{AlreadyExists, InsertSucceeded}
 import uk.gov.hmrc.organisationsmatchingapi.cache.MongoErrors.Duplicate
+import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
-import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
-
+case class SensitiveT[T](override val decryptedValue: T) extends Sensitive[T]
 @Singleton
-class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
-                      configuration: Configuration,
-                      mongo: MongoComponent)(implicit ec: ExecutionContext
-                     ) extends PlayMongoRepository[Entry](
-  mongoComponent = mongo,
-  collectionName = cacheConfig.colName,
-  domainFormat   = Entry.format,
-  replaceIndexes = true,
-  indexes        = Seq(
-    IndexModel(
-      ascending("id"),
-      IndexOptions().name("_id").
-        unique(true).
-        background(false).
-        sparse(true)),
-    IndexModel(
-      ascending("modifiedDetails.lastUpdated"),
-      IndexOptions().name("lastUpdatedIndex").
-        background(false).
-        expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)))
-) {
+class ShortLivedCache @Inject() (
+  val cacheConfig: CacheConfiguration,
+  configuration: Configuration,
+  mongo: MongoComponent
+)(implicit ec: ExecutionContext)
+    extends PlayMongoRepository[Entry](
+      mongoComponent = mongo,
+      collectionName = cacheConfig.colName,
+      domainFormat = Entry.format,
+      replaceIndexes = true,
+      indexes = Seq(
+        IndexModel(ascending("id"), IndexOptions().name("_id").unique(true).background(false).sparse(true)),
+        IndexModel(
+          ascending("modifiedDetails.lastUpdated"),
+          IndexOptions().name("lastUpdatedIndex").background(false).expireAfter(cacheConfig.cacheTtl, TimeUnit.SECONDS)
+        )
+      )
+    ) {
 
   implicit lazy val crypto: Encrypter with Decrypter =
     new ApplicationCrypto(configuration.underlying).JsonCrypto
 
   def cache[T: Format](id: String, value: T): Future[InsertResult] = {
 
-    val jsonEncryptor           = new JsonEncryptor[T]()
-    val encryptedValue: JsValue = jsonEncryptor.writes(Protected[T](value))
+    val jsonEncryptor = JsonEncryption.sensitiveEncrypter[T, SensitiveT[T]]
+    val encryptedValue: JsValue = jsonEncryptor.writes(SensitiveT[T](value))
 
     val entry = new Entry(
       id,
@@ -80,14 +77,14 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
         .insertOne(entry)
         .toFuture()
         .map(_ => InsertSucceeded)
-        .recover {
-          case Duplicate(_) => AlreadyExists
+        .recover { case Duplicate(_) =>
+          AlreadyExists
         }
     }
   }
 
   def fetchAndGetEntry[T: Format](id: String): Future[Option[T]] = {
-    val decryptor = new JsonDecryptor[T]()
+    val decryptor = JsonEncryption.sensitiveDecrypter[T, SensitiveT[T]](SensitiveT.apply)
 
     preservingMdc {
       collection
@@ -95,7 +92,7 @@ class ShortLivedCache @Inject() (val cacheConfig: CacheConfiguration,
         .headOption()
         .map {
           case Some(entry) => decryptor.reads(entry.data.value).asOpt map (_.decryptedValue)
-          case None => None
+          case None        => None
         }
     }
   }

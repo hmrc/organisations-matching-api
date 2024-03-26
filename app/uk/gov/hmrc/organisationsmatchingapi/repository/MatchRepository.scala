@@ -24,7 +24,6 @@ import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, ShortLive
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class MatchRepository @Inject()(cacheConfig: CacheConfiguration,
-                                configuration: Configuration,
-                                mongo: MongoComponent)(implicit ec: ExecutionContext)
-  extends ShortLivedCache(cacheConfig, configuration, mongo)
+class MatchRepository @Inject() (cacheConfig: CacheConfiguration, configuration: Configuration, mongo: MongoComponent)(
+  implicit ec: ExecutionContext
+) extends ShortLivedCache(cacheConfig, configuration, mongo)

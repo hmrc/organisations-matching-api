@@ -24,7 +24,3 @@ case class SaOrganisationsMatchingRequest(knownFacts: SaKnownFacts, ifData: IfSa
 object SaOrganisationsMatchingRequest {
   implicit val formatSaOrganisationsMatchingRequest = Json.format[SaOrganisationsMatchingRequest]
 }
-
-
-
-

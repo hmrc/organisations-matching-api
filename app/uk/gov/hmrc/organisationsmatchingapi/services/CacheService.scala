@@ -26,9 +26,9 @@ import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class CacheService @Inject()(
-                              matchRepository: MatchRepository,
-                              val conf: CacheConfiguration)(implicit ec: ExecutionContext) {
+class CacheService @Inject() (matchRepository: MatchRepository, val conf: CacheConfiguration)(implicit
+  ec: ExecutionContext
+) {
 
   lazy val cacheEnabled: Boolean = conf.cacheEnabled
 

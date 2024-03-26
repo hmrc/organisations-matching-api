@@ -20,10 +20,12 @@ import play.api.libs.functional.syntax._
 import play.api.libs.json.{Format, JsPath, Json}
 import play.api.libs.json.Reads.pattern
 
-case class IfCorpTaxCompanyDetails(utr: Option[String],
-                                   crn: Option[String],
-                                   registeredDetails: Option[IfNameAndAddressDetails],
-                                   communicationDetails: Option[IfNameAndAddressDetails])
+case class IfCorpTaxCompanyDetails(
+  utr: Option[String],
+  crn: Option[String],
+  registeredDetails: Option[IfNameAndAddressDetails],
+  communicationDetails: Option[IfNameAndAddressDetails]
+)
 
 object IfCorpTaxCompanyDetails {
 
@@ -35,7 +37,7 @@ object IfCorpTaxCompanyDetails {
       (JsPath \ "crn").readNullable[String](pattern(crnPattern, "CRN is in invalid format")) and
       (JsPath \ "registeredDetails").readNullable[IfNameAndAddressDetails] and
       (JsPath \ "communicationDetails").readNullable[IfNameAndAddressDetails]
-    )(IfCorpTaxCompanyDetails.apply _)
+  )(IfCorpTaxCompanyDetails.apply _)
 
   private val writes = Json.writes[IfCorpTaxCompanyDetails]
 

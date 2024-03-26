@@ -22,15 +22,17 @@ import java.util.UUID.randomUUID
 import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, SaMatchingRequest, SaMatchingResponse}
 
-case class SaMatch(request: SaMatchingRequest,
-                   matchId: UUID = randomUUID(),
-                   createdAt: LocalDateTime = LocalDateTime.now(),
-                   utr: Option[String] = None)
+case class SaMatch(
+  request: SaMatchingRequest,
+  matchId: UUID = randomUUID(),
+  createdAt: LocalDateTime = LocalDateTime.now(),
+  utr: Option[String] = None
+)
 
 object SaMatch {
   implicit val formats = Json.format[SaMatch]
 
-  def convert(cacheData: SaMatch) = {
+  def convert(cacheData: SaMatch) =
     Json.toJson(
       SaMatchingResponse(
         cacheData.request.selfAssessmentUniqueTaxPayerRef,
@@ -42,7 +44,4 @@ object SaMatch {
         )
       )
     )
-  }
 }
-
-

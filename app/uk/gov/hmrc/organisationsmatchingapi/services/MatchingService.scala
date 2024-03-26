@@ -31,44 +31,67 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnow
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class MatchingService @Inject()(ifConnector: IfConnector,
-                                matchingConnector: OrganisationsMatchingConnector,
-                                cacheService: CacheService)
-                               (implicit val ec: ExecutionContext) {
+class MatchingService @Inject() (
+  ifConnector: IfConnector,
+  matchingConnector: OrganisationsMatchingConnector,
+  cacheService: CacheService
+)(implicit val ec: ExecutionContext) {
 
-  def matchCoTax(matchId: UUID, correlationId: String, ctMatchingRequest: CtMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader): Future[JsValue] = {
+  def matchCoTax(matchId: UUID, correlationId: String, ctMatchingRequest: CtMatchingRequest)(implicit
+    hc: HeaderCarrier,
+    header: RequestHeader
+  ): Future[JsValue] =
     for {
       ifData <- ifConnector.fetchCorporationTax(matchId.toString, ctMatchingRequest.companyRegistrationNumber)
-      matched <- matchingConnector.matchCycleCotax(matchId.toString, correlationId, CtOrganisationsMatchingRequest(
-        CtKnownFacts(
-          ctMatchingRequest.companyRegistrationNumber,
-          ctMatchingRequest.employerName,
-          ctMatchingRequest.addressLine1,
-          ctMatchingRequest.postcode
-        ), ifData
-      ))
-      _ <- cacheService.cacheCtUtr(CtMatch(ctMatchingRequest, matchId, LocalDateTime.now(), ifData.utr), ifData.utr.getOrElse(""))
+      matched <- matchingConnector.matchCycleCotax(
+                   matchId.toString,
+                   correlationId,
+                   CtOrganisationsMatchingRequest(
+                     CtKnownFacts(
+                       ctMatchingRequest.companyRegistrationNumber,
+                       ctMatchingRequest.employerName,
+                       ctMatchingRequest.addressLine1,
+                       ctMatchingRequest.postcode
+                     ),
+                     ifData
+                   )
+                 )
+      _ <- cacheService.cacheCtUtr(
+             CtMatch(ctMatchingRequest, matchId, LocalDateTime.now(), ifData.utr),
+             ifData.utr.getOrElse("")
+           )
     } yield matched
-  }
 
-  def matchSaTax(matchId: UUID, correlationId: String, saMatchingRequest: SaMatchingRequest)(implicit hc: HeaderCarrier, header: RequestHeader): Future[JsValue] = {
+  def matchSaTax(matchId: UUID, correlationId: String, saMatchingRequest: SaMatchingRequest)(implicit
+    hc: HeaderCarrier,
+    header: RequestHeader
+  ): Future[JsValue] =
     for {
       ifData <- ifConnector.fetchSelfAssessment(matchId.toString, saMatchingRequest.selfAssessmentUniqueTaxPayerRef)
-      matched <- matchingConnector.matchCycleSelfAssessment(matchId.toString, correlationId, SaOrganisationsMatchingRequest(
-        SaKnownFacts(
-          saMatchingRequest.selfAssessmentUniqueTaxPayerRef,
-          saMatchingRequest.taxPayerType,
-          saMatchingRequest.taxPayerName,
-          saMatchingRequest.addressLine1,
-          saMatchingRequest.postcode
-        ), ifData
-      ))
-      _ <- cacheService.cacheSaUtr(SaMatch(saMatchingRequest, matchId, LocalDateTime.now(), ifData.utr), ifData.utr.getOrElse(""))
+      matched <- matchingConnector.matchCycleSelfAssessment(
+                   matchId.toString,
+                   correlationId,
+                   SaOrganisationsMatchingRequest(
+                     SaKnownFacts(
+                       saMatchingRequest.selfAssessmentUniqueTaxPayerRef,
+                       saMatchingRequest.taxPayerType,
+                       saMatchingRequest.taxPayerName,
+                       saMatchingRequest.addressLine1,
+                       saMatchingRequest.postcode
+                     ),
+                     ifData
+                   )
+                 )
+      _ <- cacheService.cacheSaUtr(
+             SaMatch(saMatchingRequest, matchId, LocalDateTime.now(), ifData.utr),
+             ifData.utr.getOrElse("")
+           )
     } yield matched
-  }
 
-  def matchVat(matchId: UUID, correlationId: UUID, vatMatchingRequest: VatMatchingRequest)
-              (implicit hc: HeaderCarrier, header: RequestHeader): Future[JsValue] = {
+  def matchVat(matchId: UUID, correlationId: UUID, vatMatchingRequest: VatMatchingRequest)(implicit
+    hc: HeaderCarrier,
+    header: RequestHeader
+  ): Future[JsValue] = {
     val vrn = vatMatchingRequest.vrn
     val knownFacts = VatKnownFacts(
       vatMatchingRequest.vrn,
@@ -78,11 +101,11 @@ class MatchingService @Inject()(ifConnector: IfConnector,
     )
 
     for {
-      ifData <- ifConnector.fetchVat(matchId.toString, vrn)
+      ifData       <- ifConnector.fetchVat(matchId.toString, vrn)
       ifSimplified <- Future.fromTry(IfVatCustomerInformationSimplified.fromOriginalIfData(vrn, ifData).toTry)
       request = VatOrganisationsMatchingRequest(knownFacts, ifSimplified)
       matched <- matchingConnector.matchCycleVat(matchId, correlationId, request)
-      _ <- cacheService.cacheVatVrn(VatMatch(matchId, Some(vrn)))
+      _       <- cacheService.cacheVatVrn(VatMatch(matchId, Some(vrn)))
     } yield matched
   }
 

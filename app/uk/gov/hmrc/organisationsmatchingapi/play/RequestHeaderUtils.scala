@@ -51,7 +51,7 @@ object RequestHeaderUtils {
   private def withCorrelationId[A](requestHeader: RequestHeader, onSome: String => A, onNone: () => A) =
     requestHeader.headers.get("CorrelationId") match {
       case Some(uuidString) => onSome(uuidString)
-      case None => onNone()
+      case None             => onNone()
     }
 
   private def getUuidFromString(uuidString: String) =
@@ -82,10 +82,9 @@ object RequestHeaderUtils {
       acceptHeaderRegex.findFirstMatchIn(acceptHeaderValue) map (_.group(1))
     } getOrElse "1.0"
 
-  private def versionedUri(urlPath: String, version: String) = {
+  private def versionedUri(urlPath: String, version: String) =
     urlPath match {
       case "/" => s"/v$version"
-      case _ => s"/v$version$urlPath"
+      case _   => s"/v$version$urlPath"
     }
-  }
 }

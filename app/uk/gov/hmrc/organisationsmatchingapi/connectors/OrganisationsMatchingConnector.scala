@@ -30,67 +30,114 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationsMatchingConnector @Inject()(servicesConfig: ServicesConfig,
-                                               http: HttpClient,
-                                               val auditHelper: AuditHelper) {
+class OrganisationsMatchingConnector @Inject() (
+  servicesConfig: ServicesConfig,
+  http: HttpClient,
+  val auditHelper: AuditHelper
+) {
 
   val logger: Logger = Logger(this.getClass)
 
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
   val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
 
-  def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)
-                     (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
+  def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)(implicit
+    hc: HeaderCarrier,
+    request: RequestHeader,
+    ec: ExecutionContext
+  ): Future[JsValue] = {
 
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
-    recover(http.POST[CtOrganisationsMatchingRequest, JsValue](url, postData, hc.headers(requiredHeaders)) map {
-      response =>
+    recover(
+      http.POST[CtOrganisationsMatchingRequest, JsValue](url, postData, hc.headers(requiredHeaders)) map { response =>
         auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
         response
-    }, correlationId, matchId, request, url)
+      },
+      correlationId,
+      matchId,
+      request,
+      url
+    )
   }
 
-  def matchCycleSelfAssessment(matchId: String, correlationId: String, postData: SaOrganisationsMatchingRequest)
-                              (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
+  def matchCycleSelfAssessment(
+    matchId: String,
+    correlationId: String,
+    postData: SaOrganisationsMatchingRequest
+  )(implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
 
-    val url = s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
+    val url =
+      s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 
-    recover(http.POST[SaOrganisationsMatchingRequest, JsValue](url, postData, hc.headers(requiredHeaders)) map {
-      response =>
+    recover(
+      http.POST[SaOrganisationsMatchingRequest, JsValue](url, postData, hc.headers(requiredHeaders)) map { response =>
         auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
         response
-    }, correlationId, matchId, request, url)
+      },
+      correlationId,
+      matchId,
+      request,
+      url
+    )
 
   }
 
-  def matchCycleVat(matchId: UUID, correlationId: UUID, data: VatOrganisationsMatchingRequest)
-                   (implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
+  def matchCycleVat(matchId: UUID, correlationId: UUID, data: VatOrganisationsMatchingRequest)(implicit
+    hc: HeaderCarrier,
+    request: RequestHeader,
+    ec: ExecutionContext
+  ): Future[JsValue] = {
     val url = s"$baseUrl/organisations-matching/perform-match/vat?matchId=$matchId&correlationId=$correlationId"
 
-    recover(http.POST[VatOrganisationsMatchingRequest, JsValue](url, data, hc.headers(requiredHeaders)).map { response =>
-      auditHelper.auditOrganisationsMatchingResponse(correlationId.toString, matchId.toString, request, url, response)
-      response
-    }, correlationId.toString, matchId.toString, request, url)
+    recover(
+      http.POST[VatOrganisationsMatchingRequest, JsValue](url, data, hc.headers(requiredHeaders)).map { response =>
+        auditHelper.auditOrganisationsMatchingResponse(correlationId.toString, matchId.toString, request, url, response)
+        response
+      },
+      correlationId.toString,
+      matchId.toString,
+      request,
+      url
+    )
   }
 
-  private def recover(x: Future[JsValue],
-                      correlationId: String,
-                      matchId: String,
-                      request: RequestHeader,
-                      requestUrl: String)
-                     (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = x.recoverWith {
+  private def recover(
+    x: Future[JsValue],
+    correlationId: String,
+    matchId: String,
+    request: RequestHeader,
+    requestUrl: String
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = x.recoverWith {
     case notFound: NotFoundException =>
-      auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, requestUrl, Json.toJson(notFound.getMessage))
+      auditHelper.auditOrganisationsMatchingResponse(
+        correlationId,
+        matchId,
+        request,
+        requestUrl,
+        Json.toJson(notFound.getMessage)
+      )
       // No Kibana for security reasons. Splunk only.
       Future.failed(new MatchingException)
     case validationError: JsValidationException =>
       logger.warn("Organisations Matching JsValidationException encountered")
-      auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Error parsing organisations matching response: ${validationError.errors}")
+      auditHelper.auditOrganisationsMatchingFailure(
+        correlationId,
+        matchId,
+        request,
+        requestUrl,
+        s"Error parsing organisations matching response: ${validationError.errors}"
+      )
       Future.failed(new InternalServerException("Something went wrong."))
     case Upstream5xxResponse(msg, code, _, _) =>
       logger.warn(s"Organisations Matching Upstream5xxResponse encountered: $code")
-      auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, s"Internal Server error: $msg")
+      auditHelper.auditOrganisationsMatchingFailure(
+        correlationId,
+        matchId,
+        request,
+        requestUrl,
+        s"Internal Server error: $msg"
+      )
       Future.failed(new InternalServerException("Something went wrong."))
     case Upstream4xxResponse(msg, code, _, _) =>
       logger.warn(s"Organisations Matching Upstream4xxResponse encountered: $code")

@@ -21,9 +21,7 @@ import play.api.libs.json.{Format, JsPath, Json}
 import play.api.libs.json.Reads.{maxLength, pattern}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 
-case class IfSaTaxpayerNameAddress(name: Option[String],
-                                   addressType: Option[String],
-                                   address: Option[IfAddress])
+case class IfSaTaxpayerNameAddress(name: Option[String], addressType: Option[String], address: Option[IfAddress])
 
 object IfSaTaxpayerNameAddress {
 
@@ -33,7 +31,7 @@ object IfSaTaxpayerNameAddress {
     (JsPath \ "name").readNullable[String](maxLength(100)) and
       (JsPath \ "addressType").readNullable[String](pattern(addressTypePattern, "Address type is not valid")) and
       (JsPath \ "address").readNullable[IfAddress]
-    )(IfSaTaxpayerNameAddress.apply _)
+  )(IfSaTaxpayerNameAddress.apply _)
 
   private val writes = Json.writes[IfSaTaxpayerNameAddress]
 

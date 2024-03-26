@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import akka.stream.Materializer
+import org.apache.pekko.stream.Materializer
 import controllers.Assets
 import play.api.Configuration
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
@@ -28,9 +28,10 @@ import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
 
 @Singleton
-class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets, config: Configuration)(
-  implicit materializer: Materializer, executionContext: ExecutionContext)
-  extends BackendController(cc) {
+class DocumentationController @Inject() (cc: ControllerComponents, assets: Assets, config: Configuration)(implicit
+  materializer: Materializer,
+  executionContext: ExecutionContext
+) extends BackendController(cc) {
 
   def specification(version: String, file: String): Action[AnyContent] =
     CORSActionBuilder(config).async { request =>
@@ -52,9 +53,9 @@ class DocumentationController @Inject()(cc: ControllerComponents, assets: Assets
       .withHeaders(CONTENT_TYPE -> JSON)
   }
   def documentation(
-                     version: String,
-                     endpointName: String
-                   ): Action[AnyContent] =
+    version: String,
+    endpointName: String
+  ): Action[AnyContent] =
     assets.at(s"/public/api/documentation/$version", s"${endpointName.replaceAll(" ", "-")}.xml")
 
 }

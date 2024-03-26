@@ -24,12 +24,11 @@ class MatchUuidPathBinder extends PathBindable[UUID] {
 
   private val parameterName = "matchId"
 
-  override def bind(key: String, value: String): Either[String, UUID] = {
-    if(value.isEmpty)
+  override def bind(key: String, value: String): Either[String, UUID] =
+    if (value.isEmpty)
       Left(s"$parameterName is required")
     else
       UuidValidator.validated(value).toRight(s"$parameterName format is invalid")
-  }
 
   override def unbind(key: String, uuid: UUID) = s"$key=${uuid.toString}"
 

@@ -18,17 +18,18 @@ package uk.gov.hmrc.organisationsmatchingapi.audit.models
 
 import play.api.libs.json.{JsValue, Json}
 
-case class OrganisationsMatchingResponseEventModel(deviceId: String,
-                                                   input: String,
-                                                   method: String,
-                                                   userAgent: String,
-                                                   apiVersion: String,
-                                                   matchId: String,
-                                                   correlationId: String,
-                                                   applicationId: String,
-                                                   requestUrl: String,
-                                                   matchingResponse: JsValue)
-
+case class OrganisationsMatchingResponseEventModel(
+  deviceId: String,
+  input: String,
+  method: String,
+  userAgent: String,
+  apiVersion: String,
+  matchId: String,
+  correlationId: String,
+  applicationId: String,
+  requestUrl: String,
+  matchingResponse: JsValue
+)
 
 object OrganisationsMatchingResponseEventModel {
   implicit val formatOrganisationsMatchingResponseEventModel = Json.format[OrganisationsMatchingResponseEventModel]

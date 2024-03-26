@@ -16,8 +16,8 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.platform
 
-import akka.actor.ActorSystem
-import akka.stream.Materializer
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.Materializer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock._
@@ -46,7 +46,6 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
 
   override def newAppForTest(testData: TestData): Application =
     GuiceApplicationBuilder()
-    .disable[com.kenshoo.play.metrics.PlayModule]
     .configure("run.mode" -> "Stub")
     .configure(Map(
       "appName" -> "application-name",
