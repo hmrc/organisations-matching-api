@@ -29,6 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -93,7 +94,7 @@ class OrganisationsMatchingConnectorSpec
     val saPostData: SaOrganisationsMatchingRequest = SaOrganisationsMatchingRequest(saKnownFacts, saIfData)
 
     implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = Seq(correlationIdHeader, applicationIdHeader))
-    implicit val request = FakeRequest()
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
     val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
     val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]

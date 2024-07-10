@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class VatMatchingResponse(vrn: String)
 
 object VatMatchingResponse {
-  implicit val vatMatchingResponseFormat = Json.format[VatMatchingResponse]
+  implicit val vatMatchingResponseFormat: OFormat[VatMatchingResponse] = Json.format[VatMatchingResponse]
 }
