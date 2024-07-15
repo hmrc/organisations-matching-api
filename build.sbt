@@ -28,16 +28,11 @@ def intTestFilter(name: String): Boolean = name startsWith "it"
 def unitFilter(name: String): Boolean = name startsWith "unit"
 def componentFilter(name: String): Boolean = name startsWith "component"
 
-def oneForkedJvmPerTest(tests: Seq[TestDefinition]) =
-  tests.map { test =>
-    new Group(test.name, Seq(test), SubProcess(ForkOptions().withRunJVMOptions(Vector(s"-Dtest.name=${test.name}"))))
-  }
-
 TwirlKeys.templateImports := Seq.empty
 RoutesKeys.routesImport := Seq("uk.gov.hmrc.organisationsmatchingapi.Binders._")
 
 lazy val microservice = Project(appName, file("."))
-  .enablePlugins(play.sbt.PlayScala, SbtAutoBuildPlugin, SbtGitVersioning, SbtDistributablesPlugin)
+  .enablePlugins(play.sbt.PlayScala, SbtDistributablesPlugin)
   .settings(
     onLoadMessage := "",
     majorVersion := 0,
@@ -58,7 +53,6 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     ComponentTest / testOptions := Seq(Tests.Filter(componentFilter)),
     ComponentTest / unmanagedSourceDirectories := (ComponentTest / baseDirectory)(base => Seq(base / "test")).value,
-    ComponentTest / testGrouping := oneForkedJvmPerTest((ComponentTest / definedTests).value),
     ComponentTest / parallelExecution := false
   )
   .settings(scoverageSettings: _*)

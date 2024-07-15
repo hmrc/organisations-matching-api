@@ -16,12 +16,12 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 
 case class SaKnownFacts(utr: String, taxpayerType: String, name: String, line1: String, postcode: String)
 
 object SaKnownFacts {
-  implicit val formats = Json.format[SaKnownFacts]
+  implicit val formats: OFormat[SaKnownFacts] = Json.format[SaKnownFacts]
 }
 
 case class MatchRequestSA(knownFacts: SaKnownFacts, ifData: Seq[SaKnownFacts])

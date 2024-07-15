@@ -19,7 +19,7 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.models
 import java.time.LocalDateTime
 import java.util.UUID
 import java.util.UUID.randomUUID
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, OFormat}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, SaMatchingRequest, SaMatchingResponse}
 
 case class SaMatch(
@@ -30,7 +30,7 @@ case class SaMatch(
 )
 
 object SaMatch {
-  implicit val formats = Json.format[SaMatch]
+  implicit val formats: OFormat[SaMatch] = Json.format[SaMatch]
 
   def convert(cacheData: SaMatch) =
     Json.toJson(

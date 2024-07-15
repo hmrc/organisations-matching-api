@@ -29,6 +29,7 @@ import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
+import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
@@ -84,7 +85,7 @@ class IfConnectorSpec
     val sampleCorrelationIdHeader: (String, String) = "CorrelationId" -> sampleCorrelationId
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val request = FakeRequest().withHeaders(sampleCorrelationIdHeader)
+    implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(sampleCorrelationIdHeader)
 
     val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
     val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]

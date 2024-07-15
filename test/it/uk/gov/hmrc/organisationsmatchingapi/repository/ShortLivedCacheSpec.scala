@@ -40,7 +40,7 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
   val cachekey: String = "test-class-key"
   val testValue: TestClass = TestClass("one", "two")
 
-  override def fakeApplication: Application =
+  override def fakeApplication(): Application =
     GuiceApplicationBuilder()
       .configure("run.mode" -> "Stub")
       .configure(Map(
@@ -51,10 +51,10 @@ class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuit
       .in(Mode.Test)
       .build()
 
-  implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
-  val cacheConfig: CacheConfiguration = fakeApplication.injector.instanceOf[CacheConfiguration]
-  val configuration: Configuration = fakeApplication.injector.instanceOf[Configuration]
-  val mongoComponent: MongoComponent = fakeApplication.injector.instanceOf[MongoComponent]
+  implicit val ec: ExecutionContext = fakeApplication().injector.instanceOf[ExecutionContext]
+  val cacheConfig: CacheConfiguration = fakeApplication().injector.instanceOf[CacheConfiguration]
+  val configuration: Configuration = fakeApplication().injector.instanceOf[Configuration]
+  val mongoComponent: MongoComponent = fakeApplication().injector.instanceOf[MongoComponent]
 
   val shortLivedCache = new ShortLivedCache(cacheConfig, configuration, mongoComponent)
 
