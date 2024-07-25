@@ -17,17 +17,18 @@
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.Logger
+import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, JsValidationException, NotFoundException, Upstream4xxResponse, Upstream5xxResponse}
+import uk.gov.hmrc.http.HttpReads.Implicits._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, JsValidationException, UpstreamErrorResponse}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
+import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtOrganisationsMatchingRequest, SaOrganisationsMatchingRequest, VatOrganisationsMatchingRequest}
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
-import javax.inject.Inject
-import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
-
 import java.util.UUID
+import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
 class OrganisationsMatchingConnector @Inject() (
@@ -50,8 +51,14 @@ class OrganisationsMatchingConnector @Inject() (
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.POST[CtOrganisationsMatchingRequest, JsValue](url, postData, hc.headers(requiredHeaders)) map { response =>
-        auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
+      http.POST[CtOrganisationsMatchingRequest, Either[UpstreamErrorResponse, JsValue]](
+        url,
+        postData,
+        hc.headers(requiredHeaders)
+      ) map { response =>
+        response.foreach(response =>
+          auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
+        )
         response
       },
       correlationId,
@@ -71,8 +78,14 @@ class OrganisationsMatchingConnector @Inject() (
       s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.POST[SaOrganisationsMatchingRequest, JsValue](url, postData, hc.headers(requiredHeaders)) map { response =>
-        auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
+      http.POST[SaOrganisationsMatchingRequest, Either[UpstreamErrorResponse, JsValue]](
+        url,
+        postData,
+        hc.headers(requiredHeaders)
+      ) map { response =>
+        response.foreach(response =>
+          auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
+        )
         response
       },
       correlationId,
@@ -91,10 +104,19 @@ class OrganisationsMatchingConnector @Inject() (
     val url = s"$baseUrl/organisations-matching/perform-match/vat?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.POST[VatOrganisationsMatchingRequest, JsValue](url, data, hc.headers(requiredHeaders)).map { response =>
-        auditHelper.auditOrganisationsMatchingResponse(correlationId.toString, matchId.toString, request, url, response)
-        response
-      },
+      http
+        .POST[VatOrganisationsMatchingRequest, Either[UpstreamErrorResponse, JsValue]](
+          url,
+          data,
+          hc.headers(requiredHeaders)
+        )
+        .map { response =>
+          response.foreach(response =>
+            auditHelper
+              .auditOrganisationsMatchingResponse(correlationId.toString, matchId.toString, request, url, response)
+          )
+          response
+        },
       correlationId.toString,
       matchId.toString,
       request,
@@ -103,49 +125,54 @@ class OrganisationsMatchingConnector @Inject() (
   }
 
   private def recover(
-    x: Future[JsValue],
+    x: Future[Either[UpstreamErrorResponse, JsValue]],
     correlationId: String,
     matchId: String,
     request: RequestHeader,
     requestUrl: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = x.recoverWith {
-    case notFound: NotFoundException =>
-      auditHelper.auditOrganisationsMatchingResponse(
-        correlationId,
-        matchId,
-        request,
-        requestUrl,
-        Json.toJson(notFound.getMessage)
-      )
-      // No Kibana for security reasons. Splunk only.
-      Future.failed(new MatchingException)
-    case validationError: JsValidationException =>
-      logger.warn("Organisations Matching JsValidationException encountered")
-      auditHelper.auditOrganisationsMatchingFailure(
-        correlationId,
-        matchId,
-        request,
-        requestUrl,
-        s"Error parsing organisations matching response: ${validationError.errors}"
-      )
-      Future.failed(new InternalServerException("Something went wrong."))
-    case Upstream5xxResponse(msg, code, _, _) =>
-      logger.warn(s"Organisations Matching Upstream5xxResponse encountered: $code")
-      auditHelper.auditOrganisationsMatchingFailure(
-        correlationId,
-        matchId,
-        request,
-        requestUrl,
-        s"Internal Server error: $msg"
-      )
-      Future.failed(new InternalServerException("Something went wrong."))
-    case Upstream4xxResponse(msg, code, _, _) =>
-      logger.warn(s"Organisations Matching Upstream4xxResponse encountered: $code")
-      auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, msg)
-      Future.failed(new InternalServerException("Something went wrong."))
-    case e: Exception =>
-      logger.error(s"Organisations Matching Exception encountered", e)
-      auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, e.getMessage)
-      Future.failed(new InternalServerException("Something went wrong."))
+  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = {
+    x.recover {
+      case validationError: JsValidationException =>
+        logger.warn("Organisations Matching JsValidationException encountered")
+        auditHelper.auditOrganisationsMatchingFailure(
+          correlationId,
+          matchId,
+          request,
+          requestUrl,
+          s"Error parsing organisations matching response: ${validationError.errors}"
+        )
+        throw new InternalServerException("Something went wrong.")
+      case e: Exception =>
+        logger.error(s"Organisations Matching Exception encountered", e)
+        auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, e.getMessage)
+        throw new InternalServerException("Something went wrong.")
+    }.flatMap {
+      case Left(e) if e.statusCode == NOT_FOUND =>
+        auditHelper.auditOrganisationsMatchingResponse(
+          correlationId,
+          matchId,
+          request,
+          requestUrl,
+          Json.toJson(e.message)
+        )
+        // No Kibana for security reasons. Splunk only.
+        Future.failed[JsValue](new MatchingException)
+      case Left(UpstreamErrorResponse.Upstream5xxResponse(e)) =>
+        logger.warn(s"Organisations Matching Upstream5xxResponse encountered: ${e.statusCode}")
+        auditHelper.auditOrganisationsMatchingFailure(
+          correlationId,
+          matchId,
+          request,
+          requestUrl,
+          s"Internal Server error: ${e.message}"
+        )
+        Future.failed[JsValue](new InternalServerException("Something went wrong."))
+      case Left(e) =>
+        logger.warn(s"Organisations Matching unexpected response encountered: ${e.statusCode}")
+        auditHelper.auditOrganisationsMatchingFailure(correlationId, matchId, request, requestUrl, e.message)
+        Future.failed[JsValue](new InternalServerException("Something went wrong."))
+      case Right(json) =>
+        Future.successful[JsValue](json)
+    }
   }
 }

@@ -206,7 +206,6 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
         .withHeaders(("CorrelationId", UUID.randomUUID().toString))
         .withBody(Json.obj())
       val response = controller.matchOrganisationVat()(fakeRequest)
-      println(status(response))
       contentAsJson(response) shouldBe errorResponse(
         "INVALID_REQUEST", "Missing required field(s): [/organisationName, /postcode, /vrn, /addressLine1]"
       )
