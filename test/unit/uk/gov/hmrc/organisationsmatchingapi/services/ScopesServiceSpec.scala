@@ -32,7 +32,6 @@ class ScopesServiceSpec
   "Gets correct external endpoints" when {
     "using first scope" in {
       val endpoints = scopesService.getExternalEndpoints(Seq(mockScopeOne))
-      println(s"THIS IS $endpoints")
       endpoints.size shouldBe 2
       endpoints.map(_.key).toSeq.sorted shouldBe Seq(endpointKeyOne, endpointKeyTwo)
       endpoints.map(_.link).toSeq.sorted shouldBe Seq("/external/1", "/external/2")
