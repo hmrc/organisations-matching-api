@@ -4,18 +4,6 @@
  v1Status: String
 )
  {
-   "scopes": [
-     {
-       "key": "assigned",
-       "name": "The scopes you have been assigned",
-       "description": "An OAuth 2.0 Bearer Token with the scopes you have been assigned"
-     },
-     {
-       "key": "read:organisations-matching-ho",
-       "name": "The organisations matching scope for HO",
-       "description": "Scope to be used by HO for Match ID generation"
-     }
-   ],
      "api": {
        "name": "Organisations Matching",
        "description": "Retrieves matching information for an organisation",

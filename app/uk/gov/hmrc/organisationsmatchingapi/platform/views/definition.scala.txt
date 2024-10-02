@@ -2,13 +2,6 @@
 @(whitelistedApplicationIds: Seq[String])
 
 {
-  "scopes":[
-    {
-      "key":"read:organisations-matching-api",
-      "name":"Match an organisation using their details",
-      "description":"Organisations Matching API"
-    }
-  ],
   "api":{
     "name":"Organisations Matching",
     "description":"Match an organisation against HMRC's records",
