@@ -16,14 +16,15 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.platform
 
-import org.apache.pekko.actor.ActorSystem
-import org.apache.pekko.stream.Materializer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
-import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration._
+import com.github.tomakehurst.wiremock.client.WireMock.{aResponse, post, stubFor, urlMatching}
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.stream.Materializer
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.{BeforeAndAfterEach, TestData}
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerTest
@@ -31,14 +32,14 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsValue
 import play.api.mvc.{AnyContentAsEmpty, Result}
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{contentAsJson, contentAsString, defaultAwaitTimeout, status}
 import play.api.{Application, Mode}
 import uk.gov.hmrc.organisationsmatchingapi.controllers.DocumentationController
-import util.UnitSpec
 
 import scala.collection.Seq
 import scala.concurrent.Future
 
-class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPerTest with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class PlatformIntegrationSpec extends AnyWordSpec with Matchers with GuiceOneAppPerTest with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val stubHost: String = "127.0.0.1"
   val stubPort: Int    = 11111
@@ -84,7 +85,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
       val result: Future[Result] = documentationController.definition()(request)
       status(result) shouldBe 200
 
-      val jsonResponse: JsValue = jsonBodyOf(result).futureValue
+      val jsonResponse: JsValue = contentAsJson(result)
 
       val versions: Seq[String] = (jsonResponse \\ "version") map (_.as[String])
       val endpointNames: Seq[Seq[String]] =
@@ -103,8 +104,7 @@ class PlatformIntegrationSpec extends UnitSpec with Matchers with GuiceOneAppPer
       val result: Future[Result] = documentationController.specification("1.0", "application.yaml")(request)
 
       status(result) shouldBe 200
-      bodyOf(await(result)) should startWith("openapi: 3.0.3")
-
+      contentAsString(result) should startWith("openapi: 3.0.3")
     }
   }
 

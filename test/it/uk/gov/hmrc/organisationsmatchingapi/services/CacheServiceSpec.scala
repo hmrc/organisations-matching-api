@@ -16,27 +16,27 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.services
 
+import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.BDDMockito.`given`
+import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify}
-
-import java.util.UUID
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
-import org.mockito.Mockito
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, InsertResult}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 import uk.gov.hmrc.organisationsmatchingapi.services.CacheService
-import util.UnitSpec
 
-import scala.concurrent.Future
+import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class CacheServiceSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures {
+class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures {
 
   val mockCacheConfig: CacheConfiguration = mock[CacheConfiguration]
   val mockMatchRepo: MatchRepository = mock[MatchRepository]

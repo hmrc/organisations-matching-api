@@ -31,25 +31,23 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.{IfPPOB, IfVatApprovedInformation, IfVatCustomerAddress, IfVatCustomerDetails, IfVatCustomerInformation}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat._
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
-import util.UnitSpec
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext
 
-
 class IfConnectorSpec
   extends AnyWordSpec
     with BeforeAndAfterEach
-    with UnitSpec
     with MockitoSugar
     with Matchers
     with GuiceOneAppPerSuite {
@@ -63,7 +61,6 @@ class IfConnectorSpec
   def externalServices: Seq[String] = Seq.empty
 
   override lazy val fakeApplication = new GuiceApplicationBuilder()
-    .bindings(bindModules: _*)
     .configure(
       "auditing.enabled" -> false,
       "cache.enabled"  -> false,

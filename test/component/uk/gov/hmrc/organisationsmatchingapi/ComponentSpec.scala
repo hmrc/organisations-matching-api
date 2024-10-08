@@ -16,13 +16,12 @@
 
 package component.uk.gov.hmrc.organisationsmatchingapi
 
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
-import util.UnitSpec
 
-trait ComponentSpec extends UnitSpec with GuiceOneServerPerSuite {
-
+trait ComponentSpec extends AnyWordSpec with GuiceOneServerPerSuite {
   implicit override lazy val app: Application = GuiceApplicationBuilder()
     .configure(
       "auditing.enabled"                                       -> false,
@@ -30,5 +29,4 @@ trait ComponentSpec extends UnitSpec with GuiceOneServerPerSuite {
       "run.mode"                                               -> "It"
     )
     .build()
-
 }

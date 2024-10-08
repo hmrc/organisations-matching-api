@@ -17,26 +17,29 @@
 package unit.uk.gov.hmrc.organisationsmatchingapi.util
 
 import com.typesafe.config.ConfigFactory
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.libs.json.{JsObject, Json}
 import play.api.{Application, Configuration}
-import util.UnitSpec
 
-trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
-
+trait SpecBase extends AnyWordSpec with GuiceOneAppPerSuite {
   lazy val additionalConfig: Configuration = Configuration()
 
   def buildFakeApplication(extraConfig: Configuration): Application =
     new GuiceApplicationBuilder()
       .configure(
         Configuration(
-          ConfigFactory.parseString("""
-                                      | metrics.jvm = false
-                                      | metrics.enabled = true
-                                      | """.stripMargin)
+          ConfigFactory.parseString(
+            """
+              | metrics.jvm = false
+              | metrics.enabled = true
+              | """.stripMargin)
         ) withFallback extraConfig)
       .build()
 
   override lazy val fakeApplication: Application = buildFakeApplication(additionalConfig)
 
+  protected def errorResponse(code: String, message: String): JsObject =
+    Json.obj("code" -> code, "message" -> message)
 }
