@@ -57,8 +57,6 @@ class OrganisationsMatchingConnectorSpec
   val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
-  def externalServices: Seq[String] = Seq.empty
-
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .configure(
       "auditing.enabled" -> false,
@@ -75,7 +73,6 @@ class OrganisationsMatchingConnectorSpec
     val matchIdStr = matchId.toString
     val correlationId = UUID.randomUUID()
     val correlationIdStr = correlationId.toString
-    val applicationId = "12345"
     val correlationIdHeader: (String, String) = "CorrelationId" -> correlationIdStr
     val applicationIdHeader: (String, String) = "X-Application-ID" -> "12345"
     val ctKnownFacts: CtKnownFacts = CtKnownFacts("test", "test", "test", "test")

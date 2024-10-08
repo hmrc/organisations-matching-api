@@ -58,8 +58,6 @@ class IfConnectorSpec
   val integrationFrameworkAuthorizationToken = "IF_TOKEN"
   val integrationFrameworkEnvironment = "IF_ENVIRONMENT"
 
-  def externalServices: Seq[String] = Seq.empty
-
   override lazy val fakeApplication = new GuiceApplicationBuilder()
     .configure(
       "auditing.enabled" -> false,
