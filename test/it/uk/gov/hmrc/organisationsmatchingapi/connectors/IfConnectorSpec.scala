@@ -20,7 +20,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
@@ -43,7 +42,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.util.UUID
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class IfConnectorSpec
   extends AnyWordSpec
@@ -51,7 +50,6 @@ class IfConnectorSpec
     with MockitoSugar
     with Matchers
     with GuiceOneAppPerSuite {
-
   val stubPort: Int = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
@@ -70,9 +68,6 @@ class IfConnectorSpec
       "microservice.services.integration-framework.environment" -> integrationFrameworkEnvironment
     )
     .build()
-
-  implicit val ec: ExecutionContext =
-    fakeApplication.injector.instanceOf[ExecutionContext]
 
   trait Setup {
     val matchId = "80a6bb14-d888-436e-a541-4000674c60aa"
@@ -103,7 +98,6 @@ class IfConnectorSpec
     val utr = "1234567890"
 
     "return data on successful call" in new Setup {
-
       val registeredDetails: IfNameAndAddressDetails = IfNameAndAddressDetails(
         Some(IfNameDetails(
           Some("Waitrose"),
@@ -132,8 +126,6 @@ class IfConnectorSpec
         ))
       )
 
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
           .withHeader(HeaderNames.authorisation, equalTo(s"Bearer $integrationFrameworkAuthorizationToken"))
@@ -156,7 +148,7 @@ class IfConnectorSpec
 
       val result: IfCorpTaxCompanyDetails = await(underTest.fetchCorporationTax(matchId, crn))
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
       result shouldBe IfCorpTaxCompanyDetails(
@@ -165,13 +157,9 @@ class IfConnectorSpec
         Some(registeredDetails),
         Some(communicationDetails)
       )
-
     }
 
     "Fail when IF returns an error" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
           .willReturn(aResponse().withStatus(500)))
@@ -180,15 +168,11 @@ class IfConnectorSpec
         await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
 
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
-
     }
 
     "Fail when IF returns a bad request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
@@ -197,14 +181,11 @@ class IfConnectorSpec
         await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
 
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/corporation-tax/$crn/company/details"))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
@@ -212,7 +193,7 @@ class IfConnectorSpec
       intercept[MatchingException] {
         await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
   }
@@ -221,7 +202,6 @@ class IfConnectorSpec
     val utr = "1234567890"
 
     "return data on successful request" in new Setup {
-
       val taxpayerJohnNameAddress: IfSaTaxpayerNameAddress = IfSaTaxpayerNameAddress(
         Some("John Smith II"),
         Some("Base"),
@@ -246,8 +226,6 @@ class IfConnectorSpec
         ))
       )
 
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .withHeader(
@@ -267,7 +245,7 @@ class IfConnectorSpec
         underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890")
       )
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
       result shouldBe IfSaTaxpayerDetails(
@@ -275,13 +253,9 @@ class IfConnectorSpec
         Some("Individual"),
         Some(Seq(taxpayerJohnNameAddress, taxpayerJoanneNameAddress))
       )
-
     }
 
     "Fail when IF returns an error" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(500)))
@@ -290,15 +264,11 @@ class IfConnectorSpec
         await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
 
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
-
     }
 
     "Fail when IF returns a bad request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
@@ -307,14 +277,11 @@ class IfConnectorSpec
         await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(s"/organisations/self-assessment/$utr/taxpayer/details"))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
@@ -322,7 +289,7 @@ class IfConnectorSpec
       intercept[MatchingException] {
         await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
   }
@@ -332,8 +299,6 @@ class IfConnectorSpec
     val vatUrl = s"/vat/customer/vrn/$vrn/information"
 
     "return data on successful request" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       val ifResponse = IfVatCustomerInformation(
         IfVatApprovedInformation(
           IfVatCustomerDetails(Some("orgName")),
@@ -356,15 +321,13 @@ class IfConnectorSpec
 
       val result: IfVatCustomerInformation = await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditIfApiResponse(any(), any(), any(), any(), any())(any())
 
       result shouldBe ifResponse
     }
 
     "fail with InternalServerException when IF returns 500" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(vatUrl))
           .willReturn(aResponse().withStatus(500)))
@@ -373,14 +336,11 @@ class IfConnectorSpec
         await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditIfApiFailure(any(), any(), any(), any(), any())(any())
-
     }
 
     "fail with InternalServerException when IF returns a bad request" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(vatUrl))
           .willReturn(aResponse().withStatus(400).withBody("BAD_REQUEST")))
@@ -389,13 +349,11 @@ class IfConnectorSpec
         await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
       }
 
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
 
     "fail with MatchingException when IF returns a NOT_FOUND" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         get(urlPathMatching(vatUrl))
           .willReturn(aResponse().withStatus(404).withBody("NOT_FOUND")))
@@ -403,9 +361,8 @@ class IfConnectorSpec
       intercept[MatchingException] {
         await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
       }
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
     }
-
   }
 }

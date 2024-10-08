@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
-import play.api.Logger
+import play.api.Logging
 import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.RequestHeader
@@ -31,23 +31,18 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationsMatchingConnector @Inject() (
-  servicesConfig: ServicesConfig,
-  http: HttpClient,
-  val auditHelper: AuditHelper
-) {
-
-  val logger: Logger = Logger(this.getClass)
-
+class OrganisationsMatchingConnector @Inject()(
+                                                servicesConfig: ServicesConfig,
+                                                http: HttpClient,
+                                                auditHelper: AuditHelper
+                                              )(implicit ec: ExecutionContext) extends Logging {
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
-  val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
+  private val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
 
   def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)(implicit
-    hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+                                                                                                        hc: HeaderCarrier,
+                                                                                                        request: RequestHeader
   ): Future[JsValue] = {
-
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
     recover(
@@ -69,11 +64,10 @@ class OrganisationsMatchingConnector @Inject() (
   }
 
   def matchCycleSelfAssessment(
-    matchId: String,
-    correlationId: String,
-    postData: SaOrganisationsMatchingRequest
-  )(implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
-
+                                matchId: String,
+                                correlationId: String,
+                                postData: SaOrganisationsMatchingRequest
+                              )(implicit hc: HeaderCarrier, request: RequestHeader): Future[JsValue] = {
     val url =
       s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 
@@ -93,13 +87,11 @@ class OrganisationsMatchingConnector @Inject() (
       request,
       url
     )
-
   }
 
   def matchCycleVat(matchId: UUID, correlationId: UUID, data: VatOrganisationsMatchingRequest)(implicit
-    hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+                                                                                               hc: HeaderCarrier,
+                                                                                               request: RequestHeader
   ): Future[JsValue] = {
     val url = s"$baseUrl/organisations-matching/perform-match/vat?matchId=$matchId&correlationId=$correlationId"
 
@@ -125,12 +117,12 @@ class OrganisationsMatchingConnector @Inject() (
   }
 
   private def recover(
-    x: Future[Either[UpstreamErrorResponse, JsValue]],
-    correlationId: String,
-    matchId: String,
-    request: RequestHeader,
-    requestUrl: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = {
+                       x: Future[Either[UpstreamErrorResponse, JsValue]],
+                       correlationId: String,
+                       matchId: String,
+                       request: RequestHeader,
+                       requestUrl: String
+                     )(implicit hc: HeaderCarrier): Future[JsValue] = {
     x.recover {
       case validationError: JsValidationException =>
         logger.warn("Organisations Matching JsValidationException encountered")

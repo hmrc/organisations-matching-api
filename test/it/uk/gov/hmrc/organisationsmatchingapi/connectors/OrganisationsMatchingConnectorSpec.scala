@@ -20,7 +20,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.mockito.ArgumentMatchers.any
-import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify}
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
@@ -44,7 +43,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import java.util.UUID
-import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class OrganisationsMatchingConnectorSpec
   extends AnyWordSpec
@@ -52,7 +51,6 @@ class OrganisationsMatchingConnectorSpec
     with MockitoSugar
     with Matchers
     with GuiceOneAppPerSuite {
-
   val stubPort: Int = sys.env.getOrElse("WIREMOCK", "11122").toInt
   val stubHost = "127.0.0.1"
   val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
@@ -65,8 +63,6 @@ class OrganisationsMatchingConnectorSpec
       "microservice.services.organisations-matching.port" -> "11122",
     )
     .build()
-
-  implicit val ec: ExecutionContext = fakeApplication.injector.instanceOf[ExecutionContext]
 
   trait Setup {
     val matchId = UUID.randomUUID()
@@ -108,11 +104,7 @@ class OrganisationsMatchingConnectorSpec
   }
 
   "matchCycleCotax" should {
-
     "Fail when organisations matching returns an error CT" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -157,15 +149,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleCotax(matchIdStr, correlationIdStr, ctPostData))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
-
     }
 
     "Fail when organisations matching returns a bad request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -210,14 +198,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleCotax(matchIdStr, correlationIdStr, ctPostData))
       }
 
-      verify(underTest.auditHelper,
+      verify(auditHelper,
         times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return a match for a matched request CT" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -266,15 +251,11 @@ class OrganisationsMatchingConnectorSpec
 
       result shouldBe Json.toJson("match")
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
-
     }
 
     "return NOT_FOUND for a non matched request CT" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/cotax\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -320,17 +301,13 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleCotax(matchIdStr, correlationIdStr, ctPostData))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
-
     }
   }
 
   "matchCycleSelfAssessment" should {
-
     "Fail when organisations matching returns an error SA" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -363,15 +340,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleSelfAssessment(matchIdStr, correlationIdStr, saPostData))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
-
     }
 
     "Fail when organisations matching returns a bad request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -404,14 +377,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleSelfAssessment(matchIdStr, correlationIdStr, saPostData))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return a match for a matched request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -446,15 +416,11 @@ class OrganisationsMatchingConnectorSpec
 
       result shouldBe Json.toJson("match")
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
-
     }
 
     "return NOT_FOUND for a non matched request" in new Setup {
-
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(s"/organisations-matching/perform-match/self-assessment\\?matchId=$matchId&correlationId=$correlationId"))
           .withRequestBody(equalToJson(
@@ -488,13 +454,12 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleCotax(matchIdStr, correlationIdStr, ctPostData))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
-
     }
 
     "return appropriate header carrier" in new Setup {
-      hc.headers(underTest.requiredHeaders) shouldBe Seq("CorrelationId" -> correlationIdStr, "X-Application-ID" -> "12345")
+      hc.headers(Seq("X-Application-ID", "CorrelationId")) shouldBe Seq("CorrelationId" -> correlationIdStr, "X-Application-ID" -> "12345")
     }
   }
 
@@ -508,8 +473,6 @@ class OrganisationsMatchingConnectorSpec
       s"/organisations-matching/perform-match/vat\\?matchId=$matchId&correlationId=$correlationId"
 
     "fail with InternalServerException when organisations matching vat returns 500" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(orgsMatchingVatUrl(matchId, correlationId)))
           .withRequestBody(equalToJson(Json.toJson(matchingRequest).toString()))
@@ -519,13 +482,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleVat(matchId, correlationId, matchingRequest))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
     }
 
     "fail with InternalServerException when organisations matching vat returns bad request" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(orgsMatchingVatUrl(matchId, correlationId)))
           .withRequestBody(equalToJson(Json.toJson(matchingRequest).toString()))
@@ -535,13 +496,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleVat(matchId, correlationId, matchingRequest))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
     }
 
     "return not found for a non matched request" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(orgsMatchingVatUrl(matchId, correlationId)))
           .withRequestBody(equalToJson(Json.toJson(matchingRequest).toString()))
@@ -552,13 +511,11 @@ class OrganisationsMatchingConnectorSpec
         await(underTest.matchCycleVat(matchId, correlationId, matchingRequest))
       }
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
     }
 
     "return a match for a matched request" in new Setup {
-      Mockito.reset(underTest.auditHelper)
-
       stubFor(
         post(urlMatching(orgsMatchingVatUrl(matchId, correlationId)))
           .withRequestBody(equalToJson(Json.toJson(matchingRequest).toString()))
@@ -568,9 +525,8 @@ class OrganisationsMatchingConnectorSpec
 
       await(underTest.matchCycleVat(matchId, correlationId, matchingRequest)) shouldBe Json.toJson("match")
 
-      verify(underTest.auditHelper, times(1))
+      verify(auditHelper, times(1))
         .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
     }
-
   }
 }

@@ -16,15 +16,15 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
-import play.api.Logger
+import play.api.Logging
 import play.api.libs.json.{Format, Json}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -32,16 +32,13 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, val auditHelper: AuditHelper) {
-
-  private val logger = Logger(classOf[IfConnector].getName)
-
+class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, auditHelper: AuditHelper)(implicit ec: ExecutionContext) extends Logging {
   private val baseUrl = servicesConfig.baseUrl("integration-framework")
 
   private object BearerTokens {
-    val sa = getIFToken("sa")
-    val ct = getIFToken("ct")
-    val vat = getIFToken("vat")
+    val sa: String = getIFToken("sa")
+    val ct: String = getIFToken("ct")
+    val vat: String = getIFToken("vat")
 
     private def getIFToken(key: String): String =
       servicesConfig.getString(s"microservice.services.integration-framework.authorization-token.$key")
@@ -53,8 +50,7 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, v
 
   def fetchSelfAssessment(matchId: String, utr: String)(implicit
     hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+    request: RequestHeader
   ): Future[IfSaTaxpayerDetails] = {
 
     val SAUrl = s"$baseUrl/organisations/self-assessment/$utr/taxpayer/details"
@@ -64,8 +60,7 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, v
 
   def fetchCorporationTax(matchId: String, crn: String)(implicit
     hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+    request: RequestHeader
   ): Future[IfCorpTaxCompanyDetails] = {
 
     val CTUrl = s"$baseUrl/organisations/corporation-tax/$crn/company/details"
@@ -75,8 +70,7 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, v
 
   def fetchVat(matchId: String, vrn: String)(implicit
     hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+    request: RequestHeader
   ): Future[IfVatCustomerInformation] = {
     val vatUrl = s"$baseUrl/vat/customer/vrn/$vrn/information"
 
@@ -93,8 +87,7 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, v
 
   private def callIF[R: Format: Manifest](url: String, matchId: String, bearerToken: String)(implicit
     hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+    request: RequestHeader
   ) =
     recover[R](
       http.GET[R](url, headers = setHeaders(request, bearerToken)).map(auditResponse(url, matchId)),
@@ -119,7 +112,7 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, v
     matchId: String,
     request: RequestHeader,
     requestUrl: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[T] = x.recoverWith {
+  )(implicit hc: HeaderCarrier): Future[T] = x.recoverWith {
     case validationError: JsValidationException =>
       logger.warn("Integration Framework JsValidationException encountered")
       auditHelper.auditIfApiFailure(
