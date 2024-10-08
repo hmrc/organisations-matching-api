@@ -20,7 +20,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{Address, CtMatchingResponse}
-import util.IfHelpers
+import unit.uk.gov.hmrc.organisationsmatchingapi.util.IfHelpers
 
 class CtMatchingResponseSpec extends AnyWordSpec with Matchers with IfHelpers {
 

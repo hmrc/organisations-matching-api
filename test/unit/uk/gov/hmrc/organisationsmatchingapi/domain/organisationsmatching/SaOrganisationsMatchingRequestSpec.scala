@@ -22,7 +22,7 @@ import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{SaKnownFacts, SaOrganisationsMatchingRequest}
-import util.IfHelpers
+import unit.uk.gov.hmrc.organisationsmatchingapi.util.IfHelpers
 
 class SaOrganisationsMatchingRequestSpec extends AnyWordSpec with Matchers with IfHelpers {
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package util
+package unit.uk.gov.hmrc.organisationsmatchingapi.util
 
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
