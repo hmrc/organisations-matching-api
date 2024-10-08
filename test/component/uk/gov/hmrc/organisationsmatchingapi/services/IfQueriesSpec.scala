@@ -16,10 +16,10 @@
 
 package component.uk.gov.hmrc.organisationsmatchingapi.services
 
+import component.uk.gov.hmrc.organisationsmatchingapi.ComponentSpec
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.organisationsmatchingapi.services.ScopesHelper
-import util.ComponentSpec
 
 class IfQueriesSpec extends AnyWordSpec with Matchers with ComponentSpec {
 
