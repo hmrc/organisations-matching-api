@@ -37,8 +37,8 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMat
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{VatKnownFacts, VatOrganisationsMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService}
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
-import util.SpecBase
 import org.mockito.ArgumentMatchers.{eq => eqTo}
+import unit.uk.gov.hmrc.organisationsmatchingapi.util.SpecBase
 
 import scala.concurrent.{ExecutionContext, Future}
 

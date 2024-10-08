@@ -36,7 +36,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models._
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
 import unit.uk.gov.hmrc.organisationsmatchingapi.services.ScopesConfig
-import util.SpecBase
+import unit.uk.gov.hmrc.organisationsmatchingapi.util.SpecBase
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext.Implicits.global

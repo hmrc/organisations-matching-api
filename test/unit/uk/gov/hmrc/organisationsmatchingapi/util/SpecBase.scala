@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
-package util
+package unit.uk.gov.hmrc.organisationsmatchingapi.util
 
 import com.typesafe.config.ConfigFactory
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.{Application, Configuration}
+import util.UnitSpec
 
 trait SpecBase extends UnitSpec with GuiceOneAppPerSuite {
 
