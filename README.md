@@ -15,7 +15,7 @@ Please ensure you reference the OGD Data Item matrix to ensure the right data it
 
 Ensure mongodb and service manager (for auth wizard and organisations-matching microservice) are running.
 
-```sm2 --start OVHO -r```
+```sm2 --start OVHO```
 
 ```sm2 --stop ORGANISATIONS_MATCHING_API```
 
