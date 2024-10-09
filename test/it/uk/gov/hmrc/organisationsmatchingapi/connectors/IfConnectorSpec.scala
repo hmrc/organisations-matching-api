@@ -31,7 +31,8 @@ import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
-import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, HttpClient, InternalServerException}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
@@ -78,7 +79,7 @@ class IfConnectorSpec
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(sampleCorrelationIdHeader)
 
     val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-    val httpClient: HttpClient = fakeApplication.injector.instanceOf[HttpClient]
+    private val httpClient = fakeApplication.injector.instanceOf[HttpClientV2]
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new IfConnector(config, httpClient, auditHelper)

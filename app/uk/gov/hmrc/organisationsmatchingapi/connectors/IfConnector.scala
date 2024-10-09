@@ -21,6 +21,7 @@ import play.api.libs.json.{Format, Json}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HttpReads.Implicits._
 import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
@@ -32,7 +33,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, auditHelper: AuditHelper)(implicit ec: ExecutionContext) extends Logging {
+class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClientV2, auditHelper: AuditHelper)(implicit ec: ExecutionContext) extends Logging {
   private val baseUrl = servicesConfig.baseUrl("integration-framework")
 
   private object BearerTokens {
@@ -90,7 +91,7 @@ class IfConnector @Inject() (servicesConfig: ServicesConfig, http: HttpClient, a
     request: RequestHeader
   ) =
     recover[R](
-      http.GET[R](url, headers = setHeaders(request, bearerToken)).map(auditResponse(url, matchId)),
+      http.get(url"$url").setHeader(setHeaders(request, bearerToken):_*).execute[R].map(auditResponse(url, matchId)),
       extractCorrelationId(request),
       matchId,
       request,
