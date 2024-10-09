@@ -16,12 +16,9 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.connectors
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify}
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
@@ -32,6 +29,7 @@ import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.test.WireMockSupport
 import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.OrganisationsMatchingConnector
@@ -48,20 +46,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class OrganisationsMatchingConnectorSpec
   extends AnyWordSpec
-    with BeforeAndAfterEach
+    with WireMockSupport
     with MockitoSugar
     with Matchers
     with GuiceOneAppPerSuite {
-  val stubPort: Int = sys.env.getOrElse("WIREMOCK", "11122").toInt
-  val stubHost = "127.0.0.1"
-  val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
 
-  override lazy val fakeApplication = new GuiceApplicationBuilder()
+  override def fakeApplication = new GuiceApplicationBuilder()
     .configure(
-      "auditing.enabled" -> false,
-      "cache.enabled" -> false,
-      "microservice.services.organisations-matching.host" -> "127.0.0.1",
-      "microservice.services.organisations-matching.port" -> "11122",
+      "microservice.services.organisations-matching.port" -> wireMockPort,
     )
     .build()
 
@@ -93,15 +85,6 @@ class OrganisationsMatchingConnectorSpec
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new OrganisationsMatchingConnector(config, httpClient, auditHelper)
-  }
-
-  override def beforeEach(): Unit = {
-    wireMockServer.start()
-    configureFor(stubHost, stubPort)
-  }
-
-  override def afterEach(): Unit = {
-    wireMockServer.stop()
   }
 
   "matchCycleCotax" should {

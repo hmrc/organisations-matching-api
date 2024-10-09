@@ -16,22 +16,21 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.connectors
 
-import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock._
-import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import org.mockito.ArgumentMatchers.any
 import org.mockito.Mockito.{times, verify}
-import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import play.api.mvc.AnyContentAsEmpty
 import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.test.WireMockSupport
 import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames, InternalServerException}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.connectors.IfConnector
@@ -47,22 +46,16 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class IfConnectorSpec
   extends AnyWordSpec
-    with BeforeAndAfterEach
+    with WireMockSupport
     with MockitoSugar
     with Matchers
     with GuiceOneAppPerSuite {
-  val stubPort: Int = sys.env.getOrElse("WIREMOCK", "11122").toInt
-  val stubHost = "127.0.0.1"
-  val wireMockServer = new WireMockServer(wireMockConfig().port(stubPort))
   val integrationFrameworkAuthorizationToken = "IF_TOKEN"
   val integrationFrameworkEnvironment = "IF_ENVIRONMENT"
 
-  override lazy val fakeApplication = new GuiceApplicationBuilder()
+  override def fakeApplication: Application = new GuiceApplicationBuilder()
     .configure(
-      "auditing.enabled" -> false,
-      "cache.enabled"  -> false,
-      "microservice.services.integration-framework.host" -> "127.0.0.1",
-      "microservice.services.integration-framework.port" -> "11122",
+      "microservice.services.integration-framework.port" -> wireMockPort,
       "microservice.services.integration-framework.authorization-token.ct" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.authorization-token.sa" -> integrationFrameworkAuthorizationToken,
       "microservice.services.integration-framework.authorization-token.vat" -> integrationFrameworkAuthorizationToken,
@@ -83,15 +76,6 @@ class IfConnectorSpec
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new IfConnector(config, httpClient, auditHelper)
-  }
-
-  override def beforeEach(): Unit = {
-    wireMockServer.start()
-    configureFor(stubHost, stubPort)
-  }
-
-  override def afterEach(): Unit = {
-    wireMockServer.stop()
   }
 
   "fetch Corporation Tax" should {
