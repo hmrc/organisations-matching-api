@@ -21,7 +21,8 @@ lazy val microservice = Project(appName, file("."))
     scalaVersion := "2.13.12",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
     scalacOptions += "-Wconf:src=routes/.*:s",
-    Test / testOptions := Seq(Tests.Filter(unitFilter))
+    scalacOptions += "-Wconf:cat=unused-imports&src=txt/.*:s",
+      Test / testOptions := Seq(Tests.Filter(unitFilter))
   )
   .configs(ItTest)
   .settings(inConfig(ItTest)(Defaults.testSettings) *)
