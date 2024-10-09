@@ -16,7 +16,6 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
-import org.apache.pekko.stream.Materializer
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
@@ -44,8 +43,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar with SpecBase {
-  implicit lazy val materializer: Materializer = fakeApplication.materializer
-
   trait Setup extends ScopesConfig {
     val sampleCorrelationIdHeader: (String, String) = "CorrelationId" -> UUID.randomUUID().toString
     val badCorrelationIdHeader: (String, String) = "CorrelationId" -> "foo"

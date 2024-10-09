@@ -53,7 +53,7 @@ class IfConnectorSpec
   val integrationFrameworkAuthorizationToken = "IF_TOKEN"
   val integrationFrameworkEnvironment = "IF_ENVIRONMENT"
 
-  override def fakeApplication: Application = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure(
       "microservice.services.integration-framework.port" -> wireMockPort,
       "microservice.services.integration-framework.authorization-token.ct" -> integrationFrameworkAuthorizationToken,
@@ -71,8 +71,8 @@ class IfConnectorSpec
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest().withHeaders(sampleCorrelationIdHeader)
 
-    val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-    private val httpClient = fakeApplication.injector.instanceOf[HttpClientV2]
+    val config: ServicesConfig = app.injector.instanceOf[ServicesConfig]
+    private val httpClient = app.injector.instanceOf[HttpClientV2]
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new IfConnector(config, httpClient, auditHelper)

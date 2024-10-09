@@ -23,6 +23,7 @@ import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
+import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.AnyContentAsEmpty
@@ -51,7 +52,7 @@ class OrganisationsMatchingConnectorSpec
     with Matchers
     with GuiceOneAppPerSuite {
 
-  override def fakeApplication = new GuiceApplicationBuilder()
+  override def fakeApplication(): Application = new GuiceApplicationBuilder()
     .configure(
       "microservice.services.organisations-matching.port" -> wireMockPort,
     )
@@ -80,8 +81,8 @@ class OrganisationsMatchingConnectorSpec
     implicit val hc: HeaderCarrier = HeaderCarrier(otherHeaders = Seq(correlationIdHeader, applicationIdHeader))
     implicit val request: FakeRequest[AnyContentAsEmpty.type] = FakeRequest()
 
-    val config: ServicesConfig = fakeApplication.injector.instanceOf[ServicesConfig]
-    private val httpClient = fakeApplication.injector.instanceOf[HttpClientV2]
+    val config: ServicesConfig = app.injector.instanceOf[ServicesConfig]
+    private val httpClient = app.injector.instanceOf[HttpClientV2]
     val auditHelper: AuditHelper = mock[AuditHelper]
 
     val underTest = new OrganisationsMatchingConnector(config, httpClient, auditHelper)
