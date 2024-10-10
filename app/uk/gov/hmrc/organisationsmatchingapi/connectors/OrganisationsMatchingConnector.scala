@@ -16,12 +16,13 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.connectors
 
-import play.api.Logger
+import play.api.Logging
 import play.api.http.Status.NOT_FOUND
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpClient, InternalServerException, JsValidationException, UpstreamErrorResponse}
+import uk.gov.hmrc.http.client.HttpClientV2
+import uk.gov.hmrc.http.{HeaderCarrier, InternalServerException, JsValidationException, StringContextOps, UpstreamErrorResponse}
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtOrganisationsMatchingRequest, SaOrganisationsMatchingRequest, VatOrganisationsMatchingRequest}
@@ -31,31 +32,23 @@ import java.util.UUID
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
 
-class OrganisationsMatchingConnector @Inject() (
-  servicesConfig: ServicesConfig,
-  http: HttpClient,
-  val auditHelper: AuditHelper
-) {
-
-  val logger: Logger = Logger(this.getClass)
-
+class OrganisationsMatchingConnector @Inject()(
+                                                servicesConfig: ServicesConfig,
+                                                http: HttpClientV2,
+                                                auditHelper: AuditHelper
+                                              )(implicit ec: ExecutionContext) extends Logging {
   private val baseUrl = servicesConfig.baseUrl("organisations-matching")
-  val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
+  private val requiredHeaders: Seq[String] = Seq("X-Application-ID", "CorrelationId")
 
   def matchCycleCotax(matchId: String, correlationId: String, postData: CtOrganisationsMatchingRequest)(implicit
-    hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+                                                                                                        hc: HeaderCarrier,
+                                                                                                        request: RequestHeader
   ): Future[JsValue] = {
-
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.POST[CtOrganisationsMatchingRequest, Either[UpstreamErrorResponse, JsValue]](
-        url,
-        postData,
-        hc.headers(requiredHeaders)
-      ) map { response =>
+      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders): _*).execute[Either[UpstreamErrorResponse, JsValue]]
+        map { response =>
         response.foreach(response =>
           auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
         )
@@ -69,20 +62,16 @@ class OrganisationsMatchingConnector @Inject() (
   }
 
   def matchCycleSelfAssessment(
-    matchId: String,
-    correlationId: String,
-    postData: SaOrganisationsMatchingRequest
-  )(implicit hc: HeaderCarrier, request: RequestHeader, ec: ExecutionContext): Future[JsValue] = {
-
+                                matchId: String,
+                                correlationId: String,
+                                postData: SaOrganisationsMatchingRequest
+                              )(implicit hc: HeaderCarrier, request: RequestHeader): Future[JsValue] = {
     val url =
       s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.POST[SaOrganisationsMatchingRequest, Either[UpstreamErrorResponse, JsValue]](
-        url,
-        postData,
-        hc.headers(requiredHeaders)
-      ) map { response =>
+      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders): _*).execute[Either[UpstreamErrorResponse, JsValue]]
+        map { response =>
         response.foreach(response =>
           auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
         )
@@ -93,23 +82,16 @@ class OrganisationsMatchingConnector @Inject() (
       request,
       url
     )
-
   }
 
-  def matchCycleVat(matchId: UUID, correlationId: UUID, data: VatOrganisationsMatchingRequest)(implicit
-    hc: HeaderCarrier,
-    request: RequestHeader,
-    ec: ExecutionContext
+  def matchCycleVat(matchId: UUID, correlationId: UUID, postData: VatOrganisationsMatchingRequest)(implicit
+                                                                                                   hc: HeaderCarrier,
+                                                                                                   request: RequestHeader
   ): Future[JsValue] = {
     val url = s"$baseUrl/organisations-matching/perform-match/vat?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http
-        .POST[VatOrganisationsMatchingRequest, Either[UpstreamErrorResponse, JsValue]](
-          url,
-          data,
-          hc.headers(requiredHeaders)
-        )
+      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders): _*).execute[Either[UpstreamErrorResponse, JsValue]]
         .map { response =>
           response.foreach(response =>
             auditHelper
@@ -125,12 +107,12 @@ class OrganisationsMatchingConnector @Inject() (
   }
 
   private def recover(
-    x: Future[Either[UpstreamErrorResponse, JsValue]],
-    correlationId: String,
-    matchId: String,
-    request: RequestHeader,
-    requestUrl: String
-  )(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[JsValue] = {
+                       x: Future[Either[UpstreamErrorResponse, JsValue]],
+                       correlationId: String,
+                       matchId: String,
+                       request: RequestHeader,
+                       requestUrl: String
+                     )(implicit hc: HeaderCarrier): Future[JsValue] = {
     x.recover {
       case validationError: JsValidationException =>
         logger.warn("Organisations Matching JsValidationException encountered")

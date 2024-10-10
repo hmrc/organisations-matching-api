@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-
     <appender name="FILE" class="ch.qos.logback.core.FileAppender">
         <file>logs/organisations-matching-api.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
@@ -13,11 +12,6 @@
             <pattern>%date{ISO8601} level=[%level] logger=[%logger] thread=[%thread] rid=[%X{X-Request-ID}] user=[%X{Authorization}] message=[%message] %replace(exception=[%xException]){'^exception=\[\]$',''}%n</pattern>
         </encoder>
     </appender>
-
-
-    <logger name="accesslog" level="INFO" additivity="false">
-        <appender-ref ref="ACCESS_LOG_FILE" />
-    </logger>
 
     <logger name="com.google.inject" level="INFO"/>
 

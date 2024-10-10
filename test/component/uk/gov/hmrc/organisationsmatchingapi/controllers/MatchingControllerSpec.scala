@@ -32,7 +32,6 @@ import scala.concurrent.Await
 import scala.concurrent.duration.Duration
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 
-
 class MatchingControllerSpec extends BaseSpec {
 
   val scopes = List("read:organisations-matching-ho")

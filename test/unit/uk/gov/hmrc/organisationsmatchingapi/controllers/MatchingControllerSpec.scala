@@ -33,7 +33,7 @@ import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.VatMatchingRequest
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchingService, ScopesHelper, ScopesService}
-import util.SpecBase
+import unit.uk.gov.hmrc.organisationsmatchingapi.util.SpecBase
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}

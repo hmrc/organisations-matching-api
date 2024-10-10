@@ -19,7 +19,7 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
-import util.IfHelpers
+import unit.uk.gov.hmrc.organisationsmatchingapi.util.IfHelpers
 
 class IfSaTaxpayerDetailsSpec extends AnyWordSpec with Matchers with IfHelpers {
 

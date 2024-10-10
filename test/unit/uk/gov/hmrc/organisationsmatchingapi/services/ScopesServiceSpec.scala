@@ -17,13 +17,13 @@
 package unit.uk.gov.hmrc.organisationsmatchingapi.services
 
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import uk.gov.hmrc.organisationsmatchingapi.services.ScopesService
-import util.UnitSpec
 
 import scala.collection._
 
 class ScopesServiceSpec
-  extends UnitSpec
+  extends AnyWordSpec
     with Matchers
     with ScopesConfig {
 

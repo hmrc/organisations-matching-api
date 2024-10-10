@@ -20,20 +20,21 @@ import org.mongodb.scala.model.Filters
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
 import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.{JsString, Json, OFormat}
+import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import play.api.{Application, Configuration, Mode}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, ShortLivedCache}
-import util.UnitSpec
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext
 
-class ShortLivedCacheSpec extends UnitSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class ShortLivedCacheSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuite with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val cacheTtl = 60
   val id: String = UUID.randomUUID().toString

@@ -18,18 +18,16 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.services
 
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.matchers.should.Matchers
+import org.scalatest.wordspec.AnyWordSpec
 import play.api.libs.json.Json
 import uk.gov.hmrc.organisationsmatchingapi.services.{ScopesHelper, ScopesService}
-import util.UnitSpec
 
 class ScopesHelperSpec
-  extends UnitSpec
+  extends AnyWordSpec
     with Matchers
     with ScopesConfig
     with BeforeAndAfterEach {
-
   "Scopes helper" should {
-
     val scopesService = new ScopesService(mockConfig)
     val scopesHelper = new ScopesHelper(scopesService)
 
@@ -65,7 +63,6 @@ class ScopesHelperSpec
     }
 
     "generate Hal response" in {
-
       val mockData = Json.obj(
         "employments" -> Json.obj(
           "field1" -> Json.toJson("value1"),
@@ -102,8 +99,6 @@ class ScopesHelperSpec
         halLink.rel == endpointThree && halLink.href == "/external/3") shouldBe true
 
       response2.links.links.exists(halLink => halLink.rel == "self" && halLink.href == "/internal/2") shouldBe true
-
     }
   }
 }
-
