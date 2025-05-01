@@ -17,8 +17,10 @@
 package uk.gov.hmrc.organisationsmatchingapi.domain.ogd
 
 import play.api.libs.json.{Format, JsPath}
-import play.api.libs.functional.syntax._
+import play.api.libs.functional.syntax.*
 import play.api.libs.json.Reads.pattern
+
+import scala.util.matching.Regex
 
 case class CtMatchingRequest(
   companyRegistrationNumber: String,
@@ -29,7 +31,7 @@ case class CtMatchingRequest(
 
 object CtMatchingRequest {
 
-  val crnPattern = "^[A-Z0-9]{1,10}$".r
+  val crnPattern: Regex = "^[A-Z0-9]{1,10}$".r
 
   implicit val ctMatchingformat: Format[CtMatchingRequest] = Format(
     (
@@ -43,6 +45,6 @@ object CtMatchingRequest {
         (JsPath \ "employerName").write[String] and
         (JsPath \ "address" \ "addressLine1").write[String] and
         (JsPath \ "address" \ "postcode").write[String]
-    )(unlift(CtMatchingRequest.unapply))
+    )(o => Tuple.fromProductTyped(o))
   )
 }

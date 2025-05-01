@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.cache
 
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Format, JsPath}
 
 case class Entry(id: String, data: Data, modifiedDetails: ModifiedDetails)
@@ -32,6 +32,6 @@ object Entry {
       (JsPath \ "id").write[String] and
         (JsPath \ "data").write[Data] and
         (JsPath \ "modifiedDetails").write[ModifiedDetails]
-    )(unlift(Entry.unapply))
+    )(o => Tuple.fromProductTyped(o))
   )
 }

@@ -16,10 +16,10 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.cache
 
-import java.time.LocalDateTime
-
-import play.api.libs.functional.syntax.{toFunctionalBuilderOps, unlift}
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{Format, JsPath}
+
+import java.time.LocalDateTime
 
 case class ModifiedDetails(createdAt: LocalDateTime, lastUpdated: LocalDateTime)
 
@@ -32,6 +32,6 @@ object ModifiedDetails {
     (
       (JsPath \ "createdAt").write[LocalDateTime] and
         (JsPath \ "lastUpdated").write[LocalDateTime]
-    )(unlift(ModifiedDetails.unapply))
+    )(o => Tuple.fromProductTyped(o))
   )
 }

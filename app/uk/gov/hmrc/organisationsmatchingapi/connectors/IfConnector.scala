@@ -19,8 +19,8 @@ package uk.gov.hmrc.organisationsmatchingapi.connectors
 import play.api.Logging
 import play.api.libs.json.{Format, Json}
 import play.api.mvc.RequestHeader
-import uk.gov.hmrc.http.HttpReads.Implicits._
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.http.HttpReads.Implicits.*
+import uk.gov.hmrc.http.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCorpTaxCompanyDetails
@@ -32,6 +32,7 @@ import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.reflect.ClassTag
 
 class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClientV2, auditHelper: AuditHelper)(implicit ec: ExecutionContext) extends Logging {
   private val baseUrl = servicesConfig.baseUrl("integration-framework")
@@ -86,9 +87,9 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClientV2, 
     "CorrelationId"           -> extractCorrelationId(requestHeader)
   )
 
-  private def callIF[R: Format: Manifest](url: String, matchId: String, bearerToken: String)(implicit
-    hc: HeaderCarrier,
-    request: RequestHeader
+  private def callIF[R: Format: ClassTag](url: String, matchId: String, bearerToken: String)(implicit
+                                                                                             hc: HeaderCarrier,
+                                                                                             request: RequestHeader
   ) =
     recover[R](
       http.get(url"$url").setHeader(setHeaders(request, bearerToken):_*).execute[R].map(auditResponse(url, matchId)),

@@ -33,6 +33,10 @@ import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 import scala.concurrent.Await.result
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
+import org.mongodb.scala.SingleObservableFuture
+
+
+
 trait BaseSpec
     extends AnyFeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with GuiceOneServerPerSuite
     with GivenWhenThen {
@@ -61,13 +65,13 @@ trait BaseSpec
   val correlationIdHeaderMalformed: (String, String) = "CorrelationId" -> "foo"
   val mongoRepository: MatchRepository = app.injector.instanceOf[MatchRepository]
 
-  protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderP1) =
+  protected def requestHeaders(acceptHeader: (String, String) = acceptHeaderP1): Map[String, String] =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationIdHeader)
 
-  protected def requestHeadersInvalid(acceptHeader: (String, String) = acceptHeaderP1) =
+  protected def requestHeadersInvalid(acceptHeader: (String, String) = acceptHeaderP1): Map[String, String] =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader)
 
-  protected def requestHeadersMalformed(acceptHeader: (String, String) = acceptHeaderP1) =
+  protected def requestHeadersMalformed(acceptHeader: (String, String) = acceptHeaderP1): Map[String, String] =
     Map(CONTENT_TYPE -> JSON, AUTHORIZATION -> authToken, acceptHeader, correlationIdHeaderMalformed)
 
   protected def invalidRequest(message: String) =

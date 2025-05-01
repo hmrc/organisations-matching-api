@@ -17,7 +17,7 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.hal.Hal.state
-import play.api.hal.HalLink
+import play.api.hal.*
 import play.api.libs.json.Json
 import play.api.libs.json.Json.toJson
 import play.api.mvc.{Action, AnyContent, ControllerComponents, MessagesControllerComponents}
@@ -31,6 +31,9 @@ import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelp
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+
+
+
 
 @Singleton
 class MatchedController @Inject() (
@@ -95,7 +98,7 @@ class MatchedController @Inject() (
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
   }
 
-  def matchedOrganisationVat(matchId: UUID) = Action.async { implicit request =>
+  def matchedOrganisationVat(matchId: UUID): Action[AnyContent] = Action.async { implicit request =>
     authenticate(scopeService.getAllScopes, matchId.toString) { authScopes =>
       val correlationId = validateCorrelationId(request)
       matchedService
@@ -119,7 +122,7 @@ class MatchedController @Inject() (
     }.recover(recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/vat/$matchId"))
   }
 
-  def matchedOrganisation(matchId: String) = Action.async { implicit request =>
+  def matchedOrganisation(matchId: String): Action[AnyContent] = Action.async { implicit request =>
     withValidUuid(matchId, "matchId") { matchIdUuid =>
       matchedService.fetchMatchedOrganisationRecord(matchIdUuid) map { matchedOrganisation =>
         Ok(toJson(matchedOrganisation))
@@ -127,7 +130,7 @@ class MatchedController @Inject() (
     } recover recoveryWithAudit(maybeCorrelationId(request), matchId, s"/match-record/$matchId")
   }
 
-  def matchedVatRecord(matchId: java.util.UUID) = Action.async { implicit request =>
+  def matchedVatRecord(matchId: java.util.UUID): Action[AnyContent] = Action.async { implicit request =>
     matchedService.fetchMatchedOrganisationVatRecord(matchId).map { vatMatch =>
       Ok(toJson(vatMatch))
     } recover recoveryWithAudit(maybeCorrelationId(request), matchId.toString, s"/match-record/vat/$matchId")

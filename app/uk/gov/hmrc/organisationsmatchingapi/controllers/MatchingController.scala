@@ -17,19 +17,20 @@
 package uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import play.api.hal.Hal.state
-import play.api.hal.HalLink
+import play.api.hal.*
 import play.api.libs.json.Json.toJson
 import play.api.libs.json.{JsValue, Json}
 import play.api.mvc.{Action, ControllerComponents, MessagesControllerComponents, PlayBodyParsers}
 import uk.gov.hmrc.auth.core.AuthConnector
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, MatchIdResponse, SaMatchingRequest, VatMatchingRequest}
-import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils._
+import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.*
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchingService, ScopesHelper, ScopesService}
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.ExecutionContext
+
 
 @Singleton
 class MatchingController @Inject() (
@@ -81,7 +82,7 @@ class MatchingController @Inject() (
         matchingService.matchSaTax(matchId, correlationId.toString, matchRequest).map { _ =>
           val selfLink = HalLink("self", self)
           val data = toJson(MatchIdResponse(matchId))
-          val response = Json.toJson(
+          val response: JsValue = Json.toJson(
             state(data) ++ scopesHelper
               .getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink
           )

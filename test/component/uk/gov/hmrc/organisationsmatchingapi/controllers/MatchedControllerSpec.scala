@@ -19,8 +19,8 @@ package component.uk.gov.hmrc.organisationsmatchingapi.controllers
 import scalaj.http.Http
 import component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs.{AuthStub, BaseSpec}
 import play.api.libs.json.Json
-import play.api.test.Helpers._
-import org.scalatest.matchers.should.Matchers.convertToAnyShouldWrapper
+import play.api.test.Helpers.*
+import org.scalatest.matchers.should.Matchers.shouldBe
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 
@@ -30,13 +30,13 @@ import scala.concurrent.Await.result
 class MatchedControllerSpec extends BaseSpec  {
 
   val matchId: UUID = UUID.randomUUID()
-  val scopes    = List("read:organisations-matching-ho")
+  val scopes: List[String] = List("read:organisations-matching-ho")
   val ctRequest: CtMatchingRequest = CtMatchingRequest("0123456789", "name", "line1", "postcode")
   val ctMatch: CtMatch = CtMatch(ctRequest, matchId, utr = Some("testutr"))
   val saRequest: SaMatchingRequest = SaMatchingRequest("utr", "Individual", "name", "line1", "postcode")
   val saMatch: SaMatch = SaMatch(saRequest, matchId, utr = Some("testutr"))
-  val vatRequest = VatMatchingRequest("testvrn", "organisation", "line1", "postcode")
-  val vatMatch = VatMatch(matchId, Some("testvrn"))
+  val vatRequest: VatMatchingRequest = VatMatchingRequest("testvrn", "organisation", "line1", "postcode")
+  val vatMatch: VatMatch = VatMatch(matchId, Some("testvrn"))
 
   Feature("cotax") {
     Scenario("a valid request is made for an existing match") {
