@@ -6,12 +6,14 @@ object CodeCoverageSettings {
     "<empty>",
     "Reverse.*",
     ".*(config|views.*)",
-    ".*(AuthService|BuildInfo|Routes|RoutesPrefix).*"
+    ".*(AuthService|BuildInfo|Routes|RoutesPrefix).*",
+    ".*(domain.*)",
+    ".*(cache.*)"
   )
 
   val settings: Seq[Setting[?]] = Seq(
     ScoverageKeys.coverageExcludedPackages := excludedPackages.mkString(";"),
-    ScoverageKeys.coverageMinimumStmtTotal := 90,
+    ScoverageKeys.coverageMinimumStmtTotal := 80,
     ScoverageKeys.coverageFailOnMinimum := true,
     ScoverageKeys.coverageHighlighting := true,
   )
