@@ -30,6 +30,7 @@ import play.api.{Application, Configuration, Mode}
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.organisationsmatchingapi.cache.{CacheConfiguration, ShortLivedCache}
+import org.mongodb.scala.SingleObservableFuture
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext

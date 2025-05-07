@@ -52,7 +52,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "Retrieve CT match details from cache service" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
         .willReturn(Future.successful(Some(ctMatch)))
 
       val result = cacheService.fetch[CtMatch](matchId)
@@ -62,7 +62,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "CT return none where no details found in cache" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
         .willReturn(Future.successful(None))
 
       val result = cacheService.fetch[CtMatch](matchId)
@@ -72,7 +72,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "Retrieve SA match details from cache service" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
         .willReturn(Future.successful(Some(saMatch)))
 
       val result = cacheService.fetch[SaMatch](matchId)
@@ -82,7 +82,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "SA return none where no details found in cache" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
         .willReturn(Future.successful(None))
 
       val result = cacheService.fetch[SaMatch](matchId)
@@ -97,7 +97,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
       val ctUtr = "SOMECTUTR"
       val expected = ctMatch.copy(utr = Some(ctUtr))
 
-      given(mockMatchRepo.cache(any(), any())(any()))
+      `given`(mockMatchRepo.cache(any(), any())(any()))
         .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await {
@@ -111,7 +111,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "save VRN to the cache" in {
       Mockito.reset(mockMatchRepo)
 
-      given(mockMatchRepo.cache(any(), any())(any()))
+      `given`(mockMatchRepo.cache(any(), any())(any()))
         .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await(cacheService.cacheVatVrn(vatMatch))
@@ -126,7 +126,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
       val saUtr = "SOMESAUTR"
       val expected = saMatch.copy(utr = Some(saUtr))
 
-      given(mockMatchRepo.cache(any(), any())(any()))
+      `given`(mockMatchRepo.cache(any(), any())(any()))
         .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await {

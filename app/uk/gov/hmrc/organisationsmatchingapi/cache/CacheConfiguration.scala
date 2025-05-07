@@ -16,8 +16,9 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.cache
 
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
+
+import javax.inject.{Inject, Singleton}
 
 @Singleton
 class CacheConfiguration @Inject() (configuration: Configuration) {
@@ -26,7 +27,7 @@ class CacheConfiguration @Inject() (configuration: Configuration) {
     .getOptional[Boolean]("cache.enabled")
     .getOrElse(true)
 
-  lazy val cacheTtl: Int = configuration
+  lazy val cacheTtl: Long = configuration
     .getOptional[Int]("cache.ttlInSeconds")
     .getOrElse(60 * 60 * 5)
 

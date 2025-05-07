@@ -59,17 +59,17 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
     mockMatchingService
   )(mockAuditHelper, ec)
 
-  given(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
+  `given`(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
     .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope"), Enrolment("test-scope-1")))))
 
-  given(mockScopesService.getAllScopes).willReturn(List("test-scope", "test-scope-1"))
+  `given`(mockScopesService.getAllScopes).willReturn(List("test-scope", "test-scope-1"))
 
-  given(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
-  given(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
-  given(mockMatchingService.matchVat(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+  `given`(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+  `given`(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
+  `given`(mockMatchingService.matchVat(any(), any(), any())(any(), any())).willReturn(Future.successful(Json.toJson("match")))
 
-  given(mockScopesService.getInternalEndpoints(any())).willReturn(Seq())
-  given(mockScopesService.getExternalEndpoints(any())).willReturn(Seq())
+  `given`(mockScopesService.getInternalEndpoints(any())).willReturn(Seq())
+  `given`(mockScopesService.getExternalEndpoints(any())).willReturn(Seq())
 
 
   "POST matchOrganisationCt" should {
@@ -94,7 +94,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
 
     "return 404 when request does not match" in {
 
-      given(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
+      `given`(mockMatchingService.matchCoTax(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
 
       val result = controller.matchOrganisationCt()(
         FakeRequest()
@@ -149,7 +149,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
 
     "return 404 when request does not match" in {
 
-      given(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
+      `given`(mockMatchingService.matchSaTax(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
 
       val result = controller.matchOrganisationSa()(
         FakeRequest()
@@ -195,7 +195,7 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
     }
 
     "return 404 when the matching fails" in {
-      given(mockMatchingService.matchVat(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
+      `given`(mockMatchingService.matchVat(any(), any(), any())(any(), any())).willReturn(Future.failed(new MatchingException))
       val response = controller.matchOrganisationVat()(fakeRequest)
       status(response) shouldBe Status.NOT_FOUND
       contentAsJson(response) shouldBe errorResponse("MATCHING_FAILED", "There is no match for the information provided")

@@ -18,10 +18,12 @@ lazy val microservice = Project(appName, file("."))
   .settings(
     onLoadMessage := "",
     majorVersion := 0,
-    scalaVersion := "2.13.12",
+    scalaVersion := "3.3.5",
     libraryDependencies ++= AppDependencies.compile ++ AppDependencies.test(),
-    scalacOptions += "-Wconf:src=routes/.*:s",
-    scalacOptions += "-Wconf:cat=unused-imports&src=txt/.*:s",
+    scalacOptions += "-Wconf:src=routes/.*:s,src=txt/.*:s",
+    scalacOptions ~= { options =>
+      options.distinct
+    },
       Test / testOptions := Seq(Tests.Filter(unitFilter))
   )
   .configs(ItTest)

@@ -43,7 +43,7 @@ object SaMatchingRequest {
         (JsPath \ "taxPayerName").write[String] and
         (JsPath \ "address" \ "addressLine1").write[String] and
         (JsPath \ "address" \ "postcode").write[String]
-    )(unlift(SaMatchingRequest.unapply))
+    )(o => Tuple.fromProductTyped(o))
   )
 
 }
