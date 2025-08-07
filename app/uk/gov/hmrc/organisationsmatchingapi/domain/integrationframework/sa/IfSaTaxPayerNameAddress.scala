@@ -28,10 +28,10 @@ object IfSaTaxpayerNameAddress {
   val addressTypePattern = "^[A-Za-z0-9\\s -]{1,24}$".r
 
   private val reads = (
-    (JsPath \ "name").readNullable[String](maxLength(100)) and
-      (JsPath \ "addressType").readNullable[String](pattern(addressTypePattern, "Address type is not valid")) and
+    (JsPath \ "name").readNullable[String](using maxLength(100)) and
+      (JsPath \ "addressType").readNullable[String](using pattern(addressTypePattern, "Address type is not valid")) and
       (JsPath \ "address").readNullable[IfAddress]
-  )(IfSaTaxpayerNameAddress.apply _)
+  )(IfSaTaxpayerNameAddress.apply)
 
   private val writes = Json.writes[IfSaTaxpayerNameAddress]
 

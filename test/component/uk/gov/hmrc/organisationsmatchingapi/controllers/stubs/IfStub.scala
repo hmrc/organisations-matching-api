@@ -31,12 +31,12 @@ object IfStub extends MockHost(8443) {
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(ifCorpTaxCompanyDetails).toString())))
 
-  def searchCorpTaxCompanyDetailsNotFound(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
+  def searchCorpTaxCompanyDetailsNotFound(crn: String): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.NOT_FOUND).withBody("NO_DATA_FOUND")))
 
-  def searchCorpTaxCompanyDetailsRateLimited(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =
+  def searchCorpTaxCompanyDetailsRateLimited(crn: String): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/corporation-tax/$crn/company/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))
@@ -51,12 +51,12 @@ object IfStub extends MockHost(8443) {
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.OK).withBody(Json.toJson(ifSaTaxpayerDetails).toString())))
 
-  def searchSaCompanyDetailsNotFound(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails): Unit =
+  def searchSaCompanyDetailsNotFound(utr: String): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.NOT_FOUND).withBody("NO_DATA_FOUND")))
 
-  def searchSaCompanyDetailsRateLimited(utr: String, ifSaTaxpayerDetails: IfSaTaxpayerDetails): Unit =
+  def searchSaCompanyDetailsRateLimited(utr: String): Unit =
     mock.register(
       get(urlPathEqualTo(s"/organisations/self-assessment/$utr/taxpayer/details"))
         .willReturn(aResponse().withStatus(Status.TOO_MANY_REQUESTS)))

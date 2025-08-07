@@ -16,19 +16,18 @@
 
 package uk.gov.hmrc.organisationsmatchingapi.cache
 
-import org.mongodb.scala.SingleObservableFuture
 import org.mongodb.scala.model.Indexes.ascending
 import org.mongodb.scala.model.{Filters, IndexModel, IndexOptions}
 import play.api.Configuration
 import play.api.libs.json.{Format, JsValue}
 import uk.gov.hmrc.crypto.json.JsonEncryption
-import uk.gov.hmrc.crypto.{ApplicationCrypto, Decrypter, Encrypter, Sensitive}
+import uk.gov.hmrc.crypto.{Decrypter, Encrypter, Sensitive, SymmetricCryptoFactory}
+import uk.gov.hmrc.mdc.Mdc.preservingMdc
 import uk.gov.hmrc.mongo.MongoComponent
 import uk.gov.hmrc.mongo.play.json.Codecs.toBson
 import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.organisationsmatchingapi.cache.InsertResult.{AlreadyExists, InsertSucceeded}
 import uk.gov.hmrc.organisationsmatchingapi.cache.MongoErrors.Duplicate
-import uk.gov.hmrc.play.http.logging.Mdc.preservingMdc
 
 import java.time.{LocalDateTime, ZoneOffset}
 import java.util.concurrent.TimeUnit
@@ -56,8 +55,8 @@ class ShortLivedCache @Inject() (
       )
     ) {
 
-  implicit lazy val crypto: Encrypter with Decrypter =
-    new ApplicationCrypto(configuration.underlying).JsonCrypto
+  implicit lazy val crypto: Encrypter & Decrypter =
+    SymmetricCryptoFactory.aesCryptoFromConfig("mongodb.encryption", configuration.underlying)
 
   def cache[T: Format](id: String, value: T): Future[InsertResult] = {
 

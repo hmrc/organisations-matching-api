@@ -25,9 +25,9 @@ case class IfNameDetails(name1: Option[String], name2: Option[String])
 object IfNameDetails {
 
   private val reads = (
-    (JsPath \ "name1").readNullable[String](maxLength(100)) and
-      (JsPath \ "name2").readNullable[String](maxLength(100))
-  )(IfNameDetails.apply _)
+    (JsPath \ "name1").readNullable[String](using maxLength(100)) and
+      (JsPath \ "name2").readNullable[String](using maxLength(100))
+  )(IfNameDetails.apply)
 
   private val writes = Json.writes[IfNameDetails]
 

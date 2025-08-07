@@ -67,7 +67,7 @@ class MatchingControllerSpec extends BaseSpec {
       )))
     )))
 
-  val ifVat = IfVatCustomerInformation(
+  val ifVat: IfVatCustomerInformation = IfVatCustomerInformation(
     IfVatApprovedInformation(
       IfVatCustomerDetails(Some("name")),
       IfPPOB(Some(IfVatCustomerAddress(Some("line1"), Some("NE1 1NE"))))
@@ -184,7 +184,7 @@ class MatchingControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       Given("Data not found in IF")
-      IfStub.searchCorpTaxCompanyDetailsNotFound(ctRequest.companyRegistrationNumber, ifCorpTax)
+      IfStub.searchCorpTaxCompanyDetailsNotFound(ctRequest.companyRegistrationNumber)
 
       val response: HttpResponse[String] = Http(s"$serviceUrl/corporation-tax")
         .headers(requestHeaders(acceptHeaderP1))
@@ -334,7 +334,7 @@ class MatchingControllerSpec extends BaseSpec {
       AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       Given("Data not found in IF")
-      IfStub.searchSaCompanyDetailsNotFound(saRequest.selfAssessmentUniqueTaxPayerRef, ifSa)
+      IfStub.searchSaCompanyDetailsNotFound(saRequest.selfAssessmentUniqueTaxPayerRef)
 
       val response: HttpResponse[String] = Http(s"$serviceUrl/self-assessment")
         .headers(requestHeaders(acceptHeaderP1))

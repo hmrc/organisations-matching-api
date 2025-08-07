@@ -36,7 +36,7 @@ object SaMatchingRequest {
         (JsPath \ "taxPayerName").read[String] and
         (JsPath \ "address" \ "addressLine1").read[String] and
         (JsPath \ "address" \ "postcode").read[String]
-    )(SaMatchingRequest.apply _),
+    )(SaMatchingRequest.apply),
     (
       (JsPath \ "selfAssessmentUniqueTaxPayerRef").write[String] and
         (JsPath \ "taxPayerType").write[String] and

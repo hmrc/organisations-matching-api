@@ -88,7 +88,7 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
       matchedService
     )
 
-    `given`(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(any(), any()))
+    `given`(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(using any(), any()))
       .willReturn(Future.successful(Enrolments(Set(Enrolment(mockScopeOne), Enrolment(mockScopeTwo)))))
   }
 

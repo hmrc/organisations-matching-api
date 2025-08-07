@@ -34,10 +34,10 @@ object IfSaTaxpayerDetails {
   private val taxpayerTypePattern: Regex = "^[A-Za-z0-9\\s -]{1,24}$".r
 
   private val reads = (
-    (JsPath \ "utr").readNullable[String](pattern(utrPattern, "UTR is in the incorrect Format")) and
-      (JsPath \ "taxpayerType").readNullable[String](pattern(taxpayerTypePattern, "Taxpayer type is not valid")) and
+    (JsPath \ "utr").readNullable[String](using pattern(utrPattern, "UTR is in the incorrect Format")) and
+      (JsPath \ "taxpayerType").readNullable[String](using pattern(taxpayerTypePattern, "Taxpayer type is not valid")) and
       (JsPath \ "taxpayerDetails").readNullable[Seq[IfSaTaxpayerNameAddress]]
-  )(IfSaTaxpayerDetails.apply _)
+  )(IfSaTaxpayerDetails.apply)
 
   private val writes = Json.writes[IfSaTaxpayerDetails]
 

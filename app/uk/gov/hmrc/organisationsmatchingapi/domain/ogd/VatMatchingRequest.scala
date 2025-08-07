@@ -24,11 +24,11 @@ case class VatMatchingRequest(vrn: String, organisationName: String, addressLine
 
 object VatMatchingRequest {
   private val reads: Reads[VatMatchingRequest] = (
-    (JsPath \ "vrn").read[String](pattern("^[0-9]{9}$".r, "VRN must be 9-character numeric")) and
+    (JsPath \ "vrn").read[String](using pattern("^[0-9]{9}$".r, "VRN must be 9-character numeric")) and
       (JsPath \ "organisationName").read[String] and
       (JsPath \ "addressLine1").read[String] and
       (JsPath \ "postcode").read[String]
-  )(VatMatchingRequest.apply _)
+  )(VatMatchingRequest.apply)
   private val writes: Writes[VatMatchingRequest] = Json.writes[VatMatchingRequest]
   implicit val vatMatchingRequestFormat: Format[VatMatchingRequest] = Format(reads, writes)
 }
