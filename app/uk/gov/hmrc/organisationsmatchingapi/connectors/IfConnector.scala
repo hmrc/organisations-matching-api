@@ -92,7 +92,7 @@ class IfConnector @Inject()(servicesConfig: ServicesConfig, http: HttpClientV2, 
                                                                                              request: RequestHeader
   ) =
     recover[R](
-      http.get(url"$url").setHeader(setHeaders(request, bearerToken):_*).execute[R].map(auditResponse(url, matchId)),
+      http.get(url"$url").setHeader(setHeaders(request, bearerToken)*).execute[R].map(auditResponse(url, matchId)),
       extractCorrelationId(request),
       matchId,
       request,

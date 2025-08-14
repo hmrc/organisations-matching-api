@@ -135,7 +135,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when organisations matching returns a bad request" in new Setup {
@@ -184,7 +184,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper,
-        times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "return a match for a matched request CT" in new Setup {
@@ -237,7 +237,7 @@ class OrganisationsMatchingConnectorSpec
       result shouldBe Json.toJson("match")
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(using any())
     }
 
     "return NOT_FOUND for a non matched request CT" in new Setup {
@@ -287,7 +287,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(using any())
     }
   }
 
@@ -326,7 +326,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when organisations matching returns a bad request" in new Setup {
@@ -363,7 +363,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "return a match for a matched request" in new Setup {
@@ -402,7 +402,7 @@ class OrganisationsMatchingConnectorSpec
       result shouldBe Json.toJson("match")
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(using any())
     }
 
     "return NOT_FOUND for a non matched request" in new Setup {
@@ -440,7 +440,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(using any())
     }
 
     "return appropriate header carrier" in new Setup {
@@ -468,7 +468,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "fail with InternalServerException when organisations matching vat returns bad request" in new Setup {
@@ -482,7 +482,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "return not found for a non matched request" in new Setup {
@@ -497,7 +497,7 @@ class OrganisationsMatchingConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(using any())
     }
 
     "return a match for a matched request" in new Setup {
@@ -511,7 +511,7 @@ class OrganisationsMatchingConnectorSpec
       await(underTest.matchCycleVat(matchId, correlationId, matchingRequest)) shouldBe Json.toJson("match")
 
       verify(auditHelper, times(1))
-        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(any())
+        .auditOrganisationsMatchingResponse(any(), any(), any(), any(), any())(using any())
     }
   }
 }

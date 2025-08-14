@@ -33,11 +33,11 @@ object IfCorpTaxCompanyDetails {
   val crnPattern = "^[A-Z0-9]{1,10}$".r
 
   private val reads = (
-    (JsPath \ "utr").readNullable[String](pattern(utrPattern, "UTR is in invalid format")) and
-      (JsPath \ "crn").readNullable[String](pattern(crnPattern, "CRN is in invalid format")) and
+    (JsPath \ "utr").readNullable[String](using pattern(utrPattern, "UTR is in invalid format")) and
+      (JsPath \ "crn").readNullable[String](using pattern(crnPattern, "CRN is in invalid format")) and
       (JsPath \ "registeredDetails").readNullable[IfNameAndAddressDetails] and
       (JsPath \ "communicationDetails").readNullable[IfNameAndAddressDetails]
-  )(IfCorpTaxCompanyDetails.apply _)
+  )(IfCorpTaxCompanyDetails.apply)
 
   private val writes = Json.writes[IfCorpTaxCompanyDetails]
 

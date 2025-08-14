@@ -48,7 +48,7 @@ class OrganisationsMatchingConnector @Inject()(
     val url = s"$baseUrl/organisations-matching/perform-match/cotax?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders): _*).execute[Either[UpstreamErrorResponse, JsValue]]
+      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders)*).execute[Either[UpstreamErrorResponse, JsValue]]
         map { response =>
         response.foreach(response =>
           auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
@@ -71,7 +71,7 @@ class OrganisationsMatchingConnector @Inject()(
       s"$baseUrl/organisations-matching/perform-match/self-assessment?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders): _*).execute[Either[UpstreamErrorResponse, JsValue]]
+      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders)*).execute[Either[UpstreamErrorResponse, JsValue]]
         map { response =>
         response.foreach(response =>
           auditHelper.auditOrganisationsMatchingResponse(correlationId, matchId, request, url, response)
@@ -92,7 +92,7 @@ class OrganisationsMatchingConnector @Inject()(
     val url = s"$baseUrl/organisations-matching/perform-match/vat?matchId=$matchId&correlationId=$correlationId"
 
     recover(
-      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders): _*).execute[Either[UpstreamErrorResponse, JsValue]]
+      http.post(url"$url").withBody(Json.toJson(postData)).setHeader(hc.headers(requiredHeaders)*).execute[Either[UpstreamErrorResponse, JsValue]]
         .map { response =>
           response.foreach(response =>
             auditHelper

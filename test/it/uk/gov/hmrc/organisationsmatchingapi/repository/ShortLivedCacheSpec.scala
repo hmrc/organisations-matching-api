@@ -72,7 +72,7 @@ class ShortLivedCacheSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
 
   "cache" should {
     "store the encrypted version of a value" in {
-      await(shortLivedCache.cache(id, testValue)(TestClass.format))
+      await(shortLivedCache.cache(id, testValue))
       retrieveRawCachedValue(id) shouldBe JsString(
         "I9gl6p5GRucOfXOFmhtiYfePGl5Nnksdk/aJFXf0iVQ=")
     }
@@ -80,16 +80,14 @@ class ShortLivedCacheSpec extends AnyWordSpec with Matchers with GuiceOneAppPerS
 
   "fetch" should {
     "retrieve the unencrypted cached value for a given id and key" in {
-      await(shortLivedCache.cache(id, testValue)(TestClass.format))
+      await(shortLivedCache.cache(id, testValue))
       await(
-        shortLivedCache.fetchAndGetEntry(id)(
-          TestClass.format)) shouldBe Some(testValue)
+        shortLivedCache.fetchAndGetEntry[TestClass](id)) shouldBe Some(testValue)
     }
 
     "return None if no cached value exists for a given id and key" in {
       await(
-        shortLivedCache.fetchAndGetEntry(id)(
-          TestClass.format)) shouldBe None
+        shortLivedCache.fetchAndGetEntry[TestClass](id)) shouldBe None
     }
   }
 

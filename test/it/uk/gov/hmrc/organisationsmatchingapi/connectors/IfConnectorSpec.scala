@@ -134,7 +134,7 @@ class IfConnectorSpec
       val result: IfCorpTaxCompanyDetails = await(underTest.fetchCorporationTax(matchId, crn))
 
       verify(auditHelper, times(1))
-        .auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        .auditIfApiResponse(any(), any(), any(), any(), any())(using any())
 
       result shouldBe IfCorpTaxCompanyDetails(
         Some(utr),
@@ -154,7 +154,7 @@ class IfConnectorSpec
       }
 
       verify(auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
@@ -167,7 +167,7 @@ class IfConnectorSpec
       }
 
       verify(auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
@@ -179,7 +179,7 @@ class IfConnectorSpec
         await(underTest.fetchCorporationTax(UUID.randomUUID().toString, "12345678"))
       }
       verify(auditHelper, times(1))
-        .auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        .auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
   }
 
@@ -231,7 +231,7 @@ class IfConnectorSpec
       )
 
       verify(auditHelper, times(1))
-        .auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        .auditIfApiResponse(any(), any(), any(), any(), any())(using any())
 
       result shouldBe IfSaTaxpayerDetails(
         Some(utr),
@@ -250,7 +250,7 @@ class IfConnectorSpec
       }
 
       verify(auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when IF returns a bad request" in new Setup {
@@ -263,7 +263,7 @@ class IfConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        .auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "Fail when IF returns a NOT_FOUND" in new Setup {
@@ -275,7 +275,7 @@ class IfConnectorSpec
         await(underTest.fetchSelfAssessment(UUID.randomUUID().toString, "1234567890"))
       }
       verify(auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
   }
 
@@ -307,7 +307,7 @@ class IfConnectorSpec
       val result: IfVatCustomerInformation = await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
 
       verify(auditHelper, times(1))
-        .auditIfApiResponse(any(), any(), any(), any(), any())(any())
+        .auditIfApiResponse(any(), any(), any(), any(), any())(using any())
 
       result shouldBe ifResponse
     }
@@ -322,7 +322,7 @@ class IfConnectorSpec
       }
 
       verify(auditHelper, times(1))
-        .auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        .auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "fail with InternalServerException when IF returns a bad request" in new Setup {
@@ -335,7 +335,7 @@ class IfConnectorSpec
       }
 
       verify(auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
 
     "fail with MatchingException when IF returns a NOT_FOUND" in new Setup {
@@ -347,7 +347,7 @@ class IfConnectorSpec
         await(underTest.fetchVat(UUID.randomUUID().toString, vrn))
       }
       verify(auditHelper,
-        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(any())
+        times(1)).auditIfApiFailure(any(), any(), any(), any(), any())(using any())
     }
   }
 }

@@ -35,11 +35,11 @@ object CtMatchingRequest {
 
   implicit val ctMatchingformat: Format[CtMatchingRequest] = Format(
     (
-      (JsPath \ "companyRegistrationNumber").read[String](pattern(crnPattern, "error.crn")) and
+      (JsPath \ "companyRegistrationNumber").read[String](using pattern(crnPattern, "error.crn")) and
         (JsPath \ "employerName").read[String] and
         (JsPath \ "address" \ "addressLine1").read[String] and
         (JsPath \ "address" \ "postcode").read[String]
-    )(CtMatchingRequest.apply _),
+    )(CtMatchingRequest.apply),
     (
       (JsPath \ "companyRegistrationNumber").write[String] and
         (JsPath \ "employerName").write[String] and

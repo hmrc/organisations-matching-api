@@ -16,7 +16,6 @@
 
 package it.uk.gov.hmrc.organisationsmatchingapi.services
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
 import org.mockito.BDDMockito.`given`
 import org.mockito.Mockito
 import org.mockito.Mockito.{times, verify}
@@ -52,7 +51,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "Retrieve CT match details from cache service" in {
       Mockito.reset(mockMatchRepo)
 
-      `given`(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[CtMatch](matchId.toString))
         .willReturn(Future.successful(Some(ctMatch)))
 
       val result = cacheService.fetch[CtMatch](matchId)
@@ -62,7 +61,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "CT return none where no details found in cache" in {
       Mockito.reset(mockMatchRepo)
 
-      `given`(mockMatchRepo.fetchAndGetEntry[CtMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[CtMatch](matchId.toString))
         .willReturn(Future.successful(None))
 
       val result = cacheService.fetch[CtMatch](matchId)
@@ -72,7 +71,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "Retrieve SA match details from cache service" in {
       Mockito.reset(mockMatchRepo)
 
-      `given`(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[SaMatch](matchId.toString))
         .willReturn(Future.successful(Some(saMatch)))
 
       val result = cacheService.fetch[SaMatch](matchId)
@@ -82,7 +81,7 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
     "SA return none where no details found in cache" in {
       Mockito.reset(mockMatchRepo)
 
-      `given`(mockMatchRepo.fetchAndGetEntry[SaMatch](any())(any()))
+      `given`(mockMatchRepo.fetchAndGetEntry[SaMatch](matchId.toString))
         .willReturn(Future.successful(None))
 
       val result = cacheService.fetch[SaMatch](matchId)
@@ -97,25 +96,24 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
       val ctUtr = "SOMECTUTR"
       val expected = ctMatch.copy(utr = Some(ctUtr))
 
-      `given`(mockMatchRepo.cache(any(), any())(any()))
+      `given`(mockMatchRepo.cache(matchId.toString, expected))
         .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await {
-        cacheService.cacheCtUtr(ctMatch, ctUtr)
-      }
-      verify(mockMatchRepo, times(1)).cache(any(), eqTo(expected))(any())
+      cacheService.cacheCtUtr(ctMatch, ctUtr)
+     }
+      verify(mockMatchRepo, times(1)).cache(matchId.toString, expected)
     }
   }
 
   "cacheVatVrn" should {
     "save VRN to the cache" in {
       Mockito.reset(mockMatchRepo)
-
-      `given`(mockMatchRepo.cache(any(), any())(any()))
+      `given`(mockMatchRepo.cache[VatMatch](matchId.toString, vatMatch))
         .willReturn(Future.successful(InsertResult.InsertSucceeded))
 
       await(cacheService.cacheVatVrn(vatMatch))
-      verify(mockMatchRepo, times(1)).cache(any(), eqTo(vatMatch))(any())
+      verify(mockMatchRepo, times(1)).cache(matchId.toString, vatMatch)
     }
   }
 
@@ -126,13 +124,12 @@ class CacheServiceSpec extends AnyWordSpec with Matchers with GuiceOneAppPerSuit
       val saUtr = "SOMESAUTR"
       val expected = saMatch.copy(utr = Some(saUtr))
 
-      `given`(mockMatchRepo.cache(any(), any())(any()))
+      `given`(mockMatchRepo.cache[SaMatch](matchId.toString, expected))
         .willReturn(Future.successful(InsertResult.InsertSucceeded))
-
       await {
         cacheService.cacheSaUtr(saMatch, saUtr)
       }
-      verify(mockMatchRepo, times(1)).cache(any(), eqTo(expected))(any())
+      verify(mockMatchRepo, times(1)).cache(matchId.toString, expected)
     }
   }
 }

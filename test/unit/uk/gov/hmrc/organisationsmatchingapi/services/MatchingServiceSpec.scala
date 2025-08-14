@@ -81,13 +81,13 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
           line4 = None,
           postcode = Some("postcode"))))))
 
-    `given`(mockIfConnector.fetchCorporationTax(any(), any())(any(), any()))
+    `given`(mockIfConnector.fetchCorporationTax(any(), any())(using any(), any()))
       .willReturn(Future.successful(corpTaxCompanyDetails))
 
     `given`(mockCacheService.cacheCtUtr(any(), any())).willReturn(Future.successful(InsertResult.InsertSucceeded))
 
     "Matching connector returns a match" in {
-      `given`(mockMatchingConnector.matchCycleCotax(any(), any(), any())(any(), any()))
+      `given`(mockMatchingConnector.matchCycleCotax(any(), any(), any())(using any(), any()))
         .willReturn(Future.successful(JsString("match")))
 
       val result = await(matchingService.matchCoTax(
@@ -99,7 +99,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     }
 
     "Matching connector returns a Not Found" in {
-      `given`(mockMatchingConnector.matchCycleCotax(any(), any(), any())(any(), any()))
+      `given`(mockMatchingConnector.matchCycleCotax(any(), any(), any())(using any(), any()))
         .willReturn(Future.failed(new NotFoundException("Not found")))
 
       intercept[NotFoundException] {
@@ -127,13 +127,13 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
       )))
     )
 
-    `given`(mockIfConnector.fetchSelfAssessment(any(), any())(any(), any()))
+    `given`(mockIfConnector.fetchSelfAssessment(any(), any())(using any(), any()))
       .willReturn(Future.successful(saTaxpayerDetails))
 
     `given`(mockCacheService.cacheSaUtr(any(), any())).willReturn(Future.successful(InsertResult.InsertSucceeded))
 
     "Matching connector returns a match" in {
-      `given`(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(any(), any()))
+      `given`(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(using any(), any()))
         .willReturn(Future.successful(JsString("match")))
 
       val result = await(matchingService.matchSaTax(
@@ -145,7 +145,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     }
 
     "Matching connector returns a Not Found" in {
-      `given`(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(any(), any()))
+      `given`(mockMatchingConnector.matchCycleSelfAssessment(any(), any(), any())(using any(), any()))
         .willReturn(Future.failed(new NotFoundException("Not found")))
 
       intercept[NotFoundException] {
@@ -167,7 +167,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
     )
 
     "matching return a match" in {
-      `given`(mockIfConnector.fetchVat(eqTo(matchId.toString), eqTo(request.vrn))(any(), any()))
+      `given`(mockIfConnector.fetchVat(eqTo(matchId.toString), eqTo(request.vrn))(using any(), any()))
         .willReturn(Future.successful(ifResponse))
       val orgsMatchingRequest = VatOrganisationsMatchingRequest(
         VatKnownFacts(request.vrn, request.organisationName, request.addressLine1, request.postcode),
@@ -178,7 +178,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
           ifResponse.approvedInformation.PPOB.address.flatMap(_.postCode)
         )
       )
-      `given`(mockMatchingConnector.matchCycleVat(eqTo(matchId), eqTo(UUID.randomUUID()), eqTo(orgsMatchingRequest))(any(), any()))
+      `given`(mockMatchingConnector.matchCycleVat(eqTo(matchId), eqTo(UUID.randomUUID()), eqTo(orgsMatchingRequest))(using any(), any()))
         .willReturn(Future.successful(Json.toJson("test")))
       `given`(mockCacheService.cacheVatVrn(VatMatch(matchId, Some(request.vrn))))
     }

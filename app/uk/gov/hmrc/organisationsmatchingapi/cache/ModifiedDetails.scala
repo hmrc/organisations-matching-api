@@ -28,7 +28,7 @@ object ModifiedDetails {
     (
       (JsPath \ "createdAt").read[LocalDateTime] and
         (JsPath \ "lastUpdated").read[LocalDateTime]
-    )(ModifiedDetails.apply _),
+    )(ModifiedDetails.apply),
     (
       (JsPath \ "createdAt").write[LocalDateTime] and
         (JsPath \ "lastUpdated").write[LocalDateTime]

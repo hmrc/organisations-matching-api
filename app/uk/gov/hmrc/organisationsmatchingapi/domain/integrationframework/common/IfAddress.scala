@@ -31,12 +31,12 @@ case class IfAddress(
 object IfAddress {
 
   private val reads = (
-    (JsPath \ "line1").readNullable[String](maxLength(100)) and
-      (JsPath \ "line2").readNullable[String](maxLength(100)) and
-      (JsPath \ "line3").readNullable[String](maxLength(100)) and
-      (JsPath \ "line4").readNullable[String](maxLength(100)) and
-      (JsPath \ "postcode").readNullable[String](maxLength(10))
-  )(IfAddress.apply _)
+    (JsPath \ "line1").readNullable[String](using maxLength(100)) and
+      (JsPath \ "line2").readNullable[String](using maxLength(100)) and
+      (JsPath \ "line3").readNullable[String](using maxLength(100)) and
+      (JsPath \ "line4").readNullable[String](using maxLength(100)) and
+      (JsPath \ "postcode").readNullable[String](using maxLength(10))
+  )(IfAddress.apply)
 
   private val writes = Json.writes[IfAddress]
 
