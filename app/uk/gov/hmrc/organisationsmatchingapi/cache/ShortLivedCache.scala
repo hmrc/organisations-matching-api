@@ -29,7 +29,7 @@ import uk.gov.hmrc.mongo.play.json.PlayMongoRepository
 import uk.gov.hmrc.organisationsmatchingapi.cache.InsertResult.{AlreadyExists, InsertSucceeded}
 import uk.gov.hmrc.organisationsmatchingapi.cache.MongoErrors.Duplicate
 
-import java.time.{LocalDateTime, ZoneOffset}
+import java.time.Instant
 import java.util.concurrent.TimeUnit
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
@@ -67,8 +67,8 @@ class ShortLivedCache @Inject() (
       id,
       new Data(encryptedValue),
       new ModifiedDetails(
-        LocalDateTime.now(ZoneOffset.UTC),
-        LocalDateTime.now(ZoneOffset.UTC)
+        Instant.now(),
+        Instant.now()
       )
     )
 
