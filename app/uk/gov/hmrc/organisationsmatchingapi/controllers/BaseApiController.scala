@@ -65,6 +65,24 @@ abstract class BaseApiController @Inject() (mcc: MessagesControllerComponents, c
         }
     }
 
+  protected def auditApiResponse(
+    response: JsValue,
+    correlationId: String,
+    matchId: String,
+    authScopes: Iterable[String],
+    selfLink: String
+  )(implicit request: Request[?], auditHelper: AuditHelper): Result = {
+    auditHelper.auditApiResponse(
+      correlationId,
+      matchId,
+      authScopes.mkString(","),
+      request,
+      selfLink,
+      Some(response)
+    )
+    Ok(response)
+  }
+
   private[controllers] def recoveryWithAudit(correlationId: Option[String], matchId: String, url: String)(implicit
     request: RequestHeader,
     auditHelper: AuditHelper
@@ -110,6 +128,8 @@ abstract class BaseApiController @Inject() (mcc: MessagesControllerComponents, c
 
 trait PrivilegedAuthentication extends AuthorisedFunctions {
 
+  val internalAuthHelper: InternalAuthHelper
+
   def authPredicate(scopes: Iterable[String]): Predicate =
     scopes.map(Enrolment(_): Predicate).reduce(_ or _)
 
@@ -121,9 +141,15 @@ trait PrivilegedAuthentication extends AuthorisedFunctions {
   ): Future[Result] = {
     if (endpointScopes.isEmpty) throw new Exception("No scopes defined")
 
-    authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { scopes =>
-      auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
-      f(scopes.enrolments.map(e => e.key))
+    internalAuthHelper.isAuthorised.flatMap {
+      case true =>
+        auditHelper.auditAuthScopes(matchId, "internal-auth", request)
+        f(endpointScopes)
+      case false =>
+        authorised(authPredicate(endpointScopes)).retrieve(Retrievals.allEnrolments) { scopes =>
+          auditHelper.auditAuthScopes(matchId, scopes.enrolments.map(e => e.key).mkString(","), request)
+          f(scopes.enrolments.map(e => e.key))
+        }
     }
   }
 }

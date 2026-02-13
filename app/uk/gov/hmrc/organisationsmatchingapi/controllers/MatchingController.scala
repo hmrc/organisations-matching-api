@@ -35,6 +35,7 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class MatchingController @Inject() (
   val authConnector: AuthConnector,
+  val internalAuthHelper: InternalAuthHelper,
   cc: ControllerComponents,
   mcc: MessagesControllerComponents,
   scopeService: ScopesService,
@@ -58,16 +59,7 @@ class MatchingController @Inject() (
               .getHalLinks(matchId, None, authScopes, Some(List("getCorporationTaxMatch"))) ++ selfLink
           )
 
-          auditHelper.auditApiResponse(
-            correlationId.toString,
-            matchId.toString,
-            authScopes.mkString(","),
-            request,
-            selfLink.toString,
-            Some(response)
-          )
-
-          Ok(response)
+          auditApiResponse(response, correlationId.toString, matchId.toString, authScopes, selfLink.toString)
         }
       }
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
@@ -87,16 +79,7 @@ class MatchingController @Inject() (
               .getHalLinks(matchId, None, authScopes, Some(List("getSelfAssessmentMatch"))) ++ selfLink
           )
 
-          auditHelper.auditApiResponse(
-            correlationId.toString,
-            matchId.toString,
-            authScopes.mkString(","),
-            request,
-            selfLink.toString,
-            Some(response)
-          )
-
-          Ok(response)
+          auditApiResponse(response, correlationId.toString, matchId.toString, authScopes, selfLink.toString)
         }
       }
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)
@@ -114,16 +97,7 @@ class MatchingController @Inject() (
           val data = toJson(MatchIdResponse(matchId))
           val response = Json.toJson(state(data) ++ halLinks ++ selfLink)
 
-          auditHelper.auditApiResponse(
-            correlationId.toString,
-            matchId.toString,
-            authScopes.mkString(","),
-            request,
-            selfLink.toString,
-            Some(response)
-          )
-
-          Ok(response)
+          auditApiResponse(response, correlationId.toString, matchId.toString, authScopes, selfLink.toString)
         }
       }
     } recover recoveryWithAudit(maybeCorrelationId(request), request.body.toString, self)

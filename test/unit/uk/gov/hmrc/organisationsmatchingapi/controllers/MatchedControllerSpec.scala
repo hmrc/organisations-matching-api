@@ -18,20 +18,26 @@ package unit.uk.gov.hmrc.organisationsmatchingapi.controllers
 
 import org.mockito.ArgumentMatchers.{any, refEq}
 import org.mockito.BDDMockito.`given`
+import org.mockito.Mockito.{atLeastOnce, never, verify}
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Configuration
+import play.api.http.HeaderNames.AUTHORIZATION
 import play.api.http.Status.*
 import play.api.libs.json.Json
-import play.api.mvc.{AnyContentAsEmpty, Result}
+import play.api.mvc.{AnyContentAsEmpty, ControllerComponents, Result}
 import play.api.test.Helpers.{contentAsJson, defaultAwaitTimeout, status}
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.authorise.Predicate
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.internalauth.client.test.{BackendAuthComponentsStub, StubBehaviour}
+import uk.gov.hmrc.internalauth.client.BackendAuthComponents
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchedController
+import uk.gov.hmrc.organisationsmatchingapi.controllers.{InternalAuthHelper, MatchedController}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.*
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchedService, ScopesHelper, ScopesService}
@@ -49,6 +55,14 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
     val fakeRequest: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/").withHeaders(sampleCorrelationIdHeader)
     val fakeRequestMalformed: FakeRequest[AnyContentAsEmpty.type] = FakeRequest("GET", "/").withHeaders(badCorrelationIdHeader)
     val mockAuthConnector: AuthConnector = mock[AuthConnector]
+    val mockInternalAuthBehaviour: StubBehaviour = mock[StubBehaviour]
+    val controllerComponents: ControllerComponents = Helpers.stubControllerComponents()
+    implicit val cc: ControllerComponents = controllerComponents
+    val backendAuthComponents: BackendAuthComponents = BackendAuthComponentsStub(mockInternalAuthBehaviour)
+    val internalAuthHelper = new InternalAuthHelper(
+      backendAuthComponents,
+      Configuration(InternalAuthHelper.InternalAuthFeatureFlag -> true)
+    )
 
     lazy val scopeService: ScopesService = new ScopesService(mockConfig)
     lazy val scopesHelper: ScopesHelper = new ScopesHelper(scopeService)
@@ -81,7 +95,8 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
     val controller = new MatchedController(
       mockAuthConnector,
-      Helpers.stubControllerComponents(),
+      internalAuthHelper,
+      controllerComponents,
       Helpers.stubMessagesControllerComponents(),
       scopeService,
       scopesHelper,
@@ -90,6 +105,8 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
 
     `given`(mockAuthConnector.authorise(any(), refEq(Retrievals.allEnrolments))(using any(), any()))
       .willReturn(Future.successful(Enrolments(Set(Enrolment(mockScopeOne), Enrolment(mockScopeTwo)))))
+    `given`(mockInternalAuthBehaviour.stubAuth(any(), any()))
+      .willReturn(Future.failed(UpstreamErrorResponse("Unauthorized", UNAUTHORIZED)))
   }
 
   "GET matchedOrganisationCt" when {
@@ -126,6 +143,31 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
              |  }
              |}""".stripMargin
         )
+      }
+
+      "use internal auth first and skip scopes auth when internal auth is authorised" in new Setup {
+        `given`(mockInternalAuthBehaviour.stubAuth(any(), any())).willReturn(Future.successful(true))
+        `given`(matchedService.fetchCt(matchId)).willReturn(Future.successful(ctMatch))
+
+        val result: Future[Result] = controller.matchedOrganisationCt(matchId.toString)(
+          fakeRequest.withHeaders(sampleCorrelationIdHeader, AUTHORIZATION -> "Bearer internal-token")
+        )
+        status(result) shouldBe OK
+
+        verify(mockInternalAuthBehaviour, atLeastOnce()).stubAuth(any(), any())
+        verify(mockAuthConnector, never()).authorise(any(), any())(using any(), any())
+      }
+
+      "fall back to scopes auth when internal auth is unauthorized" in new Setup {
+        `given`(matchedService.fetchCt(matchId)).willReturn(Future.successful(ctMatch))
+
+        val result: Future[Result] = controller.matchedOrganisationCt(matchId.toString)(
+          fakeRequest.withHeaders(sampleCorrelationIdHeader, AUTHORIZATION -> "Bearer internal-token")
+        )
+        status(result) shouldBe OK
+
+        verify(mockInternalAuthBehaviour, atLeastOnce()).stubAuth(any(), any())
+        verify(mockAuthConnector, atLeastOnce()).authorise(any(), any())(using any(), any())
       }
     }
 
@@ -270,6 +312,31 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
           s"""{ "matchId": "$matchId", "utr": "test" }"""
         )
       }
+
+      "use internal auth first and skip scopes auth when internal auth is authorised" in new Setup {
+        `given`(mockInternalAuthBehaviour.stubAuth(any(), any())).willReturn(Future.successful(true))
+        `given`(matchedService.fetchMatchedOrganisationRecord(matchId)).willReturn(Future.successful(utrMatch))
+
+        val result: Future[Result] = controller.matchedOrganisation(matchId.toString)(
+          fakeRequest.withHeaders(sampleCorrelationIdHeader, AUTHORIZATION -> "Bearer internal-token")
+        )
+        status(result) shouldBe OK
+
+        verify(mockInternalAuthBehaviour, atLeastOnce()).stubAuth(any(), any())
+        verify(mockAuthConnector, never()).authorise(any(), any())(using any(), any())
+      }
+
+      "fall back to scopes auth when internal auth is unauthorized" in new Setup {
+        `given`(matchedService.fetchMatchedOrganisationRecord(matchId)).willReturn(Future.successful(utrMatch))
+
+        val result: Future[Result] = controller.matchedOrganisation(matchId.toString)(
+          fakeRequest.withHeaders(sampleCorrelationIdHeader, AUTHORIZATION -> "Bearer internal-token")
+        )
+        status(result) shouldBe OK
+
+        verify(mockInternalAuthBehaviour, atLeastOnce()).stubAuth(any(), any())
+        verify(mockAuthConnector, atLeastOnce()).authorise(any(), any())(using any(), any())
+      }
     }
 
     "runtime exception is encountered through no match for information provided" should {
@@ -338,6 +405,45 @@ class MatchedControllerSpec extends AnyWordSpec with Matchers with MockitoSugar 
         "MATCHING_FAILED",
         "There is no match for the information provided"
       )
+    }
+  }
+
+  "verify matchedVatRecord" when {
+    "given a valid matchId" should {
+      "return 200" in new Setup {
+        `given`(matchedService.fetchMatchedOrganisationVatRecord(matchId)).willReturn(Future.successful(vatMatch))
+
+        val result: Future[Result] = controller.matchedVatRecord(matchId)(fakeRequest)
+        status(result) shouldBe OK
+        contentAsJson(result) shouldBe Json.parse(
+          s"""{ "matchId": "$matchId", "vrn": "${vatMatch.vrn.mkString}" }"""
+        )
+      }
+
+      "use internal auth first and skip scopes auth when internal auth is authorised" in new Setup {
+        `given`(mockInternalAuthBehaviour.stubAuth(any(), any())).willReturn(Future.successful(true))
+        `given`(matchedService.fetchMatchedOrganisationVatRecord(matchId)).willReturn(Future.successful(vatMatch))
+
+        val result: Future[Result] = controller.matchedVatRecord(matchId)(
+          fakeRequest.withHeaders(sampleCorrelationIdHeader, AUTHORIZATION -> "Bearer internal-token")
+        )
+        status(result) shouldBe OK
+
+        verify(mockInternalAuthBehaviour, atLeastOnce()).stubAuth(any(), any())
+        verify(mockAuthConnector, never()).authorise(any(), any())(using any(), any())
+      }
+
+      "fall back to scopes auth when internal auth is unauthorized" in new Setup {
+        `given`(matchedService.fetchMatchedOrganisationVatRecord(matchId)).willReturn(Future.successful(vatMatch))
+
+        val result: Future[Result] = controller.matchedVatRecord(matchId)(
+          fakeRequest.withHeaders(sampleCorrelationIdHeader, AUTHORIZATION -> "Bearer internal-token")
+        )
+        status(result) shouldBe OK
+
+        verify(mockInternalAuthBehaviour, atLeastOnce()).stubAuth(any(), any())
+        verify(mockAuthConnector, atLeastOnce()).authorise(any(), any())(using any(), any())
+      }
     }
   }
 

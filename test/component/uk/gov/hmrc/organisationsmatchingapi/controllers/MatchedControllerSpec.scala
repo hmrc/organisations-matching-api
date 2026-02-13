@@ -449,12 +449,15 @@ class MatchedControllerSpec extends BaseSpec  {
   Feature("matched organisation") {
     Scenario("a valid request is made for an existing match id") {
       Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match exist")
       result(mongoRepository.cache(matchId.toString, saMatch), timeout)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/match-record/$matchId").asString
+      val response = Http(s"$serviceUrl/match-record/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
 
       response.code shouldBe OK
 
@@ -465,11 +468,14 @@ class MatchedControllerSpec extends BaseSpec  {
 
     Scenario("a valid request is made for a match id that does not exist") {
       Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match does not exist")
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/match-record/$matchId").asString
+      val response = Http(s"$serviceUrl/match-record/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
 
       response.code shouldBe NOT_FOUND
 
@@ -481,12 +487,15 @@ class MatchedControllerSpec extends BaseSpec  {
 
     Scenario("a valid request is made for an invalid match id") {
       Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match exist")
       result(mongoRepository.cache(matchId.toString, saMatch), timeout)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/match-record/foo").asString
+      val response = Http(s"$serviceUrl/match-record/foo")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
 
       response.code shouldBe BAD_REQUEST
 
@@ -495,17 +504,33 @@ class MatchedControllerSpec extends BaseSpec  {
         "message" -> "matchId format is invalid"
       )
     }
+
+    Scenario("not authorized") {
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code shouldBe UNAUTHORIZED
+    }
   }
 
   Feature("matched organisation vat") {
     Scenario("a valid request is made for an existing match id") {
       Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match exist")
       result(mongoRepository.cache(matchId.toString, vatMatch), timeout)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/match-record/vat/$matchId").headers(acceptHeaderP1).asString
+      val response = Http(s"$serviceUrl/match-record/vat/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
 
       response.code shouldBe OK
 
@@ -516,11 +541,14 @@ class MatchedControllerSpec extends BaseSpec  {
 
     Scenario("a valid request is made for a match id that does not exist") {
       Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match does not exist")
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/match-record/vat/$matchId").asString
+      val response = Http(s"$serviceUrl/match-record/vat/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
 
       response.code shouldBe NOT_FOUND
 
@@ -532,12 +560,15 @@ class MatchedControllerSpec extends BaseSpec  {
 
     Scenario("a valid request is made for an invalid match id") {
       Given("A valid privileged Auth bearer token")
+      AuthStub.willAuthorizePrivilegedAuthToken(authToken, scopes)
 
       And("A valid match exist")
       result(mongoRepository.cache(matchId.toString, saMatch), timeout)
 
       When("the API is invoked")
-      val response = Http(s"$serviceUrl/match-record/vat/foo").asString
+      val response = Http(s"$serviceUrl/match-record/vat/foo")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
 
       response.code shouldBe BAD_REQUEST
 
@@ -545,6 +576,19 @@ class MatchedControllerSpec extends BaseSpec  {
         "code" -> "INVALID_REQUEST",
         "message" -> "matchId format is invalid"
       )
+    }
+
+    Scenario("not authorized") {
+      Given("an invalid privileged Auth bearer token")
+      AuthStub.willNotAuthorizePrivilegedAuthToken(authToken, scopes)
+
+      When("the API is invoked")
+      val response = Http(s"$serviceUrl/match-record/vat/$matchId")
+        .headers(requestHeaders(acceptHeaderP1))
+        .asString
+
+      Then("the response status should be 401 (unauthorized)")
+      response.code shouldBe UNAUTHORIZED
     }
   }
 

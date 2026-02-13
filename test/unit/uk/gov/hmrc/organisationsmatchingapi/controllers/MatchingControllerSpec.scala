@@ -21,15 +21,19 @@ import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatestplus.mockito.MockitoSugar
+import play.api.Configuration
 import play.api.http.Status
 import play.api.libs.json.Json
-import play.api.mvc.PlayBodyParsers
+import play.api.mvc.{ControllerComponents, PlayBodyParsers}
 import play.api.test.Helpers._
 import play.api.test.{FakeRequest, Helpers}
 import uk.gov.hmrc.auth.core.retrieve.v2.Retrievals
 import uk.gov.hmrc.auth.core.{AuthConnector, Enrolment, Enrolments}
+import uk.gov.hmrc.http.UpstreamErrorResponse
+import uk.gov.hmrc.internalauth.client.test.{BackendAuthComponentsStub, StubBehaviour}
+import uk.gov.hmrc.internalauth.client.BackendAuthComponents
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
-import uk.gov.hmrc.organisationsmatchingapi.controllers.MatchingController
+import uk.gov.hmrc.organisationsmatchingapi.controllers.{InternalAuthHelper, MatchingController}
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.VatMatchingRequest
 import uk.gov.hmrc.organisationsmatchingapi.services.{MatchingService, ScopesHelper, ScopesService}
@@ -48,10 +52,19 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
   private val scopesHelper = new ScopesHelper(mockScopesService)
   private val mockMatchingService = mock[MatchingService]
   private val mockBodyParser = mock[PlayBodyParsers]
+  private val mockInternalAuthBehaviour = mock[StubBehaviour]
+  private val controllerComponents = Helpers.stubControllerComponents()
+  private implicit val cc: ControllerComponents = controllerComponents
+  private val backendAuthComponents: BackendAuthComponents = BackendAuthComponentsStub(mockInternalAuthBehaviour)
+  private val internalAuthHelper = new InternalAuthHelper(
+    backendAuthComponents,
+    Configuration(InternalAuthHelper.InternalAuthFeatureFlag -> true)
+  )
 
   private val controller = new MatchingController(
     mockAuthConnector,
-    Helpers.stubControllerComponents(),
+    internalAuthHelper,
+    controllerComponents,
     Helpers.stubMessagesControllerComponents(),
     mockScopesService,
     scopesHelper,
@@ -63,6 +76,8 @@ class MatchingControllerSpec extends AnyWordSpec with SpecBase with Matchers wit
     .willReturn(Future.successful(Enrolments(Set(Enrolment("test-scope"), Enrolment("test-scope-1")))))
 
   `given`(mockScopesService.getAllScopes).willReturn(List("test-scope", "test-scope-1"))
+  `given`(mockInternalAuthBehaviour.stubAuth(any(), any()))
+    .willReturn(Future.failed(UpstreamErrorResponse("Unauthorized", Status.UNAUTHORIZED)))
 
   `given`(mockMatchingService.matchSaTax(any(), any(), any())(using any(), any())).willReturn(Future.successful(Json.toJson("match")))
   `given`(mockMatchingService.matchCoTax(any(), any(), any())(using any(), any())).willReturn(Future.successful(Json.toJson("match")))
