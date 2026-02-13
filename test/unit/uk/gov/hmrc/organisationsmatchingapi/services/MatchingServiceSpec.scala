@@ -181,6 +181,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
       `given`(mockMatchingConnector.matchCycleVat(eqTo(matchId), eqTo(UUID.randomUUID()), eqTo(orgsMatchingRequest))(using any(), any()))
         .willReturn(Future.successful(Json.toJson("test")))
       `given`(mockCacheService.cacheVatVrn(VatMatch(matchId, Some(request.vrn))))
+        .willReturn(Future.successful(InsertResult.InsertSucceeded))
     }
   }
 }

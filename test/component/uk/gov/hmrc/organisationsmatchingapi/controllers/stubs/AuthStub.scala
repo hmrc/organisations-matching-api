@@ -96,4 +96,7 @@ object AuthStub extends MockHost(22000) {
         .willReturn(aResponse()
           .withStatus(Status.UNAUTHORIZED)
           .withHeader(HeaderNames.WWW_AUTHENTICATE, """MDTP detail="Bearer token is missing or not authorized"""")))
+
+  def verifyAuthoriseRequestCount(expectedCount: Int): Unit =
+    server.verify(expectedCount, postRequestedFor(urlEqualTo("/auth/authorise")))
 }

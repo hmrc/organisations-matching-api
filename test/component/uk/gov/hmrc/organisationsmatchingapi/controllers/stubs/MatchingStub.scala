@@ -19,7 +19,7 @@ package component.uk.gov.hmrc.organisationsmatchingapi.controllers.stubs
 import com.github.tomakehurst.wiremock.client.WireMock._
 import play.api.http.Status
 
-object MatchingStub extends MockHost(9658) {
+object MatchingStub extends MockHost(22001) {
 
   def willReturnCtMatch(correlationId: String): Unit =
     mock.register(

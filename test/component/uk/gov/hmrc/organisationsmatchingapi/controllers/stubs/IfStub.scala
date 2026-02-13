@@ -23,7 +23,7 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.IfCor
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.IfSaTaxpayerDetails
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformation
 
-object IfStub extends MockHost(8443) {
+object IfStub extends MockHost(22002) {
 
 
   def searchCorpTaxCompanyDetails(crn: String, ifCorpTaxCompanyDetails: IfCorpTaxCompanyDetails): Unit =

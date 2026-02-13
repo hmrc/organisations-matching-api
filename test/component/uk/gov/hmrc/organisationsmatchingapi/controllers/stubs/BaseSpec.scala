@@ -27,9 +27,11 @@ import org.scalatestplus.play.guice.GuiceOneServerPerSuite
 import play.api.Application
 import play.api.http.HeaderNames.{ACCEPT, AUTHORIZATION, CONTENT_TYPE}
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.{Helpers, TestServer}
 import play.mvc.Http.MimeTypes.JSON
 import uk.gov.hmrc.organisationsmatchingapi.repository.MatchRepository
 
+import java.net.ServerSocket
 import scala.concurrent.Await.result
 import scala.concurrent.duration.{Duration, FiniteDuration}
 
@@ -41,23 +43,25 @@ trait BaseSpec
     extends AnyFeatureSpec with BeforeAndAfterAll with BeforeAndAfterEach with Matchers with GuiceOneServerPerSuite
     with GivenWhenThen {
 
-  implicit override lazy val app: Application = GuiceApplicationBuilder()
+  protected def appBuilder: GuiceApplicationBuilder = GuiceApplicationBuilder()
     .configure(
-      "cache.enabled"            -> true,
-      "auditing.enabled"                -> false,
-      "auditing.traceRequests"          -> false,
-      "mongodb.uri"                     -> "mongodb://localhost:27017/organisations-matching-api",
-      "microservice.services.auth.port" -> AuthStub.port,
+      "cache.enabled"                              -> true,
+      "auditing.enabled"                           -> false,
+      "auditing.traceRequests"                     -> false,
+      "mongodb.uri"                                -> "mongodb://localhost:27017/organisations-matching-api",
+      "microservice.services.auth.port"            -> AuthStub.port,
+      "microservice.services.internal-auth.port"   -> InternalAuthStub.port,
       "microservice.services.organisations-matching.port" -> MatchingStub.port,
-      "microservice.services.ifstub.port" -> IfStub.port,
-      "run.mode"                        -> "It",
-      "versioning.unversionedContexts"  -> List("/match-record")
+      "microservice.services.integration-framework.port" -> IfStub.port,
+      "run.mode"                                        -> "It",
+      "versioning.unversionedContexts"                  -> List("/match-record")
     )
-    .build()
+
+  implicit override lazy val app: Application = appBuilder.build()
 
   val timeout: FiniteDuration = Duration(5, TimeUnit.SECONDS)
   val serviceUrl = s"http://127.0.0.1:$port"
-  val mocks = Seq(AuthStub, IfStub, MatchingStub)
+  val mocks = Seq(AuthStub, InternalAuthStub, IfStub, MatchingStub)
   val authToken = "Bearer AUTH_TOKEN"
   val clientId = "CLIENT_ID"
   val acceptHeaderP1: (String, String) = ACCEPT -> "application/vnd.hmrc.1.0+json"
@@ -76,6 +80,18 @@ trait BaseSpec
 
   protected def invalidRequest(message: String) =
     s"""{"code":"INVALID_REQUEST","message":"$message"}"""
+
+  protected def withConfiguredServer[A](overrides: (String, Any)*)(f: String => A): A = {
+    val socket = new ServerSocket(0)
+    val freePort = socket.getLocalPort
+    socket.close()
+
+    val testApp = appBuilder.configure(overrides*).build()
+
+    Helpers.running(TestServer(freePort, testApp)) {
+      f(s"http://127.0.0.1:$freePort")
+    }
+  }
 
   override protected def beforeEach(): Unit = {
     mocks.foreach(m => if (!m.server.isRunning) m.server.start())
