@@ -16,7 +16,7 @@
 
 package unit.uk.gov.hmrc.organisationsmatchingapi.services
 
-import org.mockito.ArgumentMatchers.{any, eq => eqTo}
+import org.mockito.ArgumentMatchers.{any, eq as eqTo}
 import org.mockito.BDDMockito.`given`
 import org.scalatest.matchers.should.Matchers
 import org.scalatest.wordspec.AnyWordSpec
@@ -27,15 +27,16 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers.{await, defaultAwaitTimeout}
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.organisationsmatchingapi.cache.InsertResult
-import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
+import uk.gov.hmrc.organisationsmatchingapi.connectors.{HipConnector, IfConnector, OrganisationsMatchingConnector}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat._
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.*
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.VatMatch
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{VatKnownFacts, VatOrganisationsMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.services.{CacheService, MatchingService}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 import uk.gov.hmrc.play.http.HeaderCarrierConverter
 import unit.uk.gov.hmrc.organisationsmatchingapi.util.SpecBase
 
@@ -45,13 +46,17 @@ import scala.concurrent.Future
 
 class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with MockitoSugar {
   val mockIfConnector: IfConnector = mock[IfConnector]
+  val mockHipConnector: HipConnector = mock[HipConnector]
   val mockMatchingConnector: OrganisationsMatchingConnector = mock[OrganisationsMatchingConnector]
   val mockCacheService: CacheService = mock[CacheService]
+  val mockServicesConfig: ServicesConfig = mock[ServicesConfig]
 
   val matchingService = new MatchingService(
     mockIfConnector,
+    mockHipConnector,
     mockMatchingConnector,
-    mockCacheService
+    mockCacheService,
+    mockServicesConfig
   )
 
   val utr = "0123456789"
