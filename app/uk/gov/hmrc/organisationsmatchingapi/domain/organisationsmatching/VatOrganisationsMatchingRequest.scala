@@ -17,9 +17,9 @@
 package uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching
 
 import play.api.libs.json.{Json, OFormat}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformationSimplified
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfOrHipVatCustomerInformationSimplified
 
-case class VatOrganisationsMatchingRequest(matchData: VatKnownFacts, ifMatchData: IfVatCustomerInformationSimplified)
+case class VatOrganisationsMatchingRequest(matchData: VatKnownFacts, ifMatchData: IfOrHipVatCustomerInformationSimplified)
 
 object VatOrganisationsMatchingRequest {
   implicit val vatOrgsMatchingRequestFormat: OFormat[VatOrganisationsMatchingRequest] =

@@ -23,18 +23,21 @@ import java.util.UUID
 import javax.inject.Inject
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.organisationsmatchingapi.connectors.{IfConnector, OrganisationsMatchingConnector}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformationSimplified
+import uk.gov.hmrc.organisationsmatchingapi.connectors.{HipConnector, IfConnector, OrganisationsMatchingConnector}
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfOrHipVatCustomerInformationSimplified
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, CtOrganisationsMatchingRequest, SaKnownFacts, SaOrganisationsMatchingRequest, VatKnownFacts, VatOrganisationsMatchingRequest}
+import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class MatchingService @Inject() (
   ifConnector: IfConnector,
+  hipConnector: HipConnector,
   matchingConnector: OrganisationsMatchingConnector,
-  cacheService: CacheService
+  cacheService: CacheService,
+  servicesConfig: ServicesConfig
 )(implicit val ec: ExecutionContext) {
 
   def matchCoTax(matchId: UUID, correlationId: String, ctMatchingRequest: CtMatchingRequest)(implicit
@@ -92,6 +95,7 @@ class MatchingService @Inject() (
     hc: HeaderCarrier,
     header: RequestHeader
   ): Future[JsValue] = {
+    val useHipVat: Boolean = servicesConfig.getBoolean("features.hip.vat")
     val vrn = vatMatchingRequest.vrn
     val knownFacts = VatKnownFacts(
       vatMatchingRequest.vrn,
@@ -101,9 +105,12 @@ class MatchingService @Inject() (
     )
 
     for {
-      ifData       <- ifConnector.fetchVat(matchId.toString, vrn)
-      ifSimplified <- Future.fromTry(IfVatCustomerInformationSimplified.fromOriginalIfData(vrn, ifData).toTry)
-      request = VatOrganisationsMatchingRequest(knownFacts, ifSimplified)
+      ifOrHipData <- if (useHipVat)
+                  hipConnector.fetchVat(matchId.toString, vrn)
+                else
+                  ifConnector.fetchVat(matchId.toString, vrn)
+      ifOrHipSimplified <- Future.fromTry(IfOrHipVatCustomerInformationSimplified.fromOriginalIfData(vrn, ifOrHipData).toTry)
+      request = VatOrganisationsMatchingRequest(knownFacts, ifOrHipSimplified)
       matched <- matchingConnector.matchCycleVat(matchId, correlationId, request)
       _       <- cacheService.cacheVatVrn(VatMatch(matchId, Some(vrn)))
     } yield matched
