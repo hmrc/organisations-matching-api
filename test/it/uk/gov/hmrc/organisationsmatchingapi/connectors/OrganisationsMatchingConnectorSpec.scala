@@ -37,7 +37,7 @@ import uk.gov.hmrc.organisationsmatchingapi.connectors.OrganisationsMatchingConn
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.common.IfAddress
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.ct.{IfCorpTaxCompanyDetails, IfNameAndAddressDetails, IfNameDetails}
 import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.sa.{IfSaTaxpayerDetails, IfSaTaxpayerNameAddress}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformationSimplified
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfOrHipVatCustomerInformationSimplified
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching._
 import uk.gov.hmrc.play.bootstrap.config.ServicesConfig
@@ -451,7 +451,7 @@ class OrganisationsMatchingConnectorSpec
   "matchCycleVat" should {
     val matchingRequest = VatOrganisationsMatchingRequest(
       VatKnownFacts("vrn", "org", "line1", "postcode"),
-      IfVatCustomerInformationSimplified("vrn", "org", Some("line1"), Some("postcode"))
+      IfOrHipVatCustomerInformationSimplified("vrn", "org", Some("line1"), Some("postcode"))
     )
 
     def orgsMatchingVatUrl(matchId: UUID, correlationId: UUID) =

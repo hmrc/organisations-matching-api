@@ -176,7 +176,7 @@ class MatchingServiceSpec extends AnyWordSpec with SpecBase with Matchers with M
         .willReturn(Future.successful(ifResponse))
       val orgsMatchingRequest = VatOrganisationsMatchingRequest(
         VatKnownFacts(request.vrn, request.organisationName, request.addressLine1, request.postcode),
-        IfVatCustomerInformationSimplified(
+        IfOrHipVatCustomerInformationSimplified(
           request.vrn,
           ifResponse.approvedInformation.customerDetails.organisationName.get,
           ifResponse.approvedInformation.PPOB.address.flatMap(_.line1),

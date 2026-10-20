@@ -18,26 +18,26 @@ package uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat
 
 import play.api.libs.json.{Json, OFormat}
 
-case class IfVatCustomerInformationSimplified(
+case class IfOrHipVatCustomerInformationSimplified(
   vrn: String,
   organisationName: String,
   addressLine1: Option[String],
   postcode: Option[String]
 )
 
-object IfVatCustomerInformationSimplified {
-  implicit val ifVatCustomerInformationSimplifiedFormat: OFormat[IfVatCustomerInformationSimplified] =
-    Json.format[IfVatCustomerInformationSimplified]
+object IfOrHipVatCustomerInformationSimplified {
+  implicit val ifOrHipVatCustomerInformationSimplifiedFormat: OFormat[IfOrHipVatCustomerInformationSimplified] =
+    Json.format[IfOrHipVatCustomerInformationSimplified]
 
   def fromOriginalIfData(
     vrn: String,
     data: IfVatCustomerInformation
-  ): Either[Exception, IfVatCustomerInformationSimplified] =
+  ): Either[Exception, IfOrHipVatCustomerInformationSimplified] =
     for {
       organisationName <-
-        data.approvedInformation.customerDetails.organisationName.toRight(missingIfData("organisationName"))
-      address <- data.approvedInformation.PPOB.address.toRight(missingIfData("address"))
-    } yield IfVatCustomerInformationSimplified(vrn, organisationName, address.line1, address.postCode)
+        data.approvedInformation.customerDetails.organisationName.toRight(missingIfOrHipData("organisationName"))
+      address <- data.approvedInformation.PPOB.address.toRight(missingIfOrHipData("address"))
+    } yield IfOrHipVatCustomerInformationSimplified(vrn, organisationName, address.line1, address.postCode)
 
-  private def missingIfData(field: String): Exception = new Exception(s"Missing IF data $field")
+  private def missingIfOrHipData(field: String): Exception = new Exception(s"Missing IF or HIP data $field")
 }

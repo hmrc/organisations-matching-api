@@ -24,7 +24,7 @@ import javax.inject.Inject
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.organisationsmatchingapi.connectors.{HipConnector, IfConnector, OrganisationsMatchingConnector}
-import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfVatCustomerInformationSimplified
+import uk.gov.hmrc.organisationsmatchingapi.domain.integrationframework.vat.IfOrHipVatCustomerInformationSimplified
 import uk.gov.hmrc.organisationsmatchingapi.domain.models.{CtMatch, SaMatch, VatMatch}
 import uk.gov.hmrc.organisationsmatchingapi.domain.ogd.{CtMatchingRequest, SaMatchingRequest, VatMatchingRequest}
 import uk.gov.hmrc.organisationsmatchingapi.domain.organisationsmatching.{CtKnownFacts, CtOrganisationsMatchingRequest, SaKnownFacts, SaOrganisationsMatchingRequest, VatKnownFacts, VatOrganisationsMatchingRequest}
@@ -105,12 +105,12 @@ class MatchingService @Inject() (
     )
 
     for {
-      ifData <- if (useHipVat)
+      ifOrHipData <- if (useHipVat)
                   hipConnector.fetchVat(matchId.toString, vrn)
                 else
                   ifConnector.fetchVat(matchId.toString, vrn)
-      ifSimplified <- Future.fromTry(IfVatCustomerInformationSimplified.fromOriginalIfData(vrn, ifData).toTry)
-      request = VatOrganisationsMatchingRequest(knownFacts, ifSimplified)
+      ifOrHipSimplified <- Future.fromTry(IfOrHipVatCustomerInformationSimplified.fromOriginalIfData(vrn, ifOrHipData).toTry)
+      request = VatOrganisationsMatchingRequest(knownFacts, ifOrHipSimplified)
       matched <- matchingConnector.matchCycleVat(matchId, correlationId, request)
       _       <- cacheService.cacheVatVrn(VatMatch(matchId, Some(vrn)))
     } yield matched
