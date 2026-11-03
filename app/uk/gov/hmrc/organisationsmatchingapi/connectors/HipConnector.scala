@@ -18,7 +18,6 @@ package uk.gov.hmrc.organisationsmatchingapi.connectors
 
 import play.api.mvc.RequestHeader
 import uk.gov.hmrc.http.*
-import uk.gov.hmrc.http.HttpReads.Implicits.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.organisationsmatchingapi.audit.AuditHelper
 import uk.gov.hmrc.organisationsmatchingapi.domain.hip.HipSuccessWrapper
@@ -31,6 +30,7 @@ import java.time.temporal.ChronoUnit
 import java.util.Base64
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import scala.util.Try
 
 class HipConnector @Inject() (
   servicesConfig: ServicesConfig,
@@ -47,6 +47,21 @@ class HipConnector @Inject() (
   def hipAuthorizationToken: String =
     Base64.getEncoder.encodeToString(s"$hipClientIdV1:$hipSecretV1".getBytes("UTF-8"))
 
+  implicit val hipReads: HttpReads[HipSuccessWrapper] = new HttpReads[HipSuccessWrapper] {
+    override def read(method: String, url: String, response: HttpResponse): HipSuccessWrapper = {
+      val isHipNotFoundError = response.status == 422 && Try {
+        (response.json \ "error" \ "code").asOpt[String].contains("002")
+      }.getOrElse(false)
+
+      if (isHipNotFoundError) {
+        logger.warn(s"$apiName NotFoundException encountered through 422 002 , which is translated to a 404")
+        throw UpstreamErrorResponse(response.body, 404, 404)
+      } else {
+        HttpReads.Implicits.readFromJson[HipSuccessWrapper].read(method, url, response)
+      }
+    }
+  }
+
   override def fetchVat(matchId: String, vrn: String)(implicit
     hc: HeaderCarrier,
     request: RequestHeader
@@ -56,7 +71,7 @@ class HipConnector @Inject() (
     val requestExecution = http
       .get(url"$vatUrl")
       .setHeader(setHeaders(request)*)
-      .execute[HipSuccessWrapper]
+      .execute[HipSuccessWrapper](using hipReads, ec)
       .map(res => auditResponse[IfVatCustomerInformation](vatUrl, matchId)(res.success))
 
     recover[IfVatCustomerInformation](

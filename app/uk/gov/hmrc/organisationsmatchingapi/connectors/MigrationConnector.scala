@@ -26,7 +26,6 @@ import uk.gov.hmrc.organisationsmatchingapi.domain.models.MatchingException
 import uk.gov.hmrc.organisationsmatchingapi.play.RequestHeaderUtils.validateCorrelationId
 
 import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Try
 
 trait MigrationConnector extends Logging {
 
@@ -73,28 +72,6 @@ trait MigrationConnector extends Logging {
       auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
       logger.warn(s"$apiName NotFoundException encountered through 404")
       Future.failed(new MatchingException)
-
-    case UpstreamErrorResponse(msg, 422, _, _) =>
-      // Check if this is the specific HIP 422 error code '002'
-      def extractHipErrorCode(msg: String): Option[String] = {
-        val JsonBodyRegex = """(\{.*\})""".r
-        for {
-          jsonStr <- JsonBodyRegex.findFirstIn(msg)
-          json    <- Try(Json.parse(jsonStr)).toOption
-          code    <- (json \ "error" \ "code").asOpt[String]
-        } yield code
-      }
-      val isHipNotFoundError = extractHipErrorCode(msg).contains("002")
-
-      if (isHipNotFoundError) {
-        auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
-        logger.warn(s"$apiName NotFoundException encountered through 422")
-        Future.failed(new MatchingException)
-      } else {
-        logger.warn(s"$apiName Upstream4xxResponse through 422 encountered: $msg")
-        auditHelper.auditIfApiFailure(correlationId, matchId, request, requestUrl, msg)
-        Future.failed(new InternalServerException("Something went wrong."))
-      }
 
     case UpstreamErrorResponse.Upstream5xxResponse(m) =>
       logger.warn(s"$apiName Upstream5xxResponse encountered: ${m.statusCode}")
