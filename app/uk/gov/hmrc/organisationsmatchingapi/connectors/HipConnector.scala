@@ -66,7 +66,7 @@ class HipConnector @Inject() (
     hc: HeaderCarrier,
     request: RequestHeader
   ): Future[IfVatCustomerInformation] = {
-    val vatUrl = s"$baseUrl/etmp/RestAdapter/vat/subscription/vrn/$vrn"
+    val vatUrl = s"$baseUrl/etmp/RESTAdapter/vat/subscription/vrn/$vrn"
 
     val requestExecution = http
       .get(url"$vatUrl")

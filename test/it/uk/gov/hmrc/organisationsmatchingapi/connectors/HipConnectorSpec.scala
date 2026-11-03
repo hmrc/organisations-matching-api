@@ -73,7 +73,7 @@ class HipConnectorSpec
 
   "fetch VAT" should {
     val vrn = "123456789"
-    val vatUrl = s"/etmp/RestAdapter/vat/subscription/vrn/$vrn"
+    val vatUrl = s"/etmp/RESTAdapter/vat/subscription/vrn/$vrn"
 
     "return data on successful request" in new Setup {
       val ifResponse = IfVatCustomerInformation(
